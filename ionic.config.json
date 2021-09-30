@@ -1,0 +1,7 @@
+{
+  "name": "RRPS",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
