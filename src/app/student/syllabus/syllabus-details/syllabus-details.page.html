@@ -8,28 +8,21 @@
 </ion-header>
 
 <ion-content>
-  <ion-card (click)="show(0)" >
+  <ion-card (click)="show(i)" *ngFor="let syllabus of syllabusData; let i = index">
     <ion-card-header>
       <ion-card-title>
-        How to book a service?
+        {{syllabus.subject_unit.unit_no}} - {{syllabus.subject_unit.unit_name}}
       </ion-card-title>
-      <ion-icon slot='end' name='arrow-dropdown'></ion-icon>
+      <ion-icon slot="end" name="arrow-down-circle-outline" color="light"></ion-icon>
     </ion-card-header>
-    <ion-card-content *ngIf="sylExpand[0]">
-      <ion-text>
+    <ion-card-content *ngIf="sylExpand[i]">
+      <ion-text *ngFor="let inner of syllabus.chapter_notes">
         <p>
-          You can follow the below steps to book a service:
+          {{inner.subject_chapter.chapter_name}} -  {{inner.subject_chapter.chapter_no}}
         </p>
-        <ol class="ion-text-wrap ion-text-left">
-          <li>Search for the Service you need.</li>
-          <li>Open the Service and follow the instructions as you go forward.</li>
-          <li>Once you have booked the service, wait for Your MaintenanceWala to be assigned. A verified MaintenanceWala
-            will be assigned to you 1 hour before the booked time.</li>
-          <li>Your MaintenanceWala will reach the address you have provided and deliver the service.</li>
-        </ol>
-        <p>
-          For any further queries, please connect on the helpline number.
-        </p>
+        <ul class="ion-text-wrap ion-text-left">
+          <li><a [href]="syllabus.noteURL+inner.notes">Download Notes</a></li>
+        </ul>
       </ion-text>
     </ion-card-content>
   </ion-card>

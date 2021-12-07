@@ -9,64 +9,23 @@
 
 <ion-content>
   <ion-list>
-    <ion-item-divider  color="primary">
-      <ion-label>
-        Monthly -1
-      </ion-label>
-    </ion-item-divider>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Mathematics
-        <span> 20-Jul-2021, 40/45 (88.89 %)</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="secondary">Key</ion-button>
-      </div>
-    </ion-item>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Physics
-        <span> Units- 5, Chapters- 10</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary">View</ion-button>
-      </div>
-    </ion-item>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Chemistry
-        <span> Units- 5, Chapters- 10</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary">View</ion-button>
-      </div>
-    </ion-item>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Biology
-        <span> Units- 5, Chapters- 10</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary">View</ion-button>
-      </div>
-    </ion-item>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Economics
-        <span> Units- 5, Chapters- 10</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary">View</ion-button>
-      </div>
-    </ion-item>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Physical Education
-        <span> Units- 5, Chapters- 10</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary">View</ion-button>
-      </div>
-    </ion-item>
+    <ng-container *ngFor="let examT of examtitleData;">
+      <ion-item-divider  color="primary">
+        <ion-label>
+          {{examT.exam_title.title}}
+        </ion-label>
+      </ion-item-divider>
+      <ng-container *ngFor="let exam of examData;">
+        <ion-item lines="none" class="item-text-wrap" *ngIf="examT.exam_title_id===exam.exam_title_id">
+          <ion-label>
+            {{exam.subject.subject_name}}
+            <span> {{exam.exam_date | date}}, {{exam.exam_students[0].obtained_marks}}/{{exam.exam_students[0].total_marks}} ({{exam.exam_students[0].percentage}} %)</span>
+          </ion-label>
+          <!-- <div class="item-note" slot="end">
+            <ion-button color="secondary">Key</ion-button>
+          </div> -->
+        </ion-item>
+      </ng-container>
+    </ng-container>
   </ion-list>
 </ion-content>

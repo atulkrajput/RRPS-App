@@ -13,7 +13,7 @@ export class SyllabusDetailsPage implements OnInit {
   sylExpand: boolean[] = [ false, false, false, false, false, false, false, false, false, false, false, false];
   syllabusId = null;
   syllabusData = null;
-  subjectName = null;
+  subjectName = '...';
   constructor(
     private route: ActivatedRoute,
     private constants: ConstantsService,
@@ -31,9 +31,9 @@ export class SyllabusDetailsPage implements OnInit {
     const loader = await this.constants.getLoader();
     this.api.syllabusDetails(sDetails.id,sid).subscribe(async (result: any) => {
       await loader.dismiss();
-      console.log(result.data);
+      //console.log(result.data[0].subject.subject_name);
       this.syllabusData = result.data;
-      this.subjectName = result.data[0].subjects.subject_name;
+      this.subjectName = result.data[0].subject.subject_name;
     }, async (error) => {
       await  loader.dismiss();
       this.constants.presentToast('Unable To get Syllabus Details. Check Your Internet Connection.');

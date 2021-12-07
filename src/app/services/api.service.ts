@@ -98,4 +98,10 @@ export class ApiService {
     const link = this.baseUrl + 'feedback/';
     return this.http.post(link, { student_id : id});
   }
+
+  exam(id: number)
+  {
+    const link = this.baseUrl + 'examhistory/';
+    return this.http.post(link, { student_id : id});
+  }
 }
