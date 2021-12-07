@@ -29,6 +29,7 @@ export class SyllabusPage implements OnInit {
     this.api.syllabus(sDetails.id).subscribe(async (result: any) => {
       await loader.dismiss();
       this.syllabusData = result.data;
+      //console.log(result.data);
     }, async (error) => {
       await  loader.dismiss();
       this.constants.presentToast('Unable To get Syllabus Data. Check Your Internet Connection.');
@@ -37,7 +38,6 @@ export class SyllabusPage implements OnInit {
 
   syllabusDetails(id: number)
   {
-    console.log(id);
-    this.router.navigate(['/syllabus/syllabus-details/:'+id]);
+    this.router.navigate(['/syllabus/syllabus-details/'+id]);
   }
 }
