@@ -1,4 +1,14 @@
 npm i moment ionic2-calendar
 
 Storage
-npm install @capacitor/storage
+    npm install @capacitor/storage
+
+Push Notifications
+    npm install @capacitor/push-notifications
+    npm install @capacitor/local-notifications
+
+Firebase Analytics
+    npm install @capacitor-community/firebase-analytics@latest  
+
+For Network
+    npm install @capacitor/network

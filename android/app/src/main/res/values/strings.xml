@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">RRPS</string>
+    <string name="title_activity_main">RRPS</string>
+    <string name="package_name">com.doonportal.rrps</string>
+    <string name="custom_url_scheme">com.doonportal.rrps</string>
+</resources>

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { ApiService } from '../services/api.service';
-import { ConstantsService } from '../services/constants.service';
+import { Network } from '@capacitor/network';
 import { Storage } from '@capacitor/storage';
 import { NavController } from '@ionic/angular';
+import { ApiService } from '../services/api.service';
+import { ConstantsService } from '../services/constants.service';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +18,6 @@ export class LoginPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private constants: ConstantsService,
-    private router: Router,
     private api: ApiService,
     private navController: NavController,
     ) {
@@ -34,6 +33,8 @@ export class LoginPage implements OnInit {
   async login() {
     this.loginFormSubmit = true;
     if(this.loginForm.valid) {
+      let connected = await Network.getStatus();
+      if (connected.connected) {
         const loader = await this.constants.getLoader();
         await loader.present();
         this.api.login(this.loginForm.value).subscribe(async (result: any) => {
@@ -72,8 +73,11 @@ export class LoginPage implements OnInit {
           }
         }, async (error) => {
           await  loader.dismiss();
-          this.constants.presentToast('Unable To Login. Check Your Internet Connection.');
+          this.constants.presentToast('Unable to login. Please try again later');
         });
+      } else {
+        this.constants.presentToast("Check your internet connection.");
+      }
     }
   }
 }

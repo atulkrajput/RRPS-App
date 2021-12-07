@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-title></ion-title>
   </ion-toolbar>
-  <img src="../../assets/imgs/logo.png" width="150px">
+  <img src="assets/imgs/logo.png" width="150px">
   <h3>Welcome Dear Student/Guardian</h3>
 </ion-header>
 
@@ -18,7 +18,6 @@
               <ion-label mode="md" position="floating">Reg Id</ion-label>
               <ion-input mode="md" type="text" formControlName="regid"></ion-input>
             </div>
-
           </div>
         </ion-item>
         <div class="error-div" *ngIf="loginForm.get('regid').errors && ( loginForm.get('regid').dirty || loginForm.get('regid').touched || loginFormSubmit)">

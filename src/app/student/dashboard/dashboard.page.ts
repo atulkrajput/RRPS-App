@@ -1,7 +1,6 @@
-import { AfterContentInit, AfterViewInit, Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { Storage } from '@capacitor/storage';
-import { AlertController, MenuController } from '@ionic/angular';
+import { AlertController, MenuController, NavController } from '@ionic/angular';
 import { StudentBasicData } from 'src/app/interfaces/student_basic_data';
 import { ApiService } from 'src/app/services/api.service';
 import { ConstantsService } from 'src/app/services/constants.service';
@@ -19,7 +18,7 @@ export class DashboardPage implements OnInit {
     private api: ApiService,
     private alertCtrl: AlertController,
     private menuController: MenuController,
-    private router: Router
+    private navCtrl: NavController
     ) {
     this.menuController.enable(true);
     this.studentBasicData = ConstantsService.studentBasicData;
@@ -32,7 +31,6 @@ export class DashboardPage implements OnInit {
   ionViewWillEnter() {
     this.studentBasicData = ConstantsService.studentBasicData;
     this.profilePic =  this.api.profilePicUrl + this.studentBasicData.profilePic+ '?Date=' + Date.now();
-
   }
 
   async logOut() {
@@ -49,7 +47,7 @@ export class DashboardPage implements OnInit {
           handler: async () => {
             await Storage.clear();
             ConstantsService.studentBasicData = undefined;
-            this.router.navigate(['/login']);
+            this.navCtrl.navigateRoot(['/login']);
           }
         }
       ]

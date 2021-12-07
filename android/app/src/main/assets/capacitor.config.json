@@ -1,0 +1,21 @@
+{
+	"appId": "com.doonportal.rrps",
+	"appName": "RRPS",
+	"webDir": "www",
+	"bundledWebRuntime": false,
+	"plugins": {
+		"PushNotifications": {
+			"presentationOptions": [
+				"badge",
+				"sound",
+				"alert"
+			]
+		},
+		"SplashScreen": {
+			"showSpinner": false
+		}
+	},
+	"server": {
+		"url": "http://192.168.137.1:8100"
+	}
+}

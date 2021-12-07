@@ -6,8 +6,8 @@ export const environment = {
   production: false,
 
   //serverUrl: 'http://192.168.1.1/rrps/'
-  //serverUrl:  'https://rrpublicschool.com/'
-  serverUrl: 'http://localhost/rrps/'
+  serverUrl:  'https://rrpublicschool.com/'
+  // serverUrl: 'http://localhost/rrps/'
 };
 
 /*
