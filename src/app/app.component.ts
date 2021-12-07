@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Component } from '@angular/core';
 import { MenuController, Platform } from '@ionic/angular';
-// import { SplashScreen } from '@ionic-native/splash-screen/ngx';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Router } from '@angular/router';
 import { Storage } from '@capacitor/storage';
 import { ConstantsService } from './services/constants.service';
@@ -19,8 +17,6 @@ export class AppComponent {
     private router: Router,
     private platform: Platform,
     private menuCtrl: MenuController,
-    // private splashScreen: SplashScreen,
-    private statusBar: StatusBar,
     // private authenticationService: AuthenticationService
   ) {
     this.initializeApp();
@@ -28,8 +24,6 @@ export class AppComponent {
 
     initializeApp() {
       this.platform.ready().then(async () => {
-        this.statusBar.styleDefault();
-        //this.splashScreen.hide();
         let studentData = null;
         try{
           studentData = JSON.parse((await Storage.get({
