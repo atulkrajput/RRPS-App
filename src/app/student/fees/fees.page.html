@@ -20,28 +20,36 @@
           <ion-card-content>
             <div class="details">
               <ion-grid>
-                <ion-row>
+                <ion-row *ngIf="feeOldbalance !== 0">
                   <ion-col size='5'>
                     Old Balance
                   </ion-col>
                   <ion-col size='6' class="ion-text-wrap ion-text-capitalize ion-no-margin">
-                    0
+                    {{feeOldbalance}}
                   </ion-col>
                 </ion-row>
-                <ion-row>
+                <ion-row *ngIf="feeRegistration !== 0">
                   <ion-col size='5'>
-                    Monthly Fee
+                    Registration
                   </ion-col>
-                  <ion-col size='6' class="ion-text-wrap ion-no-margin">
-                    6018
+                  <ion-col size='6' class="ion-text-wrap ion-text-capitalize ion-no-margin">
+                    {{feeRegistration}}
                   </ion-col>
                 </ion-row>
-                <ion-row>
+                <ion-row *ngIf="feeAdmission !== 0">
                   <ion-col size='5'>
-                    Transport Fee
+                    Admission
                   </ion-col>
-                  <ion-col size='6' class="ion-text-wrap ion-no-margin">
-                    0
+                  <ion-col size='6' class="ion-text-wrap ion-text-capitalize ion-no-margin">
+                    {{feeAdmission}}
+                  </ion-col>
+                </ion-row>
+                <ion-row *ngIf="feeTuition !== 0">
+                  <ion-col size='5'>
+                    Tuition
+                  </ion-col>
+                  <ion-col size='6' class="ion-text-wrap ion-text-capitalize ion-no-margin">
+                    {{feeTuition}}
                   </ion-col>
                 </ion-row>
                 <ion-row>
@@ -49,11 +57,11 @@
                     Total Fee
                   </ion-col>
                   <ion-col size='6' class="ion-text-wrap ion-no-margin">
-                    6018
+                    {{feeTuition+feeAdmission+feeRegistration+feeOldbalance}}
                   </ion-col>
                 </ion-row>
               </ion-grid>
-              <ion-button size="small" slot="end">Pay now</ion-button>
+              <ion-button size="small" slot="end" [disabled]="true">Pay now</ion-button>
             </div>
           </ion-card-content>
         </ion-card>
@@ -68,9 +76,8 @@
   <ion-list>
     <ion-item lines="none" class="item-text-wrap" *ngFor="let feeH of feeHistoryData">
       <ion-label>
-        <div *ngIf="feeH.fee_type === 1">Tution Fee - Rs. {{feeH.fees_deposited}}</div>
-        <span *ngIf="feeH.fee_type === 2">Transport Fee - Rs. {{feeH.fees_deposited}}</span>
-        <span> CASH, {{feeH.fee_deposit_date | date}}</span>
+        <div>{{paymentType[feeH.payment_type]}}- Rs. {{feeH.payment_amount}}</div>
+        <span> {{paymentMode[feeH.payment_mode]}}, {{feeH.payment_date | date}}</span>
       </ion-label>
       <div class="item-note" slot="end">
         <ion-button color="primary" [disabled]="true">Receipt</ion-button>
