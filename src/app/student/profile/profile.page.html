@@ -1,0 +1,43 @@
+<ion-header class="ion-no-border header-bg">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Welcome</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <div class="profile-bg">
+    <!-- <img [src]="profilePic"  onerror='this.src="assets/imgs/profile.png"' width="50px"> -->
+  </div>
+  <div class="ion-text-center">
+    <p>Reg No: {{studentProfileData.reg_id}}</p>
+    <h3 class="ion-text-capitalize">{{studentProfileData.prefix}} {{studentProfileData.sname}}</h3>
+  </div>
+  <ion-list class="ion-padding">
+    <ion-item>
+      <ion-label position="floating">Class Section</ion-label>
+      <ion-input value="Class 12 B"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Father Name</ion-label>
+      <ion-input  class="ion-text-capitalize" value="{{studentProfileData.father_name}}"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Mother Name</ion-label>
+      <ion-input  class="ion-text-capitalize" value="{{studentProfileData.mother_name}}"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Contact no</ion-label>
+      <ion-input value="{{studentProfileData.father_name}}"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">DOB</ion-label>
+      <ion-input value="{{studentProfileData.dob}}"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="floating">Address</ion-label>
+      <ion-input value="{{studentProfileData.address}}"></ion-input>
+    </ion-item>
+  </ion-list>
+  </ion-content>

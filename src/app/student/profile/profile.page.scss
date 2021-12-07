@@ -1,0 +1,29 @@
+.header-bg{
+  --background: var(--ion-color-secondary);
+  --background-image: linear-gradient(to right, #f78ca0, #f9748f, #fd868c, #fe9a8b);
+}
+.profile-bg{
+  width: 100%;
+  display: block;
+  background: var(--ion-color-secondary);
+  background-image: linear-gradient(to right, #f78ca0, #f9748f, #fd868c, #fe9a8b);
+  text-align: center;
+  img{
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      margin: 10px auto;
+  }
+}
+h3{
+  font-size: 1.45rem;
+  color: #70041b;
+}
+ion-label{
+  color: #8f8f8f !important;
+}
+ion-button{
+  width: 100%;
+  height: 50px;
+  font-size: 1rem;
+}

@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Attendances</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-grid class="ion-margin">
+    <ion-row>
+      <ion-col>M-Y</ion-col>
+      <ion-col>Days</ion-col>
+      <ion-col>P</ion-col>
+      <ion-col>%</ion-col>
+    </ion-row>
+    <ion-row *ngFor="let adata of attendancesData; index as i">
+      <ion-col>{{ adata.month_name }}-{{ adata.year }}</ion-col>
+      <ion-col>{{ adata.total - adata.holidays}}</ion-col>
+      <ion-col>{{ adata.present }}</ion-col>
+      <ion-col>{{ adata.present/adata.total * 100 | number: '2.0-0' }}%</ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -1,0 +1,98 @@
+.dash-bg{
+  background: url('../../../assets/imgs/app-dash-bg.png') 0 0/100% 100% no-repeat;
+  height: 250px;
+  background-color: white;
+  ion-toolbar {
+    --background: transparent;
+    --ion-color-base: transparent !important;
+  }
+  ion-title{
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px black;
+  }
+  .ricon{
+    margin: 0 10px;
+    ion-icon{
+      color: val(--primary);
+    }
+  }
+}
+
+.dash-head{
+  padding: 10px;
+  h3{
+    color: var(--primary);
+    text-align: center;
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 2px black;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .dash-left{
+    float: left;
+    padding-left: 10%;
+    color: white;
+    h4{
+      font-size: 0.8rem;
+      font-weight: normal;
+      line-height: 1.2rem;
+      text-shadow: 1px 1px 2px black;
+    }
+    img{
+      margin-top: 16px;
+    }
+  }
+  .dash-right{
+    padding-left: 10px;
+    float: right;
+    ion-button{
+      margin: 25px 0 0;
+
+    }
+  }
+}
+
+.dash-row-icon{
+  margin: 0 16px 0 16px !important;
+  ion-col{
+      &.border-top {
+          border-top: 1px solid gray;
+      }
+      &.border-right {
+          border-right: 1px solid gray;
+      }
+
+      ion-item {
+          --padding-bottom:0;
+          --padding-start	:0;
+          --padding-end	:0;
+          --padding-top	:0;
+          --inner-padding-bottom:0;
+          --inner-padding-start:0;
+          --inner-padding-end:0;
+          --inner-padding-top:0;
+          ion-label{
+              display: grid;
+              margin: 5px;
+              padding: 0;
+              img{
+                //box-shadow: rgba(9, 30, 66, 0.25) 0px 1px 1px, rgba(9, 30, 66, 0.13) 0px 0px 1px 1px;
+                width: 80%;
+                margin: 0 auto;
+              }
+              ion-text {
+                  font-size: 11px;
+                  font-weight: bolder;
+              }
+          }
+      }
+  }
+}
+.dash-box{
+  // background-image: linear-gradient(to right, #f78ca0 0%, #f9748f 19%, #fd868c 60%, #fe9a8b 100%);
+  border-radius: 5px;
+  color: #000;
+
+  padding: 5px;
+  font-size: large;
+}

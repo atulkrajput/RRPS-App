@@ -1,0 +1,69 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>All Homework</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-segment [(ngModel)]="homeworkTabs" lines="none" mode="md">
+    <ion-segment-button class="ion-text-start" value="today" mode="md">
+        <ion-label>{{'today'}}</ion-label>
+    </ion-segment-button>
+    <ion-segment-button class="ion-text-start" value="yesterday" mode="md">
+        <ion-label>{{'yesterday'}}</ion-label>
+    </ion-segment-button>
+    <ion-segment-button class="ion-text-start" value="past" mode="md">
+      <ion-label>{{'past'}}</ion-label>
+  </ion-segment-button>
+  </ion-segment>
+  <div class="tab_container" [ngSwitch]="homeworkTabs">
+    <ion-list lines="none" *ngSwitchCase="'today'">
+      <ion-item class="pending" *ngFor ="let tdata of hwtodayData" (click)="homeworkDetails()">
+        <div class="item_inner d-flex">
+            <div class="text_box">
+                <h2 class="d-flex"><span>{{tdata.subject.subject_name}} By {{tdata.staff.name}}</span>
+                </h2>
+                <h3 class="d-flex">{{tdata.start_date}} to {{tdata.end_date}}
+                  <span class="end" *ngIf="tdata.status===0">In Process</span>
+                  <span class="end" *ngIf="tdata.status===1">Completed</span>
+                </h3>
+                <div class="d-flex boxInnerdiv" [innerHTML]="tdata.homework"></div>
+            </div>
+        </div>
+      </ion-item>
+    </ion-list>
+    <ion-list lines="none" *ngSwitchCase="'yesterday'">
+      <ion-item class="pending" *ngFor ="let ydata of hwydayData" (click)="homeworkDetails()">
+        <div class="item_inner d-flex">
+            <div class="text_box">
+                <h2 class="d-flex"><span>{{ydata.subject.subject_name}} By {{ydata.staff.name}}</span>
+                </h2>
+                <h3 class="d-flex">{{ydata.start_date}} to {{ydata.end_date}}
+                  <span class="end" *ngIf="ydata.status===0">In Process</span>
+                  <span class="end" *ngIf="ydata.status===1">Completed</span>
+                </h3>
+                <div class="d-flex boxInnerdiv" [innerHTML]="ydata.homework"></div>
+            </div>
+        </div>
+      </ion-item>
+    </ion-list>
+    <ion-list lines="none" *ngSwitchCase="'past'">
+      <ion-item class="pending" *ngFor ="let pdata of hwpastData" (click)="homeworkDetails()">
+        <div class="item_inner d-flex">
+            <div class="text_box">
+                <h2 class="d-flex"><span>{{pdata.subject.subject_name}} By {{pdata.staff.name}}</span>
+                </h2>
+                <h3 class="d-flex">{{pdata.start_date}} to {{pdata.end_date}}
+                  <span class="end" *ngIf="pdata.status===0">In Process</span>
+                  <span class="end" *ngIf="pdata.status===1">Completed</span>
+                </h3>
+                <div class="d-flex boxInnerdiv" [innerHTML]="pdata.homework"></div>
+            </div>
+        </div>
+      </ion-item>
+  </ion-list>
+</div>
+</ion-content>

@@ -1,0 +1,19 @@
+ion-list{
+  ion-item{
+    border-bottom: 2px dotted var(--ion-color-medium);
+    ion-label{
+      color: var(--ion-color-primary);
+      span{
+        display: block;
+        font-size: 10px;
+        color: #424242;
+      }
+    }
+  }
+
+}
+ion-item-divider{
+  margin: 0 !important;
+  color: #fff;
+  font-size: 1.15rem;
+}

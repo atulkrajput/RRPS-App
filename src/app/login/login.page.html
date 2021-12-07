@@ -1,0 +1,63 @@
+<ion-header class="login-bg">
+  <ion-toolbar>
+    <ion-title></ion-title>
+  </ion-toolbar>
+  <img src="../../assets/imgs/logo.png" width="150px">
+  <h3>Welcome Dear Student/Guardian</h3>
+</ion-header>
+
+<ion-content fullscreen>
+  <div class="form">
+    <h4>Please enter your details to continue.</h4>
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+      <ion-list lines="none">
+        <ion-item>
+          <div class="item_inner d-flex">
+            <ion-icon name="person-circle-outline"></ion-icon>
+            <div class="input_field">
+              <ion-label mode="md" position="floating">Reg Id</ion-label>
+              <ion-input mode="md" type="text" formControlName="regid"></ion-input>
+            </div>
+
+          </div>
+        </ion-item>
+        <div class="error-div" *ngIf="loginForm.get('regid').errors && ( loginForm.get('regid').dirty || loginForm.get('regid').touched || loginFormSubmit)">
+          <p class='error' *ngIf="loginForm.get('regid').hasError('required')">Enter your registration id.</p>
+        </div>
+        <ion-item>
+          <div class="item_inner d-flex">
+            <ion-icon name="key-outline"></ion-icon>
+            <div class="input_field">
+              <ion-label mode="md" position="floating">Password</ion-label>
+              <ion-input mode="md" formControlName='password' type="password"></ion-input>
+            </div>
+          </div>
+        </ion-item>
+        <div class="error-div" *ngIf="loginForm.get('password').errors && (loginForm.get('password').dirty || loginForm.get('password').touched || loginFormSubmit)">
+          <p class='error' *ngIf="loginForm.get('password').hasError('required')">Enter your password.</p>
+        </div>
+        <div lines="none">
+          <ion-button expand='block' type="submit" color="primary">Login</ion-button>
+        </div>
+      </ion-list>
+    </form>
+  </div>
+  <p>Please contact school admin in case you don't know your regid/password. <br> By login user is Agree to our terms
+    &conditions.</p>
+  <p>Powered By: Doon Portal</p>
+  <ion-footer>
+    <ion-toolbar>
+      <ion-row>
+        <ion-col size="4">
+          <ion-button fill="clear" size="small" width="30%" routerLink="/about">About Us</ion-button>
+        </ion-col>
+        <ion-col size="4">
+          <ion-button fill="clear" size="small" width="30%" routerLink="/terms">Terms</ion-button>
+        </ion-col>
+        <ion-col size="4">
+          <ion-button fill="clear" size="small" width="30%" routerLink="/privacy">Privacy</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-toolbar>
+  </ion-footer>
+</ion-content>

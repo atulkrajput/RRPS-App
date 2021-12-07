@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Teacher Feedbacks</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item lines="none" class="item-text-wrap" *ngFor="let feedback of feedbackData">
+      <ion-label> Hello
+        {{feedback.id}}
+        <!-- <span>{{acomplaint.complaint_desc}}</span>
+        <span>Reply: {{acomplaint.complaint_reply}}</span>
+        <span>Complain By: {{acomplaint.staff.name}}</span> -->
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

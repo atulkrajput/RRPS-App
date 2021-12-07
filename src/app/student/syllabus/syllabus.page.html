@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Syllabus</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item lines="none" class="item-text-wrap" *ngFor="let syllabus of syllabusData">
+      <ion-label>
+        {{syllabus.subjects.subject_name}}
+        <span> Units- {{syllabus.units}}, Chapters- {{syllabus.chapters}}</span>
+      </ion-label>
+      <div class="item-note" slot="end">
+        <ion-button color="primary" (click)="syllabusDetails(syllabus.id)">View</ion-button>
+      </div>
+    </ion-item>
+  </ion-list>
+</ion-content>

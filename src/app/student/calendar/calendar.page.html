@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Event Calendar</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <h3 class="ion-padding-horizontal">{{viewTitle}} <span><button ion-button [disabled]="isToday" (click)="today()">Today</button></span></h3>
+  <br>
+  <calendar [eventSource]="eventSource"
+  [calendarMode]="calendar.mode"
+  [currentDate]="calendar.currentDate"
+  (onTitleChanged)="onViewTitleChanged($event)"
+  [step]="calendar.step">
+</calendar>
+  <div class="ion-padding">
+
+    <!-- <ion-calendar [(ngModel)]="date"
+      (onChange)="onChange($event)"
+      [type]="type"
+      [format]="'YYYY-MM-DD'">
+    </ion-calendar> -->
+
+
+  </div>
+</ion-content>

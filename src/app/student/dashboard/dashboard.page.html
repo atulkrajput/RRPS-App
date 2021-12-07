@@ -1,0 +1,137 @@
+<ion-header color="transparent" class="dash-bg">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>RR Public School</ion-title>
+    <ion-buttons slot="end" class="ricon">
+      <ion-icon name="notifications-outline" color="primary" routerLink="/notifications"></ion-icon>
+    </ion-buttons>
+  </ion-toolbar>
+  <div class="dash-head">
+    <h3 class="ion-text-capitalize">Welcome<br>{{studentBasicData.prefix}} {{studentBasicData.sname}}</h3>
+    <div class="dash-left">
+
+      <img [src]="profilePic"  onerror='this.src="assets/imgs/profile.png"' width="50px">
+    </div>
+    <div class="dash-left">
+      <h4>Reg Id: {{studentBasicData.reg_id}}<br>
+        Class: {{studentBasicData.class}} <br>
+        Section: {{studentBasicData.section}}</h4>
+    </div>
+    <div class="dash-right">
+      <ion-button size="small"  (click)="logOut()">Signout</ion-button>
+    </div>
+  </div>
+</ion-header>
+<ion-content class="ion-center">
+  <ion-grid>
+    <ion-row class="dash-row-icon">
+      <ion-col size="4">
+        <ion-item lines="none">
+          <ion-label class="ion-text-wrap ion-text-center dash-box" routerLink="/profile">
+            <img src="assets/icon/profilem.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Profile</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box" routerLink="/homework">
+            <img src="assets/icon/homework.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Homework</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box" routerLink="/fees">
+            <img src="assets/icon/fee.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Fee</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/syllabus">
+            <img src="assets/icon/syllabus.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Syllabus</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/exams">
+            <img src="assets/icon/exam.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Exam</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/attendance">
+            <img src="assets/icon/attendance.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Attendance</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/calender">
+            <img src="assets/icon/calendar.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Calendar</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/transports">
+            <img src="assets/icon/transport.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Transport</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/meetings">
+            <img src="assets/icon/meetings.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Meetings</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/complaints">
+            <img src="assets/icon/complaint.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Complaints</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/feedbacks">
+            <img src="assets/icon/teacher.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Feedback</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+      <ion-col size="4">
+        <ion-item lines="none" class="">
+          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/settings">
+            <img src="assets/icon/settings.png" alt="profile"/>
+            <ion-text class="ion-text-wrap ion-text-center">Settings</ion-text>
+          </ion-label>
+        </ion-item>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-footer>
+    <ion-toolbar>
+      <ion-row>
+        <ion-col size="4"><ion-button fill="clear" size="small" width="30%" routerLink="/about">About Us</ion-button></ion-col>
+        <ion-col size="4"><ion-button fill="clear" size="small" width="30%" routerLink="/terms">Terms</ion-button></ion-col>
+        <ion-col size="4"><ion-button fill="clear" size="small" width="30%" routerLink="/privacy">Privacy</ion-button></ion-col>
+      </ion-row>
+    </ion-toolbar>
+  </ion-footer>
+</ion-content>

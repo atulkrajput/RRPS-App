@@ -1,0 +1,110 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Transports</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-text-wrap ion-text-center ion-no-padding">
+  <img src="../../../assets/icon/transport.png" alt="transport" width="75px" class="ion-margin-top"/>
+  <ion-grid class="ion-text-center" *ngIf="transportData === null">
+    <ion-row>
+      <ion-col>
+        <ion-title>
+          <ion-text color="default">
+            No Transport Attached
+          </ion-text>
+        </ion-title>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid class="ion-text-center"  *ngIf="transportData !== null">
+
+    <ion-row>
+      <ion-col>
+        <ion-title>
+          <ion-text color="default">
+            Transport Details
+          </ion-text>
+        </ion-title>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-text>Route</ion-text>
+      </ion-col>
+      <ion-col>
+        <ion-text>{{transportData.road_route.route_name}}</ion-text>
+      </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-text>
+            Driver name
+        </ion-text>
+      </ion-col>
+        <ion-col>
+          <ion-text>
+            {{transportData.vehicle.driver_name}}
+          </ion-text>
+        </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-text>
+            Vehicle Type
+        </ion-text>
+      </ion-col>
+        <ion-col>
+          <ion-text>
+            {{transportData.vehicle.vehicle_type}}
+          </ion-text>
+        </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-text>
+            Reg no.
+        </ion-text>
+      </ion-col>
+        <ion-col>
+          <ion-text>
+            {{transportData.vehicle.vehicle_regt_no}}
+          </ion-text>
+        </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-text>
+            Drop Point
+        </ion-text>
+      </ion-col>
+        <ion-col>
+          <ion-text>
+            {{transportData.road_route_detail.stop_point}}
+          </ion-text>
+        </ion-col>
+    </ion-row>
+
+    <ion-row>
+      <ion-col>
+        <ion-text>
+            Charges
+        </ion-text>
+      </ion-col>
+        <ion-col>
+          <ion-text>
+            Rs. {{transportData.road_route_detail.monthly_charge}}
+          </ion-text>
+        </ion-col>
+    </ion-row>
+
+  </ion-grid>
+</ion-content>
