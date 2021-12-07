@@ -39,6 +39,12 @@ export class ApiService {
     return this.http.post(link, { student_id : id});
   }
 
+  feeDetails(id: number)
+  {
+    const link = this.baseUrl + 'feedetail/';
+    return this.http.post(link, { student_id : id});
+  }
+
   meetings(id: number)
   {
     const link = this.baseUrl + 'meetings/';
