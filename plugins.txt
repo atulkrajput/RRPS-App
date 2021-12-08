@@ -12,3 +12,16 @@ Firebase Analytics
 
 For Network
     npm install @capacitor/network
+
+For App Rate
+    npm install cordova-plugin-apprate
+    npm install @ionic-native/app-rate
+    npm install cordova-plugin-nativestorage 
+    npm install @awesome-cordova-plugins/native-storage 
+    npm install cordova-plugin-inappbrowser 
+    npm install @awesome-cordova-plugins/in-app-browser 
+
+For App Version
+    npm install cordova-plugin-app-version 
+    npm install @awesome-cordova-plugins/app-version 
+    

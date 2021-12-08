@@ -14,12 +14,13 @@
     </ion-item>
     <ion-item>
       <ion-label color="primary">Notification</ion-label>
-      <ion-toggle (ionChange)='changeNotification()' slot="end" name="notification" color="primary" checked></ion-toggle>
+      <ion-toggle (ionChange)='changeNotification()' slot="end" name="notification" color="primary" checked>
+      </ion-toggle>
     </ion-item>
   </ion-list>
   <h3>Find us on Social Media</h3>
   <ion-list>
-    <ion-item (click)="goToBrowser(0)" detail >
+    <ion-item (click)="goToBrowser(0)" detail>
       <ion-label color="primary">Facebook</ion-label>
       <ion-icon slot="end" name="logo-facebook"></ion-icon>
     </ion-item>
@@ -27,19 +28,19 @@
       <ion-label color="primary">Twitter</ion-label>
       <ion-icon slot="end" name="logo-twitter"></ion-icon>
     </ion-item>
-    <ion-item (click)="goToBrowser(2)" detail >
+    <ion-item (click)="goToBrowser(2)" detail>
       <ion-label color="primary">Instagram</ion-label>
       <ion-icon slot="end" name="logo-instagram"></ion-icon>
     </ion-item>
   </ion-list>
   <h3>Other info</h3>
   <ion-list>
-    <ion-item (click)="rateApp()" detail >
+    <ion-item (click)="rateApp()" detail>
       <ion-label color="primary">Rate App</ion-label>
     </ion-item>
-    <ion-item >
+    <ion-item>
       <ion-label slot="start" color="primary">App Version</ion-label>
-      <ion-note slot="end" color="primary">{{fetchAppVersion()}}</ion-note>
+      <ion-note slot="end" color="primary">{{version}}</ion-note>
     </ion-item>
   </ion-list>
 </ion-content>
