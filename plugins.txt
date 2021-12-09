@@ -13,6 +13,12 @@ Firebase Analytics
 For Network
     npm install @capacitor/network
 
+For Browser
+    npm install @capacitor/browser
+
+For Device
+    npm install @capacitor/device
+
 For App Rate
     npm install cordova-plugin-apprate
     npm install @ionic-native/app-rate
