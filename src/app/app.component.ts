@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Component } from '@angular/core';
+import { AppVersion } from '@awesome-cordova-plugins/app-version/ngx';
 import { FirebaseAnalytics } from '@capacitor-community/firebase-analytics';
+import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { PermissionStatus, PushNotifications, PushNotificationSchema } from '@capacitor/push-notifications';
 import { SplashScreen } from '@capacitor/splash-screen';
@@ -8,7 +10,8 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Storage } from '@capacitor/storage';
 import { MenuController, NavController, Platform } from '@ionic/angular';
 import { ConstantsService } from './services/constants.service';
-
+import { Device } from '@capacitor/device';
+import { ApiService } from './services/api.service';
 
 @Component({
   selector: 'app-root',
@@ -16,21 +19,27 @@ import { ConstantsService } from './services/constants.service';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-
+  version = '';
   constructor(
     private navCtrl: NavController,
     private platform: Platform,
     private menuCtrl: MenuController,
-    private constants: ConstantsService
+    private constants: ConstantsService,
+    private appVersion: AppVersion,
+    private api: ApiService,
   ) {
     this.initializeApp();
   }
 
   initializeApp() {
     this.platform.ready().then(async () => {
-      await StatusBar.setStyle({ style: Style.Default });
-      await SplashScreen.hide();
 
+      if (Capacitor.isPluginAvailable('StatusBar')) {
+        await StatusBar.setStyle({ style: Style.Default });
+      };
+      if (Capacitor.isPluginAvailable('SplashScreen')) {
+        await SplashScreen.hide();
+      };
       let studentData = null;
       try {
         studentData = JSON.parse((await Storage.get({
@@ -68,15 +77,16 @@ export class AppComponent {
         this.menuCtrl.enable(false);
         this.navCtrl.navigateRoot(['login']);
       }
+      this.initializeFCM();
     });
   }
 
   createChannel() {
     PushNotifications.createChannel({
-      id: "default_channel",
-      name: "RRPS",
-      description: "RRPS",
-      sound: "default",
+      id: 'default_channel',
+      name: 'RRPS',
+      description: 'RRPS',
+      sound: 'default',
       vibration: true,
       lights: true,
       importance: 5,
@@ -86,23 +96,23 @@ export class AppComponent {
 
   checkChannel(channels: any, channelId: string) {
     if (channels.length > 0) {
-      const checkData = channels.find(channel => channel.id == channelId)
+      const checkData = channels.find(channel => channel.id === channelId);
       if (checkData)
-        return true;
-      else return false;
-    } else return false;
+        {return true;}
+      else {return false;}
+    } else {return false;}
   }
 
   async initializeFCM() {
     await FirebaseAnalytics.enable();
 
-    const hasPermission : PermissionStatus = await PushNotifications.checkPermissions();
-    if (hasPermission && hasPermission.receive == 'granted') {
+    const hasPermission: PermissionStatus = await PushNotifications.checkPermissions();
+    if (hasPermission && hasPermission.receive === 'granted') {
       const granted = await LocalNotifications.checkPermissions();
-      if (granted && granted.display == 'granted') {
+      if (granted && granted.display === 'granted') {
         this.registerFCM();
       } else {
-        this.constants.presentToast("Please Enable Notifications Setting To Recieve Notifications")
+        this.constants.presentToast('Please Enable Notifications Setting To Recieve Notifications');
       }
     } else {
       this.registerFCM();
@@ -113,13 +123,13 @@ export class AppComponent {
     if(this.platform.is('ios')) {
       PushNotifications.register();
     }
-    PushNotifications.addListener('registration', (token) => {
-      console.log("Token", token.value)
+    PushNotifications.addListener('registration', async (token) => {
+      await this.api.updateFCMDetails(token);
     });
 
     PushNotifications.addListener('registrationError', (error: any) => {
-      console.log(error)
-      this.constants.presentToast("Unable to register for push notifications.")
+      console.log(error);
+      this.constants.presentToast('Unable to register for push notifications.');
     });
 
     PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
@@ -134,16 +144,16 @@ export class AppComponent {
       });
     }
     PushNotifications.register().then(res=> {
-      console.log(res)
+      console.log(res);
     }).catch(err => {
-      console.log(err)
+      console.log(err);
     });
   }
 
   async initalizeLocal(data: any) {
     const granted = await LocalNotifications.requestPermissions();
-    if (granted.display != 'granted') {
-      this.constants.presentToast("Please Enable Notifications Setting To Recieve Notifications")
+    if (granted.display !== 'granted') {
+      this.constants.presentToast('Please Enable Notifications Setting To Recieve Notifications');
     } else {
       this.showLocal(data);
     }
@@ -162,7 +172,7 @@ export class AppComponent {
             channelId: 'default_channel'
           }
         ]
-      })
+      });
     } else {
       LocalNotifications.schedule({
         notifications : [
@@ -174,7 +184,7 @@ export class AppComponent {
             channelId: 'default_channel'
           }
         ]
-      })
+      });
     }
   }
 }

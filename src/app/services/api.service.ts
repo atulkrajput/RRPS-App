@@ -3,6 +3,9 @@ import { Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { LoginFormData } from '../interfaces/login_form_data';
+import { AppVersion } from '@awesome-cordova-plugins/app-version/ngx';
+import { Device } from '@capacitor/device';
+import { Storage } from '@capacitor/storage';
 
 @Injectable({
   providedIn: 'root'
@@ -21,11 +24,29 @@ export class ApiService {
 
   profilePicUrl = environment.serverUrl + 'uploads/students/';
 
-  constructor(public http: HttpClient) { }
+  constructor(
+    private appVersion: AppVersion,
+    public http: HttpClient
+  ) { }
 
-  updateFCMDetails(myData: any) {
+  async updateFCMDetails(token: any) {
+    console.log('Token', token.value);
+    // Save Token to DB
+    const version = await this.appVersion.getVersionNumber();
+    const info = await Device.getInfo();
+    const uuid = await Device.getId();
+    const sData = await Storage.get({ key: 'studentData'});
+    const sDetails = JSON.parse(sData.value);
+    const data = {
+      student_id: sDetails.id,
+      fcm_token: token,
+      uid: uuid.uuid,
+      app_version: version,
+      os: info.platform,
+      model: info.model,
+    };
     const link = this.baseUrl + 'updateFCMDetails/';
-    return this.http.post(link,myData);
+    return this.http.post(link,data);
   }
 
   login(formData: LoginFormData){
@@ -109,5 +130,10 @@ export class ApiService {
   {
     const link = this.baseUrl + 'examhistory/';
     return this.http.post(link, { student_id : id});
+  }
+
+  changepassword(myData: any) {
+    const link = this.baseUrl + 'changepassword/';
+    return this.http.post(link, myData);
   }
 }

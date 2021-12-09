@@ -33,7 +33,7 @@ export class LoginPage implements OnInit {
   async login() {
     this.loginFormSubmit = true;
     if(this.loginForm.valid) {
-      let connected = await Network.getStatus();
+      const connected = await Network.getStatus();
       if (connected.connected) {
         const loader = await this.constants.getLoader();
         await loader.present();
@@ -76,7 +76,7 @@ export class LoginPage implements OnInit {
           this.constants.presentToast('Unable to login. Please try again later');
         });
       } else {
-        this.constants.presentToast("Check your internet connection.");
+        this.constants.presentToast('Check your internet connection.');
       }
     }
   }

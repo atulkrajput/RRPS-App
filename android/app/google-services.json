@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1000405212335",
+    "project_id": "dp-rrps",
+    "storage_bucket": "dp-rrps.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1000405212335:android:ca2a9d87872e911f44885a",
+        "android_client_info": {
+          "package_name": "com.doonportal.rrps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1000405212335-9e634s2q50i6886fdp8orm6i66r562rk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtN_iY43Lu_Cjm-bX0vbYXasDdexxcDUU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1000405212335-9e634s2q50i6886fdp8orm6i66r562rk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -47,6 +47,7 @@ export class DashboardPage implements OnInit {
           handler: async () => {
             await Storage.clear();
             ConstantsService.studentBasicData = undefined;
+            ConstantsService.studentProfileData = undefined;
             this.navCtrl.navigateRoot(['/login']);
           }
         }
