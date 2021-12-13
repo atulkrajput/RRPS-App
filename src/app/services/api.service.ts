@@ -136,4 +136,9 @@ export class ApiService {
     const link = this.baseUrl + 'changepassword/';
     return this.http.post(link, myData);
   }
+
+  notifications(id: number) {
+    const link = this.baseUrl + 'notification/';
+    return this.http.post(link, { student_id : id});
+  }
 }

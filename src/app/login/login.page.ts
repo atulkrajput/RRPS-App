@@ -22,8 +22,8 @@ export class LoginPage implements OnInit {
     private navController: NavController,
     ) {
       this.loginForm = this.fb.group({
-        regid: ['2802', [Validators.required]],
-        password: ['31012012', [Validators.required]]
+        regid: ['', [Validators.required]],
+        password: ['', [Validators.required]]
       });
     }
 
