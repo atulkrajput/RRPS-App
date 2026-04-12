@@ -20,11 +20,7 @@ export class AuthGuard implements CanLoad {
       Storage.get({ key: 'studentData' })
         .then((result: GetResult) => {
           const studentData = JSON.parse(result.value);
-          if (!!studentData) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
+          resolve(!!studentData)
         })
         .catch((err) => {
           resolve(false);

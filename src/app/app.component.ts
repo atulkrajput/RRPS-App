@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Component } from '@angular/core';
-import { AlertController, MenuController, Platform } from '@ionic/angular';
-import { StatusBar } from '@ionic-native/status-bar/ngx';
-import { Router } from '@angular/router';
+import { FirebaseAnalytics } from '@capacitor-community/firebase-analytics';
+import { Capacitor } from '@capacitor/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { PermissionStatus, PushNotifications, PushNotificationSchema } from '@capacitor/push-notifications';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { Storage } from '@capacitor/storage';
+import { AlertController, MenuController, NavController, Platform } from '@ionic/angular';
 import { ConstantsService } from './services/constants.service';
-import { PushNotificationService } from './services/push-notification.service';
 import { ApiService } from './services/api.service';
 import { environment } from 'src/environments/environment';
 
@@ -15,13 +18,12 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-
+  version = '';
   constructor(
-    private router: Router,
+    private navCtrl: NavController,
     private platform: Platform,
     private menuCtrl: MenuController,
-    private statusBar: StatusBar,
-    private pushNotificationService: PushNotificationService,
+    private constants: ConstantsService,
     private api: ApiService,
     private alertCtrl: AlertController
   ) {
@@ -30,10 +32,12 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(async () => {
-      this.statusBar.styleDefault();
-
-      // Initialize push notifications
-      await this.pushNotificationService.initPushNotifications();
+      if (Capacitor.isPluginAvailable('StatusBar')) {
+        await StatusBar.setStyle({ style: Style.Default });
+      }
+      if (Capacitor.isPluginAvailable('SplashScreen')) {
+        await SplashScreen.hide();
+      }
 
       // Check for app updates
       this.checkForUpdate();
@@ -80,13 +84,12 @@ export class AppComponent {
           defaulter: studentData.defaulter || false
         };
         this.menuCtrl.enable(true);
-        this.router.navigate(['/', 'dashboard']);
-        // Re-register device for push notifications
-        this.pushNotificationService.registerDeviceForStudent(studentData.id);
+        this.navCtrl.navigateRoot(['/', 'dashboard']);
       } else {
         this.menuCtrl.enable(false);
-        this.router.navigate(['login']);
+        this.navCtrl.navigateRoot(['login']);
       }
+      this.initializeFCM();
     });
   }
 
@@ -119,5 +122,96 @@ export class AppComponent {
         await alert.present();
       }
     });
+  }
+
+  createChannel() {
+    PushNotifications.createChannel({
+      id: 'default_channel',
+      name: 'RRPS',
+      description: 'RRPS',
+      sound: 'default',
+      vibration: true,
+      lights: true,
+      importance: 5,
+      visibility: 1
+    });
+  }
+
+  checkChannel(channels: any, channelId: string) {
+    if (channels.length > 0) {
+      const checkData = channels.find(channel => channel.id === channelId);
+      return !!checkData;
+    }
+    return false;
+  }
+
+  async initializeFCM() {
+    await FirebaseAnalytics.enable();
+
+    const hasPermission: PermissionStatus = await PushNotifications.checkPermissions();
+    if (hasPermission && hasPermission.receive === 'granted') {
+      const granted = await LocalNotifications.checkPermissions();
+      if (granted && granted.display === 'granted') {
+        this.registerFCM();
+      } else {
+        this.constants.presentToast('Please Enable Notifications Setting To Recieve Notifications');
+      }
+    } else {
+      this.registerFCM();
+    }
+  }
+
+  async registerFCM() {
+    if (this.platform.is('ios')) {
+      PushNotifications.register();
+    }
+    PushNotifications.addListener('registration', async (token) => {
+      await this.api.updateFCMDetails(token);
+    });
+
+    PushNotifications.addListener('registrationError', (error: any) => {
+      console.log(error);
+      this.constants.presentToast('Unable to register for push notifications.');
+    });
+
+    PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
+      this.initalizeLocal(notification);
+    });
+
+    if (this.platform.is('android')) {
+      PushNotifications.listChannels().then((channels) => {
+        if (!this.checkChannel(channels.channels, 'default_channel')) {
+          this.createChannel();
+        }
+      });
+    }
+    PushNotifications.register().then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err);
+    });
+  }
+
+  async initalizeLocal(data: any) {
+    const granted = await LocalNotifications.requestPermissions();
+    if (granted.display !== 'granted') {
+      this.constants.presentToast('Please Enable Notifications Setting To Recieve Notifications');
+    } else {
+      this.showLocal(data);
+    }
+  }
+
+  async showLocal(data: any) {
+    const notification: any = {
+      id: Math.random(),
+      title: data.title,
+      body: data.body,
+      summaryText: data.body,
+      channelId: 'default_channel'
+    };
+    if (data.image) {
+      notification.attachments = [data.image];
+    }
+    LocalNotifications.schedule({ notifications: [notification] });
   }
 }

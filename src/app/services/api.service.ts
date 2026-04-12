@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { LoginFormData } from '../interfaces/login_form_data';
+import { Device } from '@capacitor/device';
+import { Storage } from '@capacitor/storage';
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +15,24 @@ export class ApiService {
   profilePicUrl = environment.serverUrl + 'uploads/students/';
 
   constructor(public http: HttpClient) { }
+
+  // FCM — called from app.component after push registration
+  async updateFCMDetails(token: any) {
+    const info = await Device.getInfo();
+    const uuid = await Device.getId();
+    const sData = await Storage.get({ key: 'studentData' });
+    const sDetails = JSON.parse(sData.value);
+    const data = {
+      student_id: sDetails ? sDetails.id : null,
+      fcm_token: token.value || token,
+      uid: (uuid as any).uuid || (uuid as any).identifier,
+      app_version: environment.appVersion,
+      os: info.platform,
+      model: info.model,
+    };
+    const link = this.baseUrl + 'updateFCMDetails/';
+    return this.http.post(link, data).subscribe();
+  }
 
   // Auth
   login(formData: LoginFormData) {
@@ -143,12 +163,6 @@ export class ApiService {
   getNotifications(id: number) {
     const link = this.baseUrl + 'notification/';
     return this.http.post(link, { student_id: id });
-  }
-
-  // FCM
-  updateFCMDetails(myData: any) {
-    const link = this.baseUrl + 'updateFCMDetails/';
-    return this.http.post(link, myData);
   }
 
   // Account

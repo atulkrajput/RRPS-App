@@ -1,4 +1,4 @@
-<ion-header class="ion-no-border modern-header">
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
@@ -7,79 +7,16 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="modern-content">
-  <!-- Summary Cards -->
-  <div class="summary-cards">
-    <div class="summary-card">
-      <div class="summary-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
-        <ion-icon name="book-outline"></ion-icon>
+<ion-content>
+  <ion-list>
+    <ion-item lines="none" class="item-text-wrap" *ngFor="let syllabus of syllabusData">
+      <ion-label>
+        {{syllabus.subjects.subject_name}}
+        <span> Units- {{syllabus.units}}, Chapters- {{syllabus.chapters}}</span>
+      </ion-label>
+      <div class="item-note" slot="end">
+        <ion-button  (click)="syllabusDetails(syllabus.subject_id)">View</ion-button>
       </div>
-      <div class="summary-info">
-        <h4>{{getTotalSubjects()}}</h4>
-        <p>Subjects</p>
-      </div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
-        <ion-icon name="layers-outline"></ion-icon>
-      </div>
-      <div class="summary-info">
-        <h4>{{getTotalUnits()}}</h4>
-        <p>Total Units</p>
-      </div>
-    </div>
-    <div class="summary-card">
-      <div class="summary-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
-        <ion-icon name="document-text-outline"></ion-icon>
-      </div>
-      <div class="summary-info">
-        <h4>{{getTotalChapters()}}</h4>
-        <p>Total Chapters</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Section Header -->
-  <div class="section-header">
-    <h3>Subject Syllabus</h3>
-    <p>{{syllabusData?.length || 0}} subjects available</p>
-  </div>
-
-  <!-- Syllabus List -->
-  <div class="syllabus-list">
-    <div class="syllabus-card" *ngFor="let syllabus of syllabusData; let i = index">
-      <div class="syllabus-header">
-        <div class="subject-icon" [style.background]="getSubjectGradient(syllabus.subjects.subject_name)">
-          <ion-icon [name]="getSubjectIcon(syllabus.subjects.subject_name)"></ion-icon>
-        </div>
-        <div class="subject-info">
-          <h3>{{syllabus.subjects.subject_name}}</h3>
-          <div class="subject-stats">
-            <span class="stat-item">
-              <ion-icon name="layers-outline"></ion-icon>
-              {{syllabus.units}} Units
-            </span>
-            <span class="stat-item">
-              <ion-icon name="document-text-outline"></ion-icon>
-              {{syllabus.chapters}} Chapters
-            </span>
-          </div>
-        </div>
-      </div>
-      <div class="syllabus-footer">
-        <span class="modern-badge badge-primary">Active</span>
-        <ion-button fill="clear" size="small" (click)="syllabusDetails(syllabus.id)">
-          <ion-icon slot="start" name="eye-outline"></ion-icon>
-          View Details
-        </ion-button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="!syllabusData || syllabusData.length === 0">
-    <ion-icon name="book-outline"></ion-icon>
-    <h3>No syllabus available</h3>
-    <p>Syllabus information will appear here once available</p>
-  </div>
+    </ion-item>
+  </ion-list>
 </ion-content>

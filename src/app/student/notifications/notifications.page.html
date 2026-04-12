@@ -1,58 +1,24 @@
-<ion-header class="ion-no-border modern-header">
+<ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/dashboard"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Notifications</ion-title>
-    <ion-buttons slot="end">
-      <ion-button fill="clear" (click)="markAllAsRead()">
-        <ion-icon slot="icon-only" name="checkmark-done-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+    <ion-buttons slot="start"><ion-back-button defaultHref="/dashboard"></ion-back-button></ion-buttons>
+    <ion-title>Latest Updates</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="modern-content">
-  <!-- Filter Tabs -->
-  <div class="filter-tabs">
-    <ion-segment [(ngModel)]="selectedFilter" (ionChange)="filterNotifications()">
-      <ion-segment-button value="all">
-        <ion-label>All</ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="unread">
-        <ion-label>Unread</ion-label>
-      </ion-segment-button>
-    </ion-segment>
-  </div>
-
-  <!-- Notifications List -->
-  <div class="notifications-list" *ngIf="filteredNotifications.length > 0">
-    <div class="notification-card" 
-         *ngFor="let notification of filteredNotifications"
-         [class.unread]="notification.status === 1"
-         (click)="openNotification(notification)">
-      <div class="notification-icon" [style.background]="getNotificationGradient()">
-        <ion-icon [name]="getNotificationIcon(notification)"></ion-icon>
-      </div>
-      <div class="notification-content">
-        <div class="notification-header">
-          <h3>{{notification.title}}</h3>
-        </div>
-        <p>{{notification.description}}</p>
-        <div class="notification-footer">
-          <ion-icon *ngIf="notification.status === 1" name="ellipse" class="unread-indicator"></ion-icon>
-        </div>
-      </div>
-      <div class="notification-image" *ngIf="notification.image">
-        <img [src]="notification.image" alt="Notification" onerror="this.style.display='none'">
-      </div>
-    </div>
-  </div>
-
-  <!-- Empty State -->
-  <div class="empty-state" *ngIf="filteredNotifications.length === 0">
-    <ion-icon name="notifications-off-outline"></ion-icon>
-    <h3>No notifications</h3>
-    <p>You're all caught up!</p>
-  </div>
+<ion-content class="bg_color" fullscreen>
+  <ion-list lines="none">
+      <ion-item *ngFor="let noti of notificationData">
+          <div class="item_inner d-flex">
+              <div class="img_box center_img">
+                  <img src="assets/imgs/icon.png" class="crop_img">
+              </div>
+              <div class="text_box">
+                  <h2 class="d-flex">
+                      {{noti.title}}
+                  </h2>
+                  <p class="d-flex">{{noti.description}}</p>
+              </div>
+          </div>
+      </ion-item>
+  </ion-list>
 </ion-content>

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
-import { Storage } from '@capacitor/storage';
-import { ApiService } from 'src/app/services/api.service';
-import { ConstantsService } from 'src/app/services/constants.service';
+import { AppRate } from '@ionic-native/app-rate/ngx';
+import { AlertController, Platform } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
+import { Browser } from '@capacitor/browser';
+import { Storage } from '@capacitor/storage';
+import { ConstantsService } from 'src/app/services/constants.service';
+import { ApiService } from 'src/app/services/api.service';
 
 @Component({
   selector: 'app-settings',
@@ -13,43 +15,74 @@ import { environment } from 'src/environments/environment';
 export class SettingsPage implements OnInit {
 
   constructor(
+    private platform: Platform,
     private alertCtrl: AlertController,
+    private constants: ConstantsService,
     private api: ApiService,
-    private constants: ConstantsService
+    private rate: AppRate,
   ) { }
 
   ngOnInit() { }
-
-  goToBrowser(value: number) { }
-
-  async rateApp() { }
 
   fetchAppVersion() {
     return environment.appVersion;
   }
 
+  async goToBrowser(value: number) {
+    if (value === 0) {
+      await Browser.open({ url: 'https://www.facebook.com/rrps.noorpur' });
+    } else if (value === 1) {
+      await Browser.open({ url: 'https://twitter.com/RRPUBLICSCHOOL1' });
+    } else if (value === 2) {
+      await Browser.open({ url: 'https://www.instagram.com/doonportal/' });
+    }
+  }
+
+  async rateApp() {
+    this.platform.ready().then(() => {
+      this.rate.setPreferences({
+        storeAppURL: (environment as any).storeAppURL,
+        usesUntilPrompt: 3,
+        promptAgainForEachNewVersion: true,
+        simpleMode: true
+      });
+      this.rate.promptForRating(true);
+    });
+  }
+
   async changePasswordPrompt() {
     const alert = await this.alertCtrl.create({
+      cssClass: 'changePassword',
+      mode: 'ios',
       header: 'Change Password',
       inputs: [
-        { name: 'oldPassword', type: 'password', placeholder: 'Current Password' },
-        { name: 'newPassword', type: 'password', placeholder: 'New Password' },
-        { name: 'confirmPassword', type: 'password', placeholder: 'Confirm New Password' }
+        { name: 'oldPassword', placeholder: 'Old Password', type: 'password' },
+        { name: 'newPassword', placeholder: 'New Password', type: 'password' },
+        { name: 'confirmPassword', placeholder: 'Confirm Password', type: 'password' },
       ],
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
           text: 'Change',
-          handler: (data) => {
-            if (!data.oldPassword || !data.newPassword || !data.confirmPassword) {
-              this.constants.presentToast('Please fill all fields');
+          handler: data => {
+            if (!data.oldPassword) {
+              alert.message = 'Enter Old Password';
               return false;
-            }
-            if (data.newPassword !== data.confirmPassword) {
-              this.constants.presentToast('New password and confirmation do not match');
+            } else if (!data.newPassword) {
+              alert.message = 'Enter New Password';
               return false;
+            } else if (data.newPassword.length < 5) {
+              alert.message = 'Too Short New Password.<br/>Minimum 5 Characters Required.';
+              return false;
+            } else if (!data.confirmPassword) {
+              alert.message = 'Enter Confirm Password';
+              return false;
+            } else if (data.newPassword !== data.confirmPassword) {
+              alert.message = 'Passwords Do Not Match';
+              return false;
+            } else {
+              this.changePassword(data.oldPassword, data.newPassword, data.confirmPassword);
             }
-            this.changePassword(data.oldPassword, data.newPassword, data.confirmPassword);
           }
         }
       ]
@@ -76,10 +109,10 @@ export class SettingsPage implements OnInit {
   async checkForUpdate() {
     const loader = await this.constants.getLoader();
     await loader.present();
-    this.api.checkAppVersion(this.fetchAppVersion()).subscribe(async (result: any) => {
+    this.api.checkAppVersion(environment.appVersion).subscribe(async (result: any) => {
       await loader.dismiss();
       if (result.status === 1 && result.data.needs_update) {
-        const alert = await this.alertCtrl.create({
+        const updateAlert = await this.alertCtrl.create({
           header: 'Update Available',
           message: result.data.changelog || 'A new version is available.',
           buttons: [
@@ -95,7 +128,7 @@ export class SettingsPage implements OnInit {
           ],
           backdropDismiss: !result.data.force_update
         });
-        await alert.present();
+        await updateAlert.present();
       } else {
         this.constants.presentToast('App is up to date');
       }

@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { ApiService } from '../services/api.service';
-import { ConstantsService } from '../services/constants.service';
+import { Network } from '@capacitor/network';
 import { Storage } from '@capacitor/storage';
 import { NavController } from '@ionic/angular';
-import { PushNotificationService } from '../services/push-notification.service';
+import { ApiService } from '../services/api.service';
+import { ConstantsService } from '../services/constants.service';
 
 @Component({
   selector: 'app-login',
@@ -19,10 +18,8 @@ export class LoginPage implements OnInit {
   constructor(
     private fb: FormBuilder,
     private constants: ConstantsService,
-    private router: Router,
     private api: ApiService,
     private navController: NavController,
-    private pushService: PushNotificationService,
     ) {
       this.loginForm = this.fb.group({
         regid: ['', [Validators.required]],
@@ -36,6 +33,8 @@ export class LoginPage implements OnInit {
   async login() {
     this.loginFormSubmit = true;
     if(this.loginForm.valid) {
+      const connected = await Network.getStatus();
+      if (connected.connected) {
         const loader = await this.constants.getLoader();
         await loader.present();
         this.api.login(this.loginForm.value).subscribe(async (result: any) => {
@@ -55,10 +54,7 @@ export class LoginPage implements OnInit {
               sname: result.data.sname,
               class: result.data.class_category.class,
               section: result.data.class_section.section_type,
-              profilePic: result.data.pic,
-              house_color: result.data.house_color || null,
-              house_color_code: result.data.house_color_code || null,
-              house_name: result.data.house ? result.data.house.name : null
+              profilePic: result.data.pic
             };
             ConstantsService.studentProfileData = {
               id: result.data.id,
@@ -71,23 +67,17 @@ export class LoginPage implements OnInit {
               father_name: result.data.father_name,
               mother_name: result.data.mother_name,
               address: result.data.address,
-              dob: result.data.dob,
-              house_color: result.data.house_color || null,
-              house_color_code: result.data.house_color_code || null,
-              house_name: result.data.house ? result.data.house.name : null,
-              class_section_id: result.data.class_section_id,
-              academic_session: result.data.academic_session ? result.data.academic_session.session_name : null,
-              mobile: result.data.mobile,
-              defaulter: result.data.defaulter || false
+              dob: result.data.dob
             };
             this.navController.navigateRoot([ '/', 'dashboard']);
-            // Register device for push notifications
-            this.pushService.registerDeviceForStudent(result.data.id);
           }
         }, async (error) => {
           await  loader.dismiss();
-          this.constants.presentToast('Unable To Login. Check Your Internet Connection.');
+          this.constants.presentToast('Unable to login. Please try again later');
         });
+      } else {
+        this.constants.presentToast('Check your internet connection.');
+      }
     }
   }
 }
