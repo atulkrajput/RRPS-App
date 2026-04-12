@@ -29,19 +29,27 @@
     <div class="fee-breakdown">
       <div class="fee-item">
         <span class="label">Old Balance</span>
-        <span class="value">₹ {{pendingFees.oldBalance || 0}}</span>
+        <span class="value">₹ {{pendingFees.oldBalance | number}}</span>
       </div>
       <div class="fee-item">
-        <span class="label">Monthly Fee</span>
-        <span class="value">₹ {{pendingFees.monthlyFee || 6018}}</span>
+        <span class="label">Tuition Fee</span>
+        <span class="value">₹ {{pendingFees.tuitionFee | number}}</span>
       </div>
-      <div class="fee-item">
-        <span class="label">Transport Fee</span>
-        <span class="value">₹ {{pendingFees.transportFee || 0}}</span>
+      <div class="fee-item" *ngIf="pendingFees.regFee > 0">
+        <span class="label">Registration Fee</span>
+        <span class="value">₹ {{pendingFees.regFee | number}}</span>
+      </div>
+      <div class="fee-item" *ngIf="pendingFees.admissionFee > 0">
+        <span class="label">Admission Fee</span>
+        <span class="value">₹ {{pendingFees.admissionFee | number}}</span>
+      </div>
+      <div class="fee-item" *ngIf="pendingFees.hasTransport">
+        <span class="label">Transport Fee (Pending)</span>
+        <span class="value">₹ {{pendingFees.transportFeePending | number}}</span>
       </div>
       <div class="fee-item total">
         <span class="label">Total Amount</span>
-        <span class="value">₹ {{getTotalPending()}}</span>
+        <span class="value">₹ {{getTotalPending() | number}}</span>
       </div>
     </div>
 
@@ -51,6 +59,37 @@
     </ion-button>
   </div>
 
+  <!-- Transport Fee Card -->
+  <div class="transport-fee-card" *ngIf="pendingFees.hasTransport">
+    <div class="card-header">
+      <div class="icon-wrapper transport-icon">
+        <ion-icon name="bus-outline"></ion-icon>
+      </div>
+      <div class="header-info">
+        <h3>Transport Fee</h3>
+        <p>{{pendingFees.transportRoute}} — {{pendingFees.transportStop}}</p>
+      </div>
+    </div>
+    <div class="fee-breakdown">
+      <div class="fee-item">
+        <span class="label">Monthly Charge</span>
+        <span class="value">₹ {{pendingFees.transportFeeMonthly | number}}</span>
+      </div>
+      <div class="fee-item">
+        <span class="label">Total (Session)</span>
+        <span class="value">₹ {{pendingFees.transportFeeTotal | number}}</span>
+      </div>
+      <div class="fee-item">
+        <span class="label">Paid</span>
+        <span class="value paid-value">₹ {{pendingFees.transportFeePaid | number}}</span>
+      </div>
+      <div class="fee-item total">
+        <span class="label">Pending</span>
+        <span class="value">₹ {{pendingFees.transportFeePending | number}}</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Payment Summary -->
   <div class="summary-cards">
     <div class="summary-card">
@@ -58,7 +97,7 @@
         <ion-icon name="checkmark-circle-outline"></ion-icon>
       </div>
       <div class="summary-info">
-        <h4>₹ {{getTotalPaid()}}</h4>
+        <h4>₹ {{getTotalPaid() | number}}</h4>
         <p>Total Paid</p>
       </div>
     </div>

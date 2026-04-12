@@ -15,12 +15,15 @@
 <ion-content class="modern-content">
   <!-- Filter Tabs -->
   <div class="filter-tabs">
-    <ion-segment [(ngModel)]="selectedTab" mode="md">
+    <ion-segment [(ngModel)]="selectedTab" (ionChange)="onTabChange()" mode="md">
       <ion-segment-button value="upcoming">
         <ion-label>Upcoming</ion-label>
       </ion-segment-button>
       <ion-segment-button value="results">
         <ion-label>History</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="reportcard">
+        <ion-label>Report Card</ion-label>
       </ion-segment-button>
     </ion-segment>
   </div>
@@ -35,13 +38,28 @@
     <div class="exams-list">
       <div class="exam-card" *ngFor="let exam of upcomingExams">
         <div class="exam-header">
-          <div class="exam-icon" [style.background]="'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'">
-            <ion-icon name="document-text-outline"></ion-icon>
+          <div class="exam-icon" [style.background]="getSubjectGradient(exam.subject?.subject_name)">
+            <ion-icon [name]="getSubjectIcon(exam.subject?.subject_name)"></ion-icon>
           </div>
           <div class="exam-info">
-            <h3>Exam</h3>
+            <h3>{{exam.subject?.subject_name || 'Exam'}}</h3>
+            <p class="exam-type">{{exam.exam_title?.title}}</p>
           </div>
           <span class="modern-badge badge-warning">Upcoming</span>
+        </div>
+        <div class="exam-details">
+          <div class="detail-item" *ngIf="exam.exam_date">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <span>{{exam.exam_date | date:'MMM dd, yyyy'}}</span>
+          </div>
+          <div class="detail-item" *ngIf="exam.staff?.name">
+            <ion-icon name="person-outline"></ion-icon>
+            <span>{{exam.staff.name}}</span>
+          </div>
+          <div class="detail-item" *ngIf="exam.max_marks">
+            <ion-icon name="document-text-outline"></ion-icon>
+            <span>Max Marks: {{exam.max_marks}}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -55,28 +73,155 @@
 
   <!-- History -->
   <div *ngIf="selectedTab === 'results'">
+    <!-- Exam Title Filter Chips -->
+    <div class="filter-chips" *ngIf="examTitles.length > 0">
+      <ion-chip [color]="!selectedExamTitleId ? 'primary' : 'medium'" (click)="filterByExamTitle(null)">
+        <ion-label>All</ion-label>
+      </ion-chip>
+      <ion-chip *ngFor="let t of examTitles"
+        [color]="selectedExamTitleId === t.exam_title_id ? 'primary' : 'medium'"
+        (click)="filterByExamTitle(t.exam_title_id)">
+        <ion-label>{{t.exam_title?.title}}</ion-label>
+      </ion-chip>
+    </div>
+
     <div class="section-header">
       <h3>Exam History</h3>
-      <p>{{examHistory.length}} records available</p>
+      <p>{{getFilteredHistory().length}} records available</p>
     </div>
 
     <div class="results-list">
-      <div class="result-card" *ngFor="let result of examHistory">
+      <div class="result-card" *ngFor="let exam of getFilteredHistory()">
         <div class="result-header">
-          <div class="subject-icon" [style.background]="'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'">
-            <ion-icon name="document-text-outline"></ion-icon>
+          <div class="subject-icon" [style.background]="getSubjectGradient(exam.subject?.subject_name)">
+            <ion-icon [name]="getSubjectIcon(exam.subject?.subject_name)"></ion-icon>
           </div>
           <div class="result-info">
-            <h3>Exam Record</h3>
+            <h3>{{exam.subject?.subject_name || 'Exam'}}</h3>
+            <p class="exam-date">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{exam.exam_date | date:'MMM dd, yyyy'}}
+            </p>
           </div>
+          <div class="result-score" *ngIf="exam.exam_students?.length > 0">
+            <h2>{{getMarks(exam)}}</h2>
+            <span class="modern-badge badge-info">{{exam.exam_title?.title}}</span>
+          </div>
+        </div>
+        <div class="result-footer" *ngIf="exam.staff?.name">
+          <span class="exam-teacher">
+            <ion-icon name="person-outline"></ion-icon>
+            {{exam.staff.name}}
+          </span>
         </div>
       </div>
     </div>
 
-    <div class="empty-state" *ngIf="examHistory.length === 0">
+    <div class="empty-state" *ngIf="getFilteredHistory().length === 0">
       <ion-icon name="document-text-outline"></ion-icon>
       <h3>No exam history yet</h3>
       <p>Results will appear here once published</p>
+    </div>
+  </div>
+
+  <!-- Report Card -->
+  <div *ngIf="selectedTab === 'reportcard'">
+    <!-- Student Info -->
+    <div class="report-student-card" *ngIf="reportStudent">
+      <div class="student-info-row">
+        <span class="label">Name</span>
+        <span class="value">{{reportStudent.sname}}</span>
+      </div>
+      <div class="student-info-row">
+        <span class="label">Reg ID</span>
+        <span class="value">{{reportStudent.reg_id}}</span>
+      </div>
+      <div class="student-info-row">
+        <span class="label">Class</span>
+        <span class="value">{{reportStudent.class}} - {{reportStudent.section}}</span>
+      </div>
+      <div class="student-info-row">
+        <span class="label">Session</span>
+        <span class="value">{{reportStudent.session}}</span>
+      </div>
+    </div>
+
+    <!-- Report Card Sections -->
+    <div class="report-section" *ngFor="let rc of reportCard">
+      <div class="report-section-header">
+        <h3>{{rc.exam_title}}</h3>
+        <span class="percentage-badge" [ngClass]="getPercentageClass(rc.percentage)">
+          {{rc.percentage | number:'1.1-1'}}%
+        </span>
+      </div>
+
+      <div class="report-subjects">
+        <div class="report-subject-row header-row">
+          <span class="subject-col">Subject</span>
+          <span class="marks-col">Max</span>
+          <span class="marks-col">Obtained</span>
+        </div>
+        <div class="report-subject-row" *ngFor="let sub of rc.subjects"
+          [class.absent-row]="sub.is_absent">
+          <span class="subject-col">{{sub.subject_name}}</span>
+          <span class="marks-col">{{sub.max_marks}}</span>
+          <span class="marks-col" [class.absent-mark]="sub.is_absent">
+            {{sub.marks_obtained}}
+          </span>
+        </div>
+        <div class="report-subject-row total-row">
+          <span class="subject-col">Total</span>
+          <span class="marks-col">{{rc.total_max_marks}}</span>
+          <span class="marks-col">{{rc.total_marks_obtained}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback Section -->
+    <div class="report-feedback-card" *ngIf="reportFeedback">
+      <h3>Teacher Feedback</h3>
+      <div class="feedback-ratings">
+        <div class="rating-item">
+          <span class="label">Discipline</span>
+          <span class="value">{{getRatingLabel(reportFeedback.discipline)}}</span>
+        </div>
+        <div class="rating-item">
+          <span class="label">Responsibility</span>
+          <span class="value">{{getRatingLabel(reportFeedback.responsibility)}}</span>
+        </div>
+        <div class="rating-item">
+          <span class="label">Attitude to Studies</span>
+          <span class="value">{{getRatingLabel(reportFeedback.att_studies)}}</span>
+        </div>
+        <div class="rating-item">
+          <span class="label">Attitude to Teachers</span>
+          <span class="value">{{getRatingLabel(reportFeedback.att_teachers)}}</span>
+        </div>
+        <div class="rating-item">
+          <span class="label">Attitude to Peers</span>
+          <span class="value">{{getRatingLabel(reportFeedback.att_peers)}}</span>
+        </div>
+      </div>
+      <div class="remarks-section" *ngIf="reportFeedback.teacher_remarks">
+        <p class="remarks-label">Teacher Remarks</p>
+        <p class="remarks-text">{{reportFeedback.teacher_remarks}}</p>
+      </div>
+      <div class="remarks-section" *ngIf="reportFeedback.principal_remarks">
+        <p class="remarks-label">Principal Remarks</p>
+        <p class="remarks-text">{{reportFeedback.principal_remarks}}</p>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="reportCard !== null && reportCard.length === 0">
+      <ion-icon name="school-outline"></ion-icon>
+      <h3>No report card available</h3>
+      <p>Report card will appear once exams are completed</p>
+    </div>
+
+    <div class="empty-state" *ngIf="reportCard === null">
+      <ion-icon name="school-outline"></ion-icon>
+      <h3>Report Card</h3>
+      <p>Tap to load your report card</p>
     </div>
   </div>
 </ion-content>

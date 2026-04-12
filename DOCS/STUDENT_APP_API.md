@@ -1,7 +1,7 @@
 # RRPS Student App - API Documentation
 
 **App:** Student App (IONIC)  
-**Features:** Student Activities, Homework, Fees, Exams, Attendance, Transport, Notifications, Houses  
+**Features:** Student Activities, Homework, Fees, Exams, Report Card, Attendance, Transport, Notifications, Houses  
 **Base URL:** `https://rrpublicschool.com/api/`  
 **Method:** All endpoints use `POST`  
 **Response Format:** JSON  
@@ -16,6 +16,7 @@
 4. [Homework](#homework)
 5. [Fees](#fees)
 6. [Exams](#exams)
+7. [Report Card](#13b-report-card-half-yearly--yearly)
 7. [Attendance](#14-student-attendance)
 8. [Meetings](#15-meetings)
 9. [Transport](#16-transport)
@@ -264,7 +265,71 @@ Same response format as Homework Today (returns array of past homework).
 |-----------|------|----------|-------------|
 | student_id | integer | Yes | Student ID |
 
-Returns detailed fee breakdown for the student.
+Returns detailed fee breakdown for the student including tuition, admission, registration, old balance, and transport fees (if opted).
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Fee Detail fetched successfully",
+  "data": {
+    "old_balance": 2000,
+    "reg_fee": 500,
+    "admission_fee": 1000,
+    "tuition_fee": 15000,
+    "previous_payment": [
+      {
+        "id": 1,
+        "student_id": 101,
+        "amount": 5000,
+        "payment_date": "2025-06-15",
+        "receipt_no": "REC001"
+      }
+    ],
+    "payment_mode": { "1": "Cash", "2": "Online", "3": "Cheque" },
+    "payment_type": { "1": "Tuition", "2": "Transport", "3": "Admission" },
+    "has_transport": true,
+    "transport_fee_monthly": 1500,
+    "transport_route": "Route A",
+    "transport_stop": "Main Market",
+    "transport_fee_total": 18000,
+    "transport_fee_paid": 6000,
+    "transport_fee_pending": 12000
+  }
+}
+```
+
+> **Fee Calculation Notes:**
+> - `tuition_fee` is calculated using the session end date (not current month) to determine total months. It accounts for custom monthly fees from `student_fee_balances`, fee exemptions, and deposits already made (fee_type=1).
+> - If the student has a custom `tuition_fee_monthly` in `student_fee_balances`, that is used instead of the class-level `tuition_fee`.
+> - `has_transport` indicates whether the student has an active transport subscription. If `true`, transport fee fields are populated. If `false`, `transport_fee_monthly` and `transport_fee_pending` are `0`.
+> - `transport_fee_total` = total months in session × monthly transport charge.
+> - `transport_fee_pending` = `transport_fee_total` − `transport_fee_paid`.
+
+**No Transport (student did not opt for transport):**
+```json
+{
+  "status": 1,
+  "msg": "Fee Detail fetched successfully",
+  "data": {
+    "old_balance": 2000,
+    "reg_fee": 500,
+    "admission_fee": 1000,
+    "tuition_fee": 15000,
+    "previous_payment": [],
+    "payment_mode": { ... },
+    "payment_type": { ... },
+    "has_transport": false,
+    "transport_fee_monthly": 0,
+    "transport_fee_pending": 0
+  }
+}
+```
+
+**Error:**
+```json
+{ "status": -1, "msg": "No records were found.Please try again later", "data": null }
+```
 
 ---
 
@@ -290,7 +355,7 @@ Returns fee receipt details.
 |-----------|------|----------|-------------|
 | student_id | integer | Yes | Student ID |
 
-Returns list of exams for the student's class.
+Returns list of exams for the student's class scheduled for today.
 
 ---
 
@@ -313,8 +378,42 @@ Returns upcoming exams scheduled after today.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | student_id | integer | Yes | Student ID |
+| exam_title_id | integer | No | Filter by exam title (e.g. Half-Yearly, Yearly). If omitted, returns all past exams |
 
-Returns past exam papers and results.
+Returns past exam papers and results for the current session, grouped by exam title.
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Exam fetched successfully",
+  "data": {
+    "exam": [
+      {
+        "exam_date": "2025-09-15",
+        "id": 42,
+        "exam_held": 1,
+        "subject": { "subject_name": "Mathematics" },
+        "exam_title_id": 2,
+        "exam_title": { "title": "Half-Yearly" },
+        "staff": { "name": "Teacher Name" },
+        "exam_students": [
+          { "marks_obtained": 85, "status": 1 }
+        ]
+      }
+    ],
+    "examTitles": [
+      { "exam_title": { "title": "Half-Yearly" }, "exam_title_id": 2 },
+      { "exam_title": { "title": "Yearly" }, "exam_title_id": 3 }
+    ]
+  }
+}
+```
+
+**Error:**
+```json
+{ "status": -1, "msg": "No exams were found", "data": null }
+```
 
 ---
 
@@ -325,8 +424,147 @@ Returns past exam papers and results.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | student_id | integer | Yes | Student ID |
+| exam_id | integer | Yes | Exam ID (from exam list) |
 
-Returns detailed exam information.
+Returns detailed exam information including syllabus chapters and student marks.
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Exam Details were fetched successfully",
+  "data": {
+    "exam": {
+      "id": 42,
+      "exam_title": { "title": "Half-Yearly" },
+      "class_category": { "class": "Class 5" },
+      "exam_type": { "type_name": "Half-Yearly" },
+      "subject": { "subject_name": "Mathematics" },
+      "academic_session": { "session_name": "2025-2026" },
+      "max_marks": 100,
+      "exam_date": "2025-09-15"
+    },
+    "syllabus": {
+      "curriculum_title": "Half-Yearly Syllabus",
+      "curriculum_desc": "Chapters 1-6",
+      "chapters": [
+        { "chapter_no": "1", "chapter_name": "Real Numbers", "subject_unit": { "unit_name": "Number System" } }
+      ]
+    },
+    "marks": {
+      "marks_obtained": 85,
+      "status": 1
+    }
+  }
+}
+```
+
+---
+
+### 13b. Report Card (Half-Yearly / Yearly)
+
+**Endpoint:** `POST /api/reportcard`
+
+Returns the student's report card for the current academic session. Shows subject-wise marks for Half-Yearly and Yearly exams with totals, percentage, and teacher feedback.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| student_id | integer | Yes | Student ID |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Report card fetched successfully",
+  "data": {
+    "student": {
+      "id": 101,
+      "reg_id": "RRPS2025001",
+      "sname": "Student Name",
+      "father_name": "Father Name",
+      "class": "Class 5",
+      "section": "A",
+      "session": "2025-2026"
+    },
+    "report_card": [
+      {
+        "exam_title": "Half-Yearly",
+        "exam_type": "Half-Yearly",
+        "subjects": [
+          {
+            "subject_name": "English",
+            "max_marks": 100,
+            "marks_obtained": 82,
+            "exam_date": "2025-09-15",
+            "is_absent": false
+          },
+          {
+            "subject_name": "Hindi",
+            "max_marks": 100,
+            "marks_obtained": 78,
+            "exam_date": "2025-09-16",
+            "is_absent": false
+          },
+          {
+            "subject_name": "Mathematics",
+            "max_marks": 100,
+            "marks_obtained": 91,
+            "exam_date": "2025-09-17",
+            "is_absent": false
+          },
+          {
+            "subject_name": "Science",
+            "max_marks": 100,
+            "marks_obtained": "AB",
+            "exam_date": "2025-09-18",
+            "is_absent": true
+          }
+        ],
+        "total_marks_obtained": 251,
+        "total_max_marks": 400,
+        "percentage": 62.75
+      },
+      {
+        "exam_title": "Yearly",
+        "exam_type": "Yearly",
+        "subjects": [
+          {
+            "subject_name": "English",
+            "max_marks": 100,
+            "marks_obtained": 88,
+            "exam_date": "2026-03-10",
+            "is_absent": false
+          }
+        ],
+        "total_marks_obtained": 88,
+        "total_max_marks": 100,
+        "percentage": 88.0
+      }
+    ],
+    "feedback": {
+      "discipline": 4,
+      "responsibility": 5,
+      "att_studies": 4,
+      "att_teachers": 5,
+      "att_peers": 4,
+      "teacher_remarks": "Good performance",
+      "principal_remarks": "Keep it up"
+    }
+  }
+}
+```
+
+> **Notes:**
+> - Only completed exams (status=3) for the current session are included.
+> - Exam types filtered: Half-Yearly (exam_type_id=2) and Yearly (exam_type_id=3).
+> - If a student was absent for a subject, `marks_obtained` returns `"AB"` and `is_absent` is `true`. Absent marks are not counted in `total_marks_obtained`.
+> - `feedback` contains the latest teacher/principal remarks for the session. Can be `null` if no feedback exists.
+> - The `report_card` array is ordered by exam type (Half-Yearly first, then Yearly).
+
+**Error:**
+```json
+{ "status": -1, "msg": "No report card data available for current session", "data": null }
+```
 
 ---
 
@@ -833,6 +1071,9 @@ export class StudentApiService {
   getExamDetail(studentId: number) {
     return this.postForm('examdetail', { student_id: studentId });
   }
+  getReportCard(studentId: number) {
+    return this.postForm('reportcard', { student_id: studentId });
+  }
 
   // Attendance & Meetings
   getAttendance(studentId: number) {
@@ -962,7 +1203,8 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 | 10 | Student Exam | `/api/studentexam` | student_id |
 | 11 | Upcoming Exam | `/api/upcomingexam` | student_id |
 | 12 | Exam History | `/api/examhistory` | student_id |
-| 13 | Exam Detail | `/api/examdetail` | student_id |
+| 13 | Exam Detail | `/api/examdetail` | student_id, exam_id |
+| 13b | Report Card | `/api/reportcard` | student_id |
 | 14 | Attendance | `/api/studentattendance` | student_id |
 | 15 | Meetings | `/api/meetings` | class_section_id |
 | 16 | Transport | `/api/transport` | student_id |
@@ -1029,6 +1271,15 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 
 ### 8. Fee Detail (`/api/feedetail`)
 - [ ] Valid student_id → status 1, returns detailed fee breakdown
+- [ ] Verify tuition_fee uses session end date for total months (not current month)
+- [ ] Verify tuition_fee accounts for custom monthly fee from student_fee_balances
+- [ ] Verify tuition_fee deducts fee exemptions (fee_type=1, fees_deposited=0)
+- [ ] Verify tuition_fee deducts already deposited amounts
+- [ ] Student with transport → has_transport=true, transport_fee_monthly > 0
+- [ ] Verify transport_fee_total = total_months × monthly_charge
+- [ ] Verify transport_fee_pending = transport_fee_total − transport_fee_paid
+- [ ] Verify transport_route and transport_stop are populated
+- [ ] Student without transport → has_transport=false, transport_fee_monthly=0, transport_fee_pending=0
 - [ ] No fee data → verify error response
 
 ### 9. Fee Receipt (`/api/feereceipt`)
@@ -1048,8 +1299,23 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 - [ ] No exam history → verify response
 
 ### 13. Exam Detail (`/api/examdetail`)
-- [ ] Valid student_id → status 1, returns exam details
+- [ ] Valid student_id + exam_id → status 1, returns exam details with syllabus and marks
+- [ ] Verify syllabus chapters are returned when available
+- [ ] Verify student marks (marks_obtained) are returned
 - [ ] No exam data → verify response
+
+### 13b. Report Card (`/api/reportcard`)
+- [ ] Valid student_id with completed Half-Yearly exams → status 1, report_card contains Half-Yearly entry
+- [ ] Valid student_id with completed Yearly exams → report_card contains Yearly entry
+- [ ] Verify each exam entry has subjects array with subject_name, max_marks, marks_obtained, exam_date
+- [ ] Verify absent student shows marks_obtained="AB" and is_absent=true
+- [ ] Verify total_marks_obtained excludes absent subjects
+- [ ] Verify percentage = (total_marks_obtained / total_max_marks) × 100
+- [ ] Verify report_card is ordered: Half-Yearly first, then Yearly
+- [ ] Verify student info (reg_id, sname, class, section, session) is returned
+- [ ] Verify feedback/remarks are included when available
+- [ ] No completed exams for current session → status -1, "No report card data available"
+- [ ] Non-existent student_id → status -1, "No such student exists"
 
 ### 14. Student Attendance (`/api/studentattendance`)
 - [ ] Valid student_id → status 1, returns month-wise attendance array
@@ -1158,4 +1424,4 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 
 ---
 
-**Version:** 2.1 | **Last Updated:** April 2026
+**Version:** 2.2 | **Last Updated:** April 2026

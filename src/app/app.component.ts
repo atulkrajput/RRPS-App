@@ -7,8 +7,7 @@ import { Storage } from '@capacitor/storage';
 import { ConstantsService } from './services/constants.service';
 import { PushNotificationService } from './services/push-notification.service';
 import { ApiService } from './services/api.service';
-
-const APP_VERSION = '1.0.2';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -92,7 +91,7 @@ export class AppComponent {
   }
 
   checkForUpdate() {
-    this.api.checkAppVersion(APP_VERSION).subscribe(async (result: any) => {
+    this.api.checkAppVersion(environment.appVersion).subscribe(async (result: any) => {
       if (result.status === 1 && result.data && result.data.needs_update) {
         const isForce = result.data.force_update;
         const buttons: any[] = [];

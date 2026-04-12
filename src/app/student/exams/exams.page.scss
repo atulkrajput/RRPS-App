@@ -419,6 +419,246 @@
 .exam-card:nth-child(3),
 .result-card:nth-child(3) { animation-delay: 0.15s; }
 
+// Filter Chips
+.filter-chips {
+  padding: 8px 16px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  ion-chip {
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+}
+
+// Exam Teacher
+.exam-teacher {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+
+  ion-icon {
+    font-size: 0.9rem;
+  }
+}
+
+// Report Card Styles
+.report-student-card {
+  background: white;
+  border-radius: var(--border-radius);
+  margin: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  animation: fadeInUp 0.4s ease-out;
+
+  .student-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--bg-color);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+  }
+}
+
+.report-section {
+  background: white;
+  border-radius: var(--border-radius);
+  margin: 0 16px 16px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  animation: fadeInUp 0.4s ease-out;
+
+  .report-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--bg-color);
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .percentage-badge {
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 8px;
+
+      &.excellent {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+      }
+      &.good {
+        background: rgba(99, 102, 241, 0.1);
+        color: #6366f1;
+      }
+      &.average {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+      }
+      &.poor {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+      }
+    }
+  }
+
+  .report-subjects {
+    .report-subject-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--bg-color);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.header-row {
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--bg-color);
+      }
+
+      &.total-row {
+        font-weight: 700;
+        border-top: 2px solid var(--bg-color);
+        padding-top: 12px;
+        margin-top: 4px;
+
+        .subject-col {
+          color: var(--text-primary);
+        }
+
+        .marks-col {
+          color: var(--primary);
+          font-size: 1rem;
+        }
+      }
+
+      &.absent-row {
+        opacity: 0.7;
+      }
+
+      .subject-col {
+        flex: 2;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+
+      .marks-col {
+        flex: 1;
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-primary);
+
+        &.absent-mark {
+          color: #ef4444;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+}
+
+.report-feedback-card {
+  background: white;
+  border-radius: var(--border-radius);
+  margin: 0 16px 16px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  animation: fadeInUp 0.4s ease-out 0.1s both;
+
+  h3 {
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .feedback-ratings {
+    .rating-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--bg-color);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .value {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--primary);
+      }
+    }
+  }
+
+  .remarks-section {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 2px solid var(--bg-color);
+
+    .remarks-label {
+      margin: 0 0 4px 0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .remarks-text {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+  }
+}
+
 // Responsive Design
 @media (max-width: 576px) {
   .performance-card {

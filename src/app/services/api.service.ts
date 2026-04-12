@@ -75,13 +75,20 @@ export class ApiService {
     return this.http.post(link, { student_id: id });
   }
 
-  examHistory(id: number) {
+  examHistory(id: number, examTitleId?: number) {
     const link = this.baseUrl + 'examhistory/';
-    return this.http.post(link, { student_id: id });
+    const params: any = { student_id: id };
+    if (examTitleId) { params.exam_title_id = examTitleId; }
+    return this.http.post(link, params);
   }
 
-  examDetail(id: number) {
+  examDetail(studentId: number, examId: number) {
     const link = this.baseUrl + 'examdetail/';
+    return this.http.post(link, { student_id: studentId, exam_id: examId });
+  }
+
+  reportCard(id: number) {
+    const link = this.baseUrl + 'reportcard/';
     return this.http.post(link, { student_id: id });
   }
 

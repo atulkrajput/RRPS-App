@@ -3,6 +3,7 @@ import { AlertController } from '@ionic/angular';
 import { Storage } from '@capacitor/storage';
 import { ApiService } from 'src/app/services/api.service';
 import { ConstantsService } from 'src/app/services/constants.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-settings',
@@ -24,7 +25,7 @@ export class SettingsPage implements OnInit {
   async rateApp() { }
 
   fetchAppVersion() {
-    return '1.0.3';
+    return environment.appVersion;
   }
 
   async changePasswordPrompt() {
