@@ -27,15 +27,32 @@
 
 
 :root {
-  --primary: #f1693b;
-  --secondary: #adc84b;
-  --bg-color: #f4f5f8;
-  --text-light: #92949c;
-  --white: #fff;
-  --red_color: #ff5e5e;
+  // Modern color scheme
+  --primary: #6366f1;
+  --primary-light: #818cf8;
+  --primary-dark: #4f46e5;
+  --secondary: #10b981;
+  --secondary-light: #34d399;
+  --accent: #f59e0b;
+  --bg-color: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-light: #94a3b8;
+  --white: #ffffff;
+  --red_color: #ef4444;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
   --transparent: rgba(0, 0, 0, 0);
-  //     --item_bg: linear-gradient(135deg, rgba(87, 87, 104, 1) 0%, rgba(62, 62, 72, 1) 100%);
-  --item_bg: linear-gradient(118deg, rgba(87, 87, 104, 1) 0%, rgba(62, 62, 72, 1) 78%, rgba(62, 62, 72, 1) 79%);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+  --border-radius-lg: 16px;
+  --item_bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .bg_color {
@@ -143,12 +160,10 @@ ion-header {
           --padding-start: 0 !important;
 
           ion-back-button {
-              --color: var(--primary);
               --icon-font-size: 1.5rem !important;
           }
 
           ion-menu-button {
-              --color: var(--primary) !important;
               --padding-end: 0 !important;
               font-size: 1.5rem !important;
               margin-right: 8px;
@@ -172,7 +187,6 @@ ion-header {
       }
 
       ion-title {
-          color: var(--secondary);
           padding: 0 15px !important;
           padding-left: 0 !important;
           text-align: justify !important;
@@ -338,9 +352,139 @@ ion-header {
   --animate-duration: .2s;
 }
 
+// Modern Header - default styling for all pages
+.modern-header {
+  ion-toolbar {
+    --background: var(--bg-color);
+    --color: var(--text-primary);
+
+    ion-title {
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    ion-menu-button,
+    ion-back-button {
+      --color: var(--text-primary);
+    }
+
+    ion-button {
+      --color: var(--text-primary);
+    }
+  }
+
+  // When toolbar has a dynamic background (house color), use white
+  ion-toolbar[style*="--background"] {
+    --color: white;
+
+    ion-title {
+      color: white;
+    }
+
+    ion-menu-button,
+    ion-back-button,
+    ion-button {
+      --color: white;
+    }
+  }
+}
+
+// Modern Card Styles
+.modern-card {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  margin: 12px 0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+}
+
+.modern-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+// Modern Button Styles
+.modern-btn {
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// Modern Badge
+.modern-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  
+  &.badge-primary {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+  }
+  
+  &.badge-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+  
+  &.badge-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+  
+  &.badge-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+  }
+}
+
+// Modern Grid Layout
+.modern-grid {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+
+// Glassmorphism Effect
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+// Smooth Transitions
+* {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
 
 .alert-wrapper {
-  border-radius: 13px !important;
+  border-radius: 16px !important;
   min-width: calc(100% - 58px) !important;
   max-height: 484px !important;
   height: auto;
@@ -352,8 +496,16 @@ ion-header {
       h2 {
           text-transform: uppercase;
           letter-spacing: 1px;
-          font-size: 1.2rem;
+          font-size: 1.1rem;
+          color: var(--text-primary) !important;
+          font-weight: 700;
       }
+  }
+
+  .alert-message {
+      color: var(--text-secondary) !important;
+      font-size: 0.95rem;
+      padding: 12px 27px !important;
   }
 
   .alert-radio-group {
@@ -363,47 +515,43 @@ ion-header {
           .alert-button-inner {
               .alert-radio-label {
                   font-size: 1.2rem;
-                  color: var(--text-black);
+                  color: var(--text-primary);
               }
           }
       }
   }
 
   .alert-button-group {
-      padding: 0;
+      padding: 8px;
       display: flex;
       align-items: center;
-      position: relative;
-
-      &::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          width: 1.5px;
-          height: 100%;
-          background-color: var(--secondary);
-          z-index: 9999;
-          margin: 0 auto;
-      }
+      gap: 8px;
 
       .alert-button {
-          color: var(--primary);
-          background: var(--primary);
-          height: 50px;
+          border-radius: 10px;
+          height: 44px;
           text-align: center;
           margin: 0;
-          width: 50%;
+          flex: 1;
+          font-weight: 600;
+
+          &:first-child {
+              color: var(--text-secondary);
+              background: var(--bg-color);
+          }
+
+          &:last-child {
+              color: white;
+              background: var(--primary);
+          }
 
           .alert-button-inner {
               width: 100%;
               display: block;
               height: fit-content;
-              font-size: 1rem;
-              text-transform: uppercase;
-              letter-spacing: 0.7px;
-              color: white;
+              font-size: 0.9rem;
+              text-transform: none;
+              letter-spacing: 0.3px;
           }
       }
   }

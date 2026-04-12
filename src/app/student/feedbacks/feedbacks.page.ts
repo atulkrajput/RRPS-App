@@ -10,6 +10,7 @@ import { Storage } from '@capacitor/storage';
 })
 export class FeedbacksPage implements OnInit {
   feedbackData = null;
+  
   constructor(
     private constants: ConstantsService,
     private api: ApiService,
@@ -33,6 +34,25 @@ export class FeedbacksPage implements OnInit {
       await  loader.dismiss();
       this.constants.presentToast('Unable To get Feedback Data. Check Your Internet Connection.');
     });
+  }
+
+  getFeedbackCount(): number {
+    return this.feedbackData ? this.feedbackData.length : 0;
+  }
+
+  getFeedbackGradient(index: number): string {
+    const gradients = [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+    ];
+    return gradients[index % gradients.length];
+  }
+
+  getCurrentDate(): Date {
+    return new Date();
   }
 
 }

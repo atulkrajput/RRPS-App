@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
@@ -7,35 +7,108 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-item-divider  color="primary" class="ion-margin">
-    <ion-label>
-      Active Complaints
-    </ion-label>
-  </ion-item-divider>
-  <ion-list>
-    <ion-item lines="none" class="item-text-wrap" *ngFor="let acomplaint of activeComplainData">
-      <ion-label>
-        {{acomplaint.complaint_title}}
-        <span>{{acomplaint.complaint_desc}}</span>
-        <span>Reply: {{acomplaint.complaint_reply}}</span>
-        <span>Complain By: {{acomplaint.staff.name}}</span>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-  <ion-item-divider  color="primary" class="ion-margin">
-    <ion-label>
-      Complaints History
-    </ion-label>
-  </ion-item-divider>
-  <ion-list>
-    <ion-item lines="none" class="item-text-wrap" *ngFor="let acomplaint of complainData">
-      <ion-label>
-        {{acomplaint.complaint_title}}
-        <span>{{acomplaint.complaint_desc}}</span>
-        <span>Reply: {{acomplaint.complaint_reply}}</span>
-        <span>Complain By: {{acomplaint.staff.name}}</span>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+<ion-content class="modern-content">
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="summary-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%)">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+      </div>
+      <div class="summary-info">
+        <h4>{{getActiveCount()}}</h4>
+        <p>Active</p>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+        <ion-icon name="checkmark-done-outline"></ion-icon>
+      </div>
+      <div class="summary-info">
+        <h4>{{getHistoryCount()}}</h4>
+        <p>Resolved</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Complaints -->
+  <div class="section-header">
+    <h3>Active Complaints</h3>
+    <p>{{getActiveCount()}} pending complaints</p>
+  </div>
+
+  <div class="complaints-list">
+    <div class="complaint-card" *ngFor="let complaint of activeComplainData">
+      <div class="complaint-header">
+        <div class="complaint-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%)">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+        </div>
+        <div class="complaint-info">
+          <h3>{{complaint.complaint_title}}</h3>
+          <p class="complaint-by">
+            <ion-icon name="person-outline"></ion-icon>
+            By: {{complaint.staff.name}}
+          </p>
+        </div>
+        <span class="modern-badge badge-warning">Active</span>
+      </div>
+      <div class="complaint-body">
+        <p class="complaint-desc">{{complaint.complaint_desc}}</p>
+        <div class="complaint-reply" *ngIf="complaint.complaint_reply">
+          <ion-icon name="chatbox-outline"></ion-icon>
+          <div>
+            <span class="reply-label">Reply:</span>
+            <p>{{complaint.complaint_reply}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State for Active -->
+  <div class="empty-state" *ngIf="!activeComplainData || activeComplainData.length === 0">
+    <ion-icon name="checkmark-circle-outline"></ion-icon>
+    <h3>No active complaints</h3>
+    <p>You don't have any pending complaints</p>
+  </div>
+
+  <!-- Complaints History -->
+  <div class="section-header">
+    <h3>Resolved Complaints</h3>
+    <p>{{getHistoryCount()}} resolved complaints</p>
+  </div>
+
+  <div class="complaints-list">
+    <div class="complaint-card resolved" *ngFor="let complaint of complainData">
+      <div class="complaint-header">
+        <div class="complaint-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+          <ion-icon name="checkmark-done-outline"></ion-icon>
+        </div>
+        <div class="complaint-info">
+          <h3>{{complaint.complaint_title}}</h3>
+          <p class="complaint-by">
+            <ion-icon name="person-outline"></ion-icon>
+            By: {{complaint.staff.name}}
+          </p>
+        </div>
+        <span class="modern-badge badge-success">Resolved</span>
+      </div>
+      <div class="complaint-body">
+        <p class="complaint-desc">{{complaint.complaint_desc}}</p>
+        <div class="complaint-reply" *ngIf="complaint.complaint_reply">
+          <ion-icon name="chatbox-outline"></ion-icon>
+          <div>
+            <span class="reply-label">Reply:</span>
+            <p>{{complaint.complaint_reply}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State for History -->
+  <div class="empty-state" *ngIf="!complainData || complainData.length === 0">
+    <ion-icon name="time-outline"></ion-icon>
+    <h3>No complaint history</h3>
+    <p>Resolved complaints will appear here</p>
+  </div>
 </ion-content>

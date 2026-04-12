@@ -7,4 +7,7 @@ export interface StudentBasicData {
   class: string;
   section: string;
   profilePic: string;
+  house_color: string;
+  house_color_code: string;
+  house_name: string;
 }

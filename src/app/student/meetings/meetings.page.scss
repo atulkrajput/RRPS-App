@@ -1,19 +1,277 @@
-ion-list{
-  ion-item{
-    border-bottom: 2px dotted var(--ion-color-medium);
-    ion-label{
-      color: var(--ion-color-primary);
-      span{
-        display: block;
-        font-size: 10px;
-        color: #424242;
+// Modern Header
+.modern-header {
+  ion-toolbar {
+    --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --color: white;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  ion-title {
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  ion-menu-button,
+  ion-button {
+    --color: white;
+  }
+}
+
+// Modern Content
+.modern-content {
+  --background: var(--bg-color);
+}
+
+// Summary Cards
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 16px;
+  animation: fadeInUp 0.5s ease-out;
+
+  .summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .summary-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      ion-icon {
+        font-size: 24px;
+        color: white;
+      }
+    }
+
+    .summary-info {
+      flex: 1;
+      min-width: 0;
+
+      h4 {
+        margin: 0 0 4px 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Section Header
+.section-header {
+  padding: 20px 16px 12px;
+  animation: fadeInUp 0.5s ease-out 0.1s both;
+
+  h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+}
+
+// Meetings List
+.meetings-list {
+  padding: 0 16px 16px;
+
+  .meeting-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: fadeInUp 0.5s ease-out;
+
+    &:nth-child(1) { animation-delay: 0.2s; }
+    &:nth-child(2) { animation-delay: 0.25s; }
+    &:nth-child(3) { animation-delay: 0.3s; }
+    &:nth-child(4) { animation-delay: 0.35s; }
+    &:nth-child(n+5) { animation-delay: 0.4s; }
+
+    .meeting-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      ion-icon {
+        font-size: 24px;
+        color: white;
+      }
+    }
+
+    .meeting-info {
+      flex: 1;
+      min-width: 0;
+
+      h3 {
+        margin: 0 0 6px 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .meeting-date {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        ion-icon {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  animation: fadeInUp 0.5s ease-out;
+
+  ion-icon {
+    font-size: 64px;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive Design
+@media (max-width: 576px) {
+  .summary-cards {
+    gap: 8px;
+    padding: 12px;
+
+    .summary-card {
+      padding: 12px;
+
+      .summary-icon {
+        width: 40px;
+        height: 40px;
+
+        ion-icon {
+          font-size: 20px;
+        }
+      }
+
+      .summary-info {
+        h4 {
+          font-size: 1.1rem;
+        }
+
+        p {
+          font-size: 0.75rem;
+        }
       }
     }
   }
 
-}
-ion-item-divider{
-  margin: 0 !important;
-  color: #fff;
-  font-size: 1.15rem;
+  .meetings-list {
+    padding: 0 12px 12px;
+
+    .meeting-card {
+      padding: 12px;
+
+      .meeting-icon {
+        width: 40px;
+        height: 40px;
+
+        ion-icon {
+          font-size: 20px;
+        }
+      }
+
+      .meeting-info {
+        h3 {
+          font-size: 0.9rem;
+        }
+
+        .meeting-date {
+          font-size: 0.75rem;
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    padding: 30px 20px;
+
+    ion-icon {
+      font-size: 56px;
+    }
+
+    h3 {
+      font-size: 0.95rem;
+    }
+
+    p {
+      font-size: 0.8rem;
+    }
+  }
 }

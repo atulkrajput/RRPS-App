@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
@@ -7,23 +7,59 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <h3 class="ion-padding-horizontal">{{viewTitle}} <span><button ion-button [disabled]="isToday" (click)="today()">Today</button></span></h3>
-  <br>
-  <calendar [eventSource]="eventSource"
-  [calendarMode]="calendar.mode"
-  [currentDate]="calendar.currentDate"
-  (onTitleChanged)="onViewTitleChanged($event)"
-  [step]="calendar.step">
-</calendar>
-  <div class="ion-padding">
+<ion-content class="modern-content">
+  <!-- Calendar Header -->
+  <div class="calendar-header">
+    <div class="header-content">
+      <div class="month-info">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <h2>{{viewTitle}}</h2>
+      </div>
+      <ion-button fill="outline" [disabled]="isToday" (click)="today()" class="today-btn">
+        <ion-icon slot="start" name="today-outline"></ion-icon>
+        Today
+      </ion-button>
+    </div>
+  </div>
 
-    <!-- <ion-calendar [(ngModel)]="date"
-      (onChange)="onChange($event)"
-      [type]="type"
-      [format]="'YYYY-MM-DD'">
-    </ion-calendar> -->
+  <!-- Calendar Widget -->
+  <div class="calendar-container">
+    <calendar [eventSource]="eventSource"
+      [calendarMode]="calendar.mode"
+      [currentDate]="calendar.currentDate"
+      (onTitleChanged)="onViewTitleChanged($event)"
+      [step]="calendar.step">
+    </calendar>
+  </div>
 
+  <!-- Upcoming Events -->
+  <div class="section-header">
+    <h3>Upcoming Events</h3>
+    <p>{{getUpcomingEventsCount()}} events scheduled</p>
+  </div>
 
+  <div class="events-list">
+    <div class="event-card" *ngFor="let event of calendarEvents">
+      <div class="event-date">
+        <div class="date-box">
+          <span class="day">{{event.event_date | date:'dd'}}</span>
+          <span class="month">{{event.event_date | date:'MMM'}}</span>
+        </div>
+      </div>
+      <div class="event-info">
+        <h3>{{event.event_name}}</h3>
+        <p class="event-time">
+          <ion-icon name="calendar-outline"></ion-icon>
+          {{event.event_date}}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!calendarEvents || calendarEvents.length === 0">
+    <ion-icon name="calendar-outline"></ion-icon>
+    <h3>No upcoming events</h3>
+    <p>Your scheduled events will appear here</p>
   </div>
 </ion-content>

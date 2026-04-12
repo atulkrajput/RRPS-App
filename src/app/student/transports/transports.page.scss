@@ -1,27 +1,281 @@
-ion-grid {
-  --ion-grid-column-padding: 10px;
-  border-collapse: collapse;
-  border-style: hidden;
+// Modern Header
+.modern-header {
+  ion-toolbar {
+    --background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --color: white;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
 
-  ion-row:first-child {
-    background-color: var(--primary);
-    font-weight: bold;
-    border-radius: 10px 10px 0 0;
-    ion-col{
-      border-radius: 10px 10px 0 0;
+  ion-title {
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  ion-menu-button,
+  ion-button {
+    --color: white;
+  }
+}
+
+// Modern Content
+.modern-content {
+  --background: var(--bg-color);
+}
+
+// Transport Info Card
+.transport-info-card {
+  background: white;
+  border-radius: 16px;
+  margin: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  animation: fadeInUp 0.5s ease-out;
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--bg-color);
+
+    .icon-wrapper {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      ion-icon {
+        font-size: 28px;
+        color: white;
+      }
+    }
+
+    .header-info {
+      flex: 1;
+
+      h3 {
+        margin: 0 0 4px 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
     }
   }
-  ion-col {
-    border: 1px solid black;
-    border-bottom: 0;
-    border-right: 0;
+
+  .transport-details {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-color);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: var(--bg-secondary);
+        transform: translateX(4px);
+      }
+
+      .detail-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        ion-icon {
+          font-size: 24px;
+          color: white;
+        }
+      }
+
+      .detail-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .label {
+          font-size: 0.8rem;
+          color: var(--text-secondary);
+          font-weight: 500;
+        }
+
+        .value {
+          font-size: 0.95rem;
+          color: var(--text-primary);
+          font-weight: 600;
+        }
+      }
+    }
   }
-  ion-col:last-child {
-    border-right: 1px solid black;
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  animation: fadeInUp 0.5s ease-out;
+
+  .empty-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(79, 172, 254, 0.3);
+
+    ion-icon {
+      font-size: 64px;
+      color: white;
+    }
   }
 
-  ion-row:last-child {
-    border-bottom: 1px solid black;
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
 
+  p {
+    margin: 0 0 24px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    max-width: 300px;
+  }
+
+  .contact-btn {
+    --border-color: var(--primary);
+    --color: var(--primary);
+    --border-width: 2px;
+    --border-radius: 12px;
+    font-weight: 600;
+    height: 44px;
+    text-transform: none;
+
+    ion-icon {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive Design
+@media (max-width: 576px) {
+  .transport-info-card {
+    margin: 12px;
+    padding: 16px;
+
+    .card-header {
+      .icon-wrapper {
+        width: 48px;
+        height: 48px;
+
+        ion-icon {
+          font-size: 24px;
+        }
+      }
+
+      .header-info {
+        h3 {
+          font-size: 1.1rem;
+        }
+
+        p {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    .transport-details {
+      gap: 12px;
+
+      .detail-item {
+        padding: 10px;
+
+        .detail-icon {
+          width: 40px;
+          height: 40px;
+
+          ion-icon {
+            font-size: 20px;
+          }
+        }
+
+        .detail-content {
+          .label {
+            font-size: 0.75rem;
+          }
+
+          .value {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    padding: 40px 20px;
+
+    .empty-icon {
+      width: 100px;
+      height: 100px;
+
+      ion-icon {
+        font-size: 52px;
+      }
+    }
+
+    h3 {
+      font-size: 1.1rem;
+    }
+
+    p {
+      font-size: 0.85rem;
+    }
+
+    .contact-btn {
+      height: 40px;
+      font-size: 0.9rem;
+    }
   }
 }

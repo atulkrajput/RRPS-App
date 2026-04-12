@@ -1,24 +1,132 @@
-<ion-header>
+<ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button autoHide="false"></ion-menu-button>
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
     </ion-buttons>
-    <ion-title>Attendances</ion-title>
+    <ion-title>Attendance</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content>
-  <ion-grid class="ion-margin">
-    <ion-row>
-      <ion-col>M-Y</ion-col>
-      <ion-col>Days</ion-col>
-      <ion-col>P</ion-col>
-      <ion-col>%</ion-col>
-    </ion-row>
-    <ion-row *ngFor="let adata of attendancesData; index as i">
-      <ion-col>{{ adata.month_name }}-{{ adata.year }}</ion-col>
-      <ion-col>{{ adata.total - adata.holidays}}</ion-col>
-      <ion-col>{{ adata.present }}</ion-col>
-      <ion-col>{{ adata.present/adata.total * 100 | number: '2.0-0' }}%</ion-col>
-    </ion-row>
-  </ion-grid>
+
+<ion-content class="modern-content">
+  <!-- Overall Stats -->
+  <div class="stats-card">
+    <h3>Overall Attendance</h3>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-circle" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+          <span>{{getOverallPercentage()}}%</span>
+        </div>
+        <p>Overall</p>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" style="color: var(--success)">
+          <h2>{{getTotalPresent()}}</h2>
+          <p>Present</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" style="color: var(--danger)">
+          <h2>{{getTotalAbsent()}}</h2>
+          <p>Absent</p>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" style="color: var(--text-secondary)">
+          <h2>{{getTotalDays()}}</h2>
+          <p>Total Days</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Breakdown -->
+  <div class="section-header">
+    <h3>Monthly Breakdown</h3>
+    <p>{{attendancesData.length}} months recorded</p>
+  </div>
+
+  <div class="attendance-list">
+    <div class="attendance-card" *ngFor="let adata of attendancesData; let i = index">
+      <div class="card-header">
+        <div class="month-icon">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
+        <div class="month-info">
+          <h3>{{adata.month_name}} {{adata.year}}</h3>
+          <p>{{adata.total - adata.holidays}} working days</p>
+        </div>
+        <div class="percentage-badge" [ngClass]="getAttendanceClass(adata.present, adata.total)">
+          {{getPercentage(adata.present, adata.total)}}%
+        </div>
+      </div>
+      
+      <div class="card-stats">
+        <div class="stat-row">
+          <div class="stat-col present">
+            <ion-icon name="checkmark-circle"></ion-icon>
+            <div>
+              <span class="value">{{adata.present}}</span>
+              <span class="label">Present</span>
+            </div>
+          </div>
+          <div class="stat-col absent">
+            <ion-icon name="close-circle"></ion-icon>
+            <div>
+              <span class="value">{{adata.total - adata.present - adata.holidays}}</span>
+              <span class="label">Absent</span>
+            </div>
+          </div>
+          <div class="stat-col holiday">
+            <ion-icon name="sunny"></ion-icon>
+            <div>
+              <span class="value">{{adata.holidays}}</span>
+              <span class="label">Holidays</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" 
+             [style.width.%]="getPercentage(adata.present, adata.total)"
+             [ngClass]="getAttendanceClass(adata.present, adata.total)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!attendancesData || attendancesData.length === 0">
+    <ion-icon name="calendar-clear-outline"></ion-icon>
+    <h3>No attendance records</h3>
+    <p>Attendance data will appear here</p>
+  </div>
+
+  <!-- Attendance Legend -->
+  <div class="legend-card">
+    <h4>Attendance Status</h4>
+    <div class="legend-items">
+      <div class="legend-item">
+        <span class="legend-dot excellent"></span>
+        <span>Excellent (≥ 90%)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot good"></span>
+        <span>Good (75% - 89%)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot warning"></span>
+        <span>Warning (60% - 74%)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot poor"></span>
+        <span>Poor (< 60%)</span>
+      </div>
+    </div>
+  </div>
 </ion-content>

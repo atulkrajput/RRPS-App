@@ -1,43 +1,157 @@
-<ion-header class="ion-no-border header-bg">
-  <ion-toolbar>
+<ion-header class="ion-no-border modern-header">
+  <ion-toolbar [style.--background]="houseGradient">
     <ion-buttons slot="start">
-      <ion-menu-button autoHide="false"></ion-menu-button>
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
     </ion-buttons>
-    <ion-title>Welcome</ion-title>
+    <ion-title>Profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="logOut()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content>
-  <div class="profile-bg">
-    <!-- <img [src]="profilePic"  onerror='this.src="assets/imgs/profile.png"' width="50px"> -->
+
+<ion-content class="modern-content">
+  <!-- Profile Header -->
+  <div class="profile-header" [style.background]="houseGradient">
+    <div class="profile-avatar-large">
+      <img [src]="profilePic" onerror='this.src="assets/imgs/profile.png"' alt="Profile">
+      <div class="status-indicator"></div>
+    </div>
+    <h2 class="ion-text-capitalize">{{studentProfileData.prefix}} {{studentProfileData.sname}}</h2>
+    <p class="reg-id">
+      <ion-icon name="card-outline"></ion-icon>
+      Reg No: {{studentProfileData.reg_id}}
+    </p>
+    <div class="header-badges">
+      <span class="class-badge">
+        <ion-icon name="school-outline"></ion-icon>
+        {{studentProfileData.class}} - {{studentProfileData.section}}
+      </span>
+      <span class="class-badge" *ngIf="houseName !== 'No House'">
+        <ion-icon name="flag-outline"></ion-icon>
+        {{houseName}} House
+      </span>
+    </div>
   </div>
-  <div class="ion-text-center">
-    <p>Reg No: {{studentProfileData.reg_id}}</p>
-    <h3 class="ion-text-capitalize">{{studentProfileData.prefix}} {{studentProfileData.sname}}</h3>
+
+  <!-- Personal Information -->
+  <div class="info-section">
+    <h3 class="section-title">Personal Information</h3>
+    
+    <div class="info-card">
+      <div class="info-item">
+        <div class="info-icon" [style.background]="houseColor + '20'">
+          <ion-icon name="male-outline" [style.color]="houseColor"></ion-icon>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Father's Name</span>
+          <span class="info-value ion-text-capitalize">{{studentProfileData.father_name}}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <div class="info-icon" [style.background]="houseColor + '20'">
+          <ion-icon name="female-outline" [style.color]="houseColor"></ion-icon>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Mother's Name</span>
+          <span class="info-value ion-text-capitalize">{{studentProfileData.mother_name}}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <div class="info-icon" [style.background]="houseColor + '20'">
+          <ion-icon name="calendar-outline" [style.color]="houseColor"></ion-icon>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Date of Birth</span>
+          <span class="info-value">{{studentProfileData.dob}}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <div class="info-icon" [style.background]="houseColor + '20'">
+          <ion-icon name="location-outline" [style.color]="houseColor"></ion-icon>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Address</span>
+          <span class="info-value">{{studentProfileData.address}}</span>
+        </div>
+      </div>
+
+      <div class="info-item" *ngIf="studentProfileData.mobile">
+        <div class="info-icon" [style.background]="houseColor + '20'">
+          <ion-icon name="call-outline" [style.color]="houseColor"></ion-icon>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Mobile</span>
+          <span class="info-value">{{studentProfileData.mobile}}</span>
+        </div>
+      </div>
+
+      <div class="info-item" *ngIf="studentProfileData.academic_session">
+        <div class="info-icon" [style.background]="houseColor + '20'">
+          <ion-icon name="book-outline" [style.color]="houseColor"></ion-icon>
+        </div>
+        <div class="info-content">
+          <span class="info-label">Academic Session</span>
+          <span class="info-value">{{studentProfileData.academic_session}}</span>
+        </div>
+      </div>
+    </div>
   </div>
-  <ion-list class="ion-padding">
-    <ion-item>
-      <ion-label position="floating">Class Section</ion-label>
-      <ion-input value="Class 12 B"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Father Name</ion-label>
-      <ion-input  class="ion-text-capitalize" value="{{studentProfileData.father_name}}"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Mother Name</ion-label>
-      <ion-input  class="ion-text-capitalize" value="{{studentProfileData.mother_name}}"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Contact no</ion-label>
-      <ion-input value="{{studentProfileData.father_name}}"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">DOB</ion-label>
-      <ion-input value="{{studentProfileData.dob}}"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="floating">Address</ion-label>
-      <ion-input value="{{studentProfileData.address}}"></ion-input>
-    </ion-item>
-  </ion-list>
-  </ion-content>
+
+  <!-- Fee Defaulter Warning -->
+  <div class="defaulter-warning" *ngIf="studentProfileData.defaulter">
+    <ion-icon name="warning-outline"></ion-icon>
+    <span>Fee payment pending. Please clear your dues.</span>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="actions-section">
+    <h3 class="section-title">Quick Actions</h3>
+    
+    <ion-grid>
+      <ion-row>
+        <ion-col size="6">
+          <div class="action-card" routerLink="/attendance">
+            <div class="action-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+              <ion-icon name="checkmark-done-outline"></ion-icon>
+            </div>
+            <h4>Attendance</h4>
+            <p>View records</p>
+          </div>
+        </ion-col>
+        <ion-col size="6">
+          <div class="action-card" routerLink="/fees">
+            <div class="action-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">
+              <ion-icon name="card-outline"></ion-icon>
+            </div>
+            <h4>Fees</h4>
+            <p>Payment info</p>
+          </div>
+        </ion-col>
+        <ion-col size="6">
+          <div class="action-card" routerLink="/exams">
+            <div class="action-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%)">
+              <ion-icon name="document-text-outline"></ion-icon>
+            </div>
+            <h4>Exams</h4>
+            <p>Test schedule</p>
+          </div>
+        </ion-col>
+        <ion-col size="6">
+          <div class="action-card" routerLink="/homework">
+            <div class="action-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
+              <ion-icon name="book-outline"></ion-icon>
+            </div>
+            <h4>Homework</h4>
+            <p>Assignments</p>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

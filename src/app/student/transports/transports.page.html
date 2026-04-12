@@ -1,110 +1,99 @@
-<ion-header>
+<ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
     </ion-buttons>
-    <ion-title>Transports</ion-title>
+    <ion-title>Transport</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-text-wrap ion-text-center ion-no-padding">
-  <img src="../../../assets/icon/transport.png" alt="transport" width="75px" class="ion-margin-top"/>
-  <ion-grid class="ion-text-center" *ngIf="transportData === null">
-    <ion-row>
-      <ion-col>
-        <ion-title>
-          <ion-text color="default">
-            No Transport Attached
-          </ion-text>
-        </ion-title>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-  <ion-grid class="ion-text-center"  *ngIf="transportData !== null">
+<ion-content class="modern-content">
+  <!-- Transport Info Card -->
+  <div class="transport-info-card" *ngIf="transportData !== null">
+    <div class="card-header">
+      <div class="icon-wrapper">
+        <ion-icon name="bus-outline"></ion-icon>
+      </div>
+      <div class="header-info">
+        <h3>Transport Details</h3>
+        <p>Your assigned transport information</p>
+      </div>
+      <span class="modern-badge badge-success">Active</span>
+    </div>
 
-    <ion-row>
-      <ion-col>
-        <ion-title>
-          <ion-text color="default">
-            Transport Details
-          </ion-text>
-        </ion-title>
-      </ion-col>
-    </ion-row>
+    <div class="transport-details">
+      <div class="detail-item">
+        <div class="detail-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+          <ion-icon name="navigate-outline"></ion-icon>
+        </div>
+        <div class="detail-content">
+          <span class="label">Route</span>
+          <span class="value">{{transportData.road_route.route_name}}</span>
+        </div>
+      </div>
 
-    <ion-row>
-      <ion-col>
-        <ion-text>Route</ion-text>
-      </ion-col>
-      <ion-col>
-        <ion-text>{{transportData.road_route.route_name}}</ion-text>
-      </ion-col>
-    </ion-row>
+      <div class="detail-item">
+        <div class="detail-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+        <div class="detail-content">
+          <span class="label">Driver Name</span>
+          <span class="value">{{transportData.vehicle.driver_name}}</span>
+        </div>
+      </div>
 
-    <ion-row>
-      <ion-col>
-        <ion-text>
-            Driver name
-        </ion-text>
-      </ion-col>
-        <ion-col>
-          <ion-text>
-            {{transportData.vehicle.driver_name}}
-          </ion-text>
-        </ion-col>
-    </ion-row>
+      <div class="detail-item">
+        <div class="detail-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
+          <ion-icon name="car-outline"></ion-icon>
+        </div>
+        <div class="detail-content">
+          <span class="label">Vehicle Type</span>
+          <span class="value">{{transportData.vehicle.vehicle_type}}</span>
+        </div>
+      </div>
 
-    <ion-row>
-      <ion-col>
-        <ion-text>
-            Vehicle Type
-        </ion-text>
-      </ion-col>
-        <ion-col>
-          <ion-text>
-            {{transportData.vehicle.vehicle_type}}
-          </ion-text>
-        </ion-col>
-    </ion-row>
+      <div class="detail-item">
+        <div class="detail-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">
+          <ion-icon name="card-outline"></ion-icon>
+        </div>
+        <div class="detail-content">
+          <span class="label">Registration No.</span>
+          <span class="value">{{transportData.vehicle.vehicle_regt_no}}</span>
+        </div>
+      </div>
 
-    <ion-row>
-      <ion-col>
-        <ion-text>
-            Reg no.
-        </ion-text>
-      </ion-col>
-        <ion-col>
-          <ion-text>
-            {{transportData.vehicle.vehicle_regt_no}}
-          </ion-text>
-        </ion-col>
-    </ion-row>
+      <div class="detail-item">
+        <div class="detail-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%)">
+          <ion-icon name="location-outline"></ion-icon>
+        </div>
+        <div class="detail-content">
+          <span class="label">Drop Point</span>
+          <span class="value">{{transportData.road_route_detail.stop_point}}</span>
+        </div>
+      </div>
 
-    <ion-row>
-      <ion-col>
-        <ion-text>
-            Drop Point
-        </ion-text>
-      </ion-col>
-        <ion-col>
-          <ion-text>
-            {{transportData.road_route_detail.stop_point}}
-          </ion-text>
-        </ion-col>
-    </ion-row>
+      <div class="detail-item">
+        <div class="detail-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%)">
+          <ion-icon name="cash-outline"></ion-icon>
+        </div>
+        <div class="detail-content">
+          <span class="label">Monthly Charges</span>
+          <span class="value">₹ {{transportData.road_route_detail.monthly_charge}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <ion-row>
-      <ion-col>
-        <ion-text>
-            Charges
-        </ion-text>
-      </ion-col>
-        <ion-col>
-          <ion-text>
-            Rs. {{transportData.road_route_detail.monthly_charge}}
-          </ion-text>
-        </ion-col>
-    </ion-row>
-
-  </ion-grid>
+  <!-- No Transport State -->
+  <div class="empty-state" *ngIf="transportData === null">
+    <div class="empty-icon">
+      <ion-icon name="bus-outline"></ion-icon>
+    </div>
+    <h3>No Transport Assigned</h3>
+    <p>You don't have any transport facility assigned yet</p>
+    <ion-button fill="outline" class="contact-btn">
+      <ion-icon slot="start" name="call-outline"></ion-icon>
+      Contact Office
+    </ion-button>
+  </div>
 </ion-content>

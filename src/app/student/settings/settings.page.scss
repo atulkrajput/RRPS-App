@@ -1,15 +1,187 @@
-h3{
-  color: var(--secondary);
-  font-size: 18px;
+// Modern Header
+.modern-header {
+  ion-toolbar {
+    --background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    --color: white;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  ion-title {
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  ion-menu-button,
+  ion-button {
+    --color: white;
+  }
 }
 
-ion-item.item:hover a {
-  background-color: slategray;
-  color: --tertiary;
+// Modern Content
+.modern-content {
+  --background: var(--bg-color);
 }
-.ion-color.sc-ion-label-md-h{
-    color: #000000;
+
+// Section Header
+.section-header {
+  padding: 20px 16px 12px;
+  animation: fadeInUp 0.5s ease-out;
+
+  &:first-child {
+    padding-top: 16px;
+  }
+
+  h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
 }
-.sc-ion-item-md-s{
-      color: #000000;
+
+// Settings List
+.settings-list {
+  padding: 0 16px 16px;
+
+  .settings-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.5s ease-out;
+
+    &:nth-child(1) { animation-delay: 0.1s; }
+    &:nth-child(2) { animation-delay: 0.15s; }
+    &:nth-child(3) { animation-delay: 0.2s; }
+    &:nth-child(4) { animation-delay: 0.25s; }
+    &:nth-child(5) { animation-delay: 0.3s; }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .setting-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      ion-icon {
+        font-size: 24px;
+        color: white;
+      }
+    }
+
+    .setting-info {
+      flex: 1;
+      min-width: 0;
+
+      h3 {
+        margin: 0 0 4px 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+      }
+    }
+
+    .arrow-icon {
+      font-size: 1.2rem;
+      color: var(--text-light);
+      flex-shrink: 0;
+    }
+
+    ion-toggle {
+      --background: var(--bg-secondary);
+      --background-checked: var(--primary);
+      --handle-background: white;
+      --handle-background-checked: white;
+    }
+
+    .version-badge {
+      padding: 6px 12px;
+      background: var(--bg-color);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive Design
+@media (max-width: 576px) {
+  .settings-list {
+    padding: 0 12px 12px;
+
+    .settings-card {
+      padding: 12px;
+
+      .setting-icon {
+        width: 40px;
+        height: 40px;
+
+        ion-icon {
+          font-size: 20px;
+        }
+      }
+
+      .setting-info {
+        h3 {
+          font-size: 0.9rem;
+        }
+
+        p {
+          font-size: 0.75rem;
+        }
+      }
+
+      .arrow-icon {
+        font-size: 1.1rem;
+      }
+
+      .version-badge {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+      }
+    }
+  }
 }

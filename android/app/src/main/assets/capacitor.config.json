@@ -1,0 +1,6 @@
+{
+	"appId": "com.doonportal.rrps",
+	"appName": "RRPS",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}

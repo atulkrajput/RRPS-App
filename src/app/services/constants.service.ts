@@ -18,6 +18,35 @@ export class ConstantsService {
   public static studentBasicData: StudentBasicData = undefined;
   public static studentProfileData: StudentProfileData = undefined;
 
+  // Default grey color when house is not assigned
+  public static readonly DEFAULT_HOUSE_COLOR = '#6b7280';
+  public static readonly DEFAULT_HOUSE_GRADIENT = 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)';
+
+  static getHouseColorCode(): string {
+    return ConstantsService.studentBasicData?.house_color_code || ConstantsService.DEFAULT_HOUSE_COLOR;
+  }
+
+  static getHouseGradient(): string {
+    const color = ConstantsService.getHouseColorCode();
+    if (color === ConstantsService.DEFAULT_HOUSE_COLOR) {
+      return ConstantsService.DEFAULT_HOUSE_GRADIENT;
+    }
+    // Generate a darker shade for gradient end
+    return `linear-gradient(135deg, ${color} 0%, ${ConstantsService.darkenColor(color, 30)} 100%)`;
+  }
+
+  static getHouseName(): string {
+    return ConstantsService.studentBasicData?.house_name || 'No House';
+  }
+
+  private static darkenColor(hex: string, percent: number): string {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const r = Math.max(0, (num >> 16) - Math.round(2.55 * percent));
+    const g = Math.max(0, ((num >> 8) & 0x00FF) - Math.round(2.55 * percent));
+    const b = Math.max(0, (num & 0x0000FF) - Math.round(2.55 * percent));
+    return '#' + (0x1000000 + r * 0x10000 + g * 0x100 + b).toString(16).slice(1);
+  }
+
   // public static userData: any = null;
   // public static appVersion  = '';
   // public static placeData = [];

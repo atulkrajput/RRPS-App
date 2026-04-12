@@ -1,69 +1,160 @@
-<ion-header>
+<ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button autoHide="false"></ion-menu-button>
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
     </ion-buttons>
-    <ion-title>All Homework</ion-title>
+    <ion-title>Homework</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon slot="icon-only" name="filter-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-segment [(ngModel)]="homeworkTabs" lines="none" mode="md">
-    <ion-segment-button class="ion-text-start" value="today" mode="md">
-        <ion-label>{{'today'}}</ion-label>
-    </ion-segment-button>
-    <ion-segment-button class="ion-text-start" value="yesterday" mode="md">
-        <ion-label>{{'yesterday'}}</ion-label>
-    </ion-segment-button>
-    <ion-segment-button class="ion-text-start" value="past" mode="md">
-      <ion-label>{{'past'}}</ion-label>
-  </ion-segment-button>
-  </ion-segment>
-  <div class="tab_container" [ngSwitch]="homeworkTabs">
-    <ion-list lines="none" *ngSwitchCase="'today'">
-      <ion-item class="pending" *ngFor ="let tdata of hwtodayData" (click)="homeworkDetails()">
-        <div class="item_inner d-flex">
-            <div class="text_box">
-                <h2 class="d-flex"><span>{{tdata.subject.subject_name}} By {{tdata.staff.name}}</span>
-                </h2>
-                <h3 class="d-flex">{{tdata.start_date}} to {{tdata.end_date}}
-                  <span class="end" *ngIf="tdata.status===0">In Process</span>
-                  <span class="end" *ngIf="tdata.status===1">Completed</span>
-                </h3>
-                <div class="d-flex boxInnerdiv" [innerHTML]="tdata.homework"></div>
-            </div>
+<ion-content class="modern-content">
+  <!-- Stats Summary -->
+  <div class="stats-summary">
+    <div class="stat-item">
+      <h3>{{getTotalCount()}}</h3>
+      <p>Total</p>
+    </div>
+    <div class="stat-item">
+      <h3>{{getPendingCount()}}</h3>
+      <p>Pending</p>
+    </div>
+    <div class="stat-item">
+      <h3>{{getCompletedCount()}}</h3>
+      <p>Completed</p>
+    </div>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <ion-segment [(ngModel)]="homeworkTabs" mode="md">
+      <ion-segment-button value="today">
+        <ion-label>Today</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="yesterday">
+        <ion-label>Yesterday</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="past">
+        <ion-label>Past</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <!-- Homework List -->
+  <div class="homework-list" [ngSwitch]="homeworkTabs">
+    <!-- Today's Homework -->
+    <div *ngSwitchCase="'today'">
+      <div class="homework-card" *ngFor="let hw of hwtodayData" (click)="homeworkDetails(hw)">
+        <div class="card-header">
+          <div class="subject-icon" [style.background]="getSubjectGradient(hw.subject?.subject_name)">
+            <ion-icon [name]="getSubjectIcon(hw.subject?.subject_name)"></ion-icon>
+          </div>
+          <div class="card-info">
+            <h3>{{hw.subject?.subject_name}}</h3>
+            <p class="teacher-name">
+              <ion-icon name="person-outline"></ion-icon>
+              {{hw.staff?.name}}
+            </p>
+          </div>
+          <span class="modern-badge" [ngClass]="hw.status === 1 ? 'badge-success' : 'badge-warning'">
+            {{hw.status === 1 ? 'Completed' : 'Pending'}}
+          </span>
         </div>
-      </ion-item>
-    </ion-list>
-    <ion-list lines="none" *ngSwitchCase="'yesterday'">
-      <ion-item class="pending" *ngFor ="let ydata of hwydayData" (click)="homeworkDetails()">
-        <div class="item_inner d-flex">
-            <div class="text_box">
-                <h2 class="d-flex"><span>{{ydata.subject.subject_name}} By {{ydata.staff.name}}</span>
-                </h2>
-                <h3 class="d-flex">{{ydata.start_date}} to {{ydata.end_date}}
-                  <span class="end" *ngIf="ydata.status===0">In Process</span>
-                  <span class="end" *ngIf="ydata.status===1">Completed</span>
-                </h3>
-                <div class="d-flex boxInnerdiv" [innerHTML]="ydata.homework"></div>
-            </div>
+        <div class="card-content" [innerHTML]="hw.homework"></div>
+        <div class="card-footer">
+          <span class="date-range">
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{hw.start_date}} - {{hw.end_date}}
+          </span>
+          <ion-button fill="clear" size="small">
+            View Details
+            <ion-icon slot="end" name="arrow-forward"></ion-icon>
+          </ion-button>
         </div>
-      </ion-item>
-    </ion-list>
-    <ion-list lines="none" *ngSwitchCase="'past'">
-      <ion-item class="pending" *ngFor ="let pdata of hwpastData" (click)="homeworkDetails()">
-        <div class="item_inner d-flex">
-            <div class="text_box">
-                <h2 class="d-flex"><span>{{pdata.subject.subject_name}} By {{pdata.staff.name}}</span>
-                </h2>
-                <h3 class="d-flex">{{pdata.start_date}} to {{pdata.end_date}}
-                  <span class="end" *ngIf="pdata.status===0">In Process</span>
-                  <span class="end" *ngIf="pdata.status===1">Completed</span>
-                </h3>
-                <div class="d-flex boxInnerdiv" [innerHTML]="pdata.homework"></div>
-            </div>
+      </div>
+      <div class="empty-state" *ngIf="!hwtodayData || hwtodayData.length === 0">
+        <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+        <h3>No homework for today</h3>
+        <p>You're all caught up!</p>
+      </div>
+    </div>
+
+    <!-- Yesterday's Homework -->
+    <div *ngSwitchCase="'yesterday'">
+      <div class="homework-card" *ngFor="let hw of hwydayData" (click)="homeworkDetails(hw)">
+        <div class="card-header">
+          <div class="subject-icon" [style.background]="getSubjectGradient(hw.subject?.subject_name)">
+            <ion-icon [name]="getSubjectIcon(hw.subject?.subject_name)"></ion-icon>
+          </div>
+          <div class="card-info">
+            <h3>{{hw.subject?.subject_name}}</h3>
+            <p class="teacher-name">
+              <ion-icon name="person-outline"></ion-icon>
+              {{hw.staff?.name}}
+            </p>
+          </div>
+          <span class="modern-badge" [ngClass]="hw.status === 1 ? 'badge-success' : 'badge-warning'">
+            {{hw.status === 1 ? 'Completed' : 'Pending'}}
+          </span>
         </div>
-      </ion-item>
-  </ion-list>
-</div>
+        <div class="card-content" [innerHTML]="hw.homework"></div>
+        <div class="card-footer">
+          <span class="date-range">
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{hw.start_date}} - {{hw.end_date}}
+          </span>
+          <ion-button fill="clear" size="small">
+            View Details
+            <ion-icon slot="end" name="arrow-forward"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+      <div class="empty-state" *ngIf="!hwydayData || hwydayData.length === 0">
+        <ion-icon name="document-text-outline"></ion-icon>
+        <h3>No homework from yesterday</h3>
+        <p>Nothing to show here</p>
+      </div>
+    </div>
+
+    <!-- Past Homework -->
+    <div *ngSwitchCase="'past'">
+      <div class="homework-card" *ngFor="let hw of hwpastData" (click)="homeworkDetails(hw)">
+        <div class="card-header">
+          <div class="subject-icon" [style.background]="getSubjectGradient(hw.subject?.subject_name)">
+            <ion-icon [name]="getSubjectIcon(hw.subject?.subject_name)"></ion-icon>
+          </div>
+          <div class="card-info">
+            <h3>{{hw.subject?.subject_name}}</h3>
+            <p class="teacher-name">
+              <ion-icon name="person-outline"></ion-icon>
+              {{hw.staff?.name}}
+            </p>
+          </div>
+          <span class="modern-badge" [ngClass]="hw.status === 1 ? 'badge-success' : 'badge-warning'">
+            {{hw.status === 1 ? 'Completed' : 'Pending'}}
+          </span>
+        </div>
+        <div class="card-content" [innerHTML]="hw.homework"></div>
+        <div class="card-footer">
+          <span class="date-range">
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{hw.start_date}} - {{hw.end_date}}
+          </span>
+          <ion-button fill="clear" size="small">
+            View Details
+            <ion-icon slot="end" name="arrow-forward"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+      <div class="empty-state" *ngIf="!hwpastData || hwpastData.length === 0">
+        <ion-icon name="time-outline"></ion-icon>
+        <h3>No past homework</h3>
+        <p>History is empty</p>
+      </div>
+    </div>
+  </div>
 </ion-content>

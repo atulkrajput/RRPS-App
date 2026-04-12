@@ -11,4 +11,11 @@ export interface StudentProfileData {
   mother_name: string;
   address: string;
   dob: Date;
+  house_color: string;
+  house_color_code: string;
+  house_name: string;
+  class_section_id: number;
+  academic_session: string;
+  mobile: string;
+  defaulter: boolean;
 }

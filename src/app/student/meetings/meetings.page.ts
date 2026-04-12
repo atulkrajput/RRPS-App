@@ -11,6 +11,7 @@ import { Storage } from '@capacitor/storage';
 export class MeetingsPage implements OnInit {
   newmeetingsData = null;
   meetingsData = null;
+  
   constructor(
     private constants: ConstantsService,
     private api: ApiService,
@@ -34,6 +35,14 @@ export class MeetingsPage implements OnInit {
       await  loader.dismiss();
       this.constants.presentToast('Unable To get Meetings Data. Check Your Internet Connection.');
     });
+  }
+
+  getUpcomingCount(): number {
+    return this.newmeetingsData ? this.newmeetingsData.length : 0;
+  }
+
+  getHistoryCount(): number {
+    return this.meetingsData ? this.meetingsData.length : 0;
   }
 
 }

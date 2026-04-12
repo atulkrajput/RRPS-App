@@ -1,80 +1,116 @@
-<ion-header>
+<ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button autoHide="false"></ion-menu-button>
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
     </ion-buttons>
     <ion-title>Fees</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon slot="icon-only" name="download-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-grid>
-    <ion-row class="ion-justify-content-evenly">
-      <ion-col class="ion-align-self-stretch" size="12">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title class="ion-text-capitalize"></ion-card-title>
-            <ion-card-subtitle color="primary" >Pending Fee Details (Rs.)</ion-card-subtitle>
-          </ion-card-header>
-
-          <ion-card-content>
-            <div class="details">
-              <ion-grid>
-                <ion-row>
-                  <ion-col size='5'>
-                    Old Balance
-                  </ion-col>
-                  <ion-col size='6' class="ion-text-wrap ion-text-capitalize ion-no-margin">
-                    0
-                  </ion-col>
-                </ion-row>
-                <ion-row>
-                  <ion-col size='5'>
-                    Monthly Fee
-                  </ion-col>
-                  <ion-col size='6' class="ion-text-wrap ion-no-margin">
-                    6018
-                  </ion-col>
-                </ion-row>
-                <ion-row>
-                  <ion-col size='5'>
-                    Transport Fee
-                  </ion-col>
-                  <ion-col size='6' class="ion-text-wrap ion-no-margin">
-                    0
-                  </ion-col>
-                </ion-row>
-                <ion-row>
-                  <ion-col size='5'>
-                    Total Fee
-                  </ion-col>
-                  <ion-col size='6' class="ion-text-wrap ion-no-margin">
-                    6018
-                  </ion-col>
-                </ion-row>
-              </ion-grid>
-              <ion-button size="small" slot="end">Pay now</ion-button>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-  <ion-item-divider  color="primary">
-    <ion-label>
-      Previous Payments
-    </ion-label>
-  </ion-item-divider>
-  <ion-list>
-    <ion-item lines="none" class="item-text-wrap" *ngFor="let feeH of feeHistoryData">
-      <ion-label>
-        <div *ngIf="feeH.fee_type === 1">Tution Fee - Rs. {{feeH.fees_deposited}}</div>
-        <span *ngIf="feeH.fee_type === 2">Transport Fee - Rs. {{feeH.fees_deposited}}</span>
-        <span> CASH, {{feeH.fee_deposit_date | date}}</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary" [disabled]="true">Receipt</ion-button>
+<ion-content class="modern-content">
+  <!-- Pending Fee Card -->
+  <div class="pending-fee-card">
+    <div class="card-header">
+      <div class="icon-wrapper">
+        <ion-icon name="card-outline"></ion-icon>
       </div>
-    </ion-item>
-  </ion-list>
+      <div class="header-info">
+        <h3>Pending Fees</h3>
+        <p>Payment due</p>
+      </div>
+      <span class="modern-badge badge-warning">Due</span>
+    </div>
+
+    <div class="fee-breakdown">
+      <div class="fee-item">
+        <span class="label">Old Balance</span>
+        <span class="value">₹ {{pendingFees.oldBalance || 0}}</span>
+      </div>
+      <div class="fee-item">
+        <span class="label">Monthly Fee</span>
+        <span class="value">₹ {{pendingFees.monthlyFee || 6018}}</span>
+      </div>
+      <div class="fee-item">
+        <span class="label">Transport Fee</span>
+        <span class="value">₹ {{pendingFees.transportFee || 0}}</span>
+      </div>
+      <div class="fee-item total">
+        <span class="label">Total Amount</span>
+        <span class="value">₹ {{getTotalPending()}}</span>
+      </div>
+    </div>
+
+    <ion-button expand="block" class="pay-button">
+      <ion-icon slot="start" name="card-outline"></ion-icon>
+      Pay Now
+    </ion-button>
+  </div>
+
+  <!-- Payment Summary -->
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="summary-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+      </div>
+      <div class="summary-info">
+        <h4>₹ {{getTotalPaid()}}</h4>
+        <p>Total Paid</p>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
+        <ion-icon name="calendar-outline"></ion-icon>
+      </div>
+      <div class="summary-info">
+        <h4>{{getPaymentCount()}}</h4>
+        <p>Payments</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment History -->
+  <div class="section-header">
+    <h3>Payment History</h3>
+    <p>{{feeHistoryData?.length || 0}} transactions</p>
+  </div>
+
+  <div class="payment-list">
+    <div class="payment-card" *ngFor="let fee of feeHistoryData">
+      <div class="payment-header">
+        <div class="payment-icon" [style.background]="getFeeTypeGradient(fee.fee_type)">
+          <ion-icon [name]="getFeeTypeIcon(fee.fee_type)"></ion-icon>
+        </div>
+        <div class="payment-info">
+          <h3>{{getFeeTypeName(fee.fee_type)}}</h3>
+          <p class="payment-date">
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{fee.fee_deposit_date | date:'MMM dd, yyyy'}}
+          </p>
+        </div>
+        <div class="payment-amount">
+          <h2>₹ {{fee.fees_deposited}}</h2>
+          <span class="payment-method">CASH</span>
+        </div>
+      </div>
+      <div class="payment-footer">
+        <span class="modern-badge badge-success">Paid</span>
+        <ion-button fill="clear" size="small" disabled>
+          <ion-icon slot="start" name="document-text-outline"></ion-icon>
+          Receipt
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!feeHistoryData || feeHistoryData.length === 0">
+    <ion-icon name="receipt-outline"></ion-icon>
+    <h3>No payment history</h3>
+    <p>Your payment records will appear here</p>
+  </div>
 </ion-content>

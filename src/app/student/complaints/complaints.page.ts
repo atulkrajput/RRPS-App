@@ -38,4 +38,12 @@ export class ComplaintsPage implements OnInit {
       this.constants.presentToast('Unable To get Meetings Data. Check Your Internet Connection.');
     });
   }
+
+  getActiveCount(): number {
+    return this.activeComplainData ? this.activeComplainData.length : 0;
+  }
+
+  getHistoryCount(): number {
+    return this.complainData ? this.complainData.length : 0;
+  }
 }

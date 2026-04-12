@@ -1,72 +1,82 @@
-<ion-header>
+<ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button autoHide="false"></ion-menu-button>
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
     </ion-buttons>
     <ion-title>Exams</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon slot="icon-only" name="calendar-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
-    <ion-item-divider  color="primary">
-      <ion-label>
-        Monthly -1
-      </ion-label>
-    </ion-item-divider>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Mathematics
-        <span> 20-Jul-2021, 40/45 (88.89 %)</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="secondary">Key</ion-button>
+<ion-content class="modern-content">
+  <!-- Filter Tabs -->
+  <div class="filter-tabs">
+    <ion-segment [(ngModel)]="selectedTab" mode="md">
+      <ion-segment-button value="upcoming">
+        <ion-label>Upcoming</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="results">
+        <ion-label>History</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </div>
+
+  <!-- Upcoming Exams -->
+  <div *ngIf="selectedTab === 'upcoming'">
+    <div class="section-header">
+      <h3>Upcoming Exams</h3>
+      <p>{{upcomingExams.length}} exams scheduled</p>
+    </div>
+
+    <div class="exams-list">
+      <div class="exam-card" *ngFor="let exam of upcomingExams">
+        <div class="exam-header">
+          <div class="exam-icon" [style.background]="'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </div>
+          <div class="exam-info">
+            <h3>Exam</h3>
+          </div>
+          <span class="modern-badge badge-warning">Upcoming</span>
+        </div>
       </div>
-    </ion-item>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Physics
-        <span> Units- 5, Chapters- 10</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary">View</ion-button>
+    </div>
+
+    <div class="empty-state" *ngIf="upcomingExams.length === 0">
+      <ion-icon name="calendar-clear-outline"></ion-icon>
+      <h3>No upcoming exams</h3>
+      <p>You're all set for now!</p>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div *ngIf="selectedTab === 'results'">
+    <div class="section-header">
+      <h3>Exam History</h3>
+      <p>{{examHistory.length}} records available</p>
+    </div>
+
+    <div class="results-list">
+      <div class="result-card" *ngFor="let result of examHistory">
+        <div class="result-header">
+          <div class="subject-icon" [style.background]="'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </div>
+          <div class="result-info">
+            <h3>Exam Record</h3>
+          </div>
+        </div>
       </div>
-    </ion-item>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Chemistry
-        <span> Units- 5, Chapters- 10</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary">View</ion-button>
-      </div>
-    </ion-item>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Biology
-        <span> Units- 5, Chapters- 10</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary">View</ion-button>
-      </div>
-    </ion-item>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Economics
-        <span> Units- 5, Chapters- 10</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary">View</ion-button>
-      </div>
-    </ion-item>
-    <ion-item lines="none" class="item-text-wrap">
-      <ion-label>
-        Physical Education
-        <span> Units- 5, Chapters- 10</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button color="primary">View</ion-button>
-      </div>
-    </ion-item>
-  </ion-list>
+    </div>
+
+    <div class="empty-state" *ngIf="examHistory.length === 0">
+      <ion-icon name="document-text-outline"></ion-icon>
+      <h3>No exam history yet</h3>
+      <p>Results will appear here once published</p>
+    </div>
+  </div>
 </ion-content>

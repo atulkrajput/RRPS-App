@@ -1,137 +1,85 @@
-<ion-header color="transparent" class="dash-bg">
-  <ion-toolbar>
+<ion-header class="ion-no-border modern-header">
+  <ion-toolbar [style.--background]="houseGradient">
     <ion-buttons slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
     </ion-buttons>
     <ion-title>RR Public School</ion-title>
-    <ion-buttons slot="end" class="ricon">
-      <ion-icon name="notifications-outline" color="primary" routerLink="/notifications"></ion-icon>
+    <ion-buttons slot="end" class="notification-btn">
+      <ion-button fill="clear" routerLink="/notifications">
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        <ion-badge color="danger" class="notification-badge">3</ion-badge>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
-  <div class="dash-head">
-    <h3 class="ion-text-capitalize">Welcome<br>{{studentBasicData.prefix}} {{studentBasicData.sname}}</h3>
-    <div class="dash-left">
-
-      <img [src]="profilePic"  onerror='this.src="assets/imgs/profile.png"' width="50px">
-    </div>
-    <div class="dash-left">
-      <h4>Reg Id: {{studentBasicData.reg_id}}<br>
-        Class: {{studentBasicData.class}} <br>
-        Section: {{studentBasicData.section}}</h4>
-    </div>
-    <div class="dash-right">
-      <ion-button size="small"  (click)="logOut()">Signout</ion-button>
+  
+  <div class="modern-profile-header" [style.background]="houseGradient">
+    <div class="profile-content">
+      <div class="profile-avatar">
+        <img [src]="profilePic" onerror='this.src="assets/imgs/profile.png"' alt="Profile">
+        <div class="status-indicator"></div>
+      </div>
+      <div class="profile-info">
+        <h2 class="ion-text-capitalize">Welcome Back!</h2>
+        <h3>{{studentBasicData.prefix}} {{studentBasicData.sname}}</h3>
+        <div class="student-details">
+          <span class="detail-badge">
+            <ion-icon name="card-outline"></ion-icon>
+            {{studentBasicData.reg_id}}
+          </span>
+          <span class="detail-badge">
+            <ion-icon name="school-outline"></ion-icon>
+            {{studentBasicData.class}} - {{studentBasicData.section}}
+          </span>
+          <span class="detail-badge" *ngIf="houseName !== 'No House'">
+            <ion-icon name="flag-outline"></ion-icon>
+            {{houseName}} House
+          </span>
+        </div>
+      </div>
+      <ion-button fill="outline" size="small" class="logout-btn" (click)="logOut()">
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+        Logout
+      </ion-button>
     </div>
   </div>
 </ion-header>
-<ion-content class="ion-center">
-  <ion-grid>
-    <ion-row class="dash-row-icon">
-      <ion-col size="4">
-        <ion-item lines="none">
-          <ion-label class="ion-text-wrap ion-text-center dash-box" routerLink="/profile">
-            <img src="assets/icon/profilem.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Profile</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box" routerLink="/homework">
-            <img src="assets/icon/homework.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Homework</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box" routerLink="/fees">
-            <img src="assets/icon/fee.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Fee</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/syllabus">
-            <img src="assets/icon/syllabus.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Syllabus</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/exams">
-            <img src="assets/icon/exam.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Exam</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/attendance">
-            <img src="assets/icon/attendance.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Attendance</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/calender">
-            <img src="assets/icon/calendar.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Calendar</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/transports">
-            <img src="assets/icon/transport.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Transport</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/meetings">
-            <img src="assets/icon/meetings.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Meetings</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/complaints">
-            <img src="assets/icon/complaint.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Complaints</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/feedbacks">
-            <img src="assets/icon/teacher.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Feedback</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-      <ion-col size="4">
-        <ion-item lines="none" class="">
-          <ion-label class="ion-text-wrap ion-text-center dash-box"  routerLink="/settings">
-            <img src="assets/icon/settings.png" alt="profile"/>
-            <ion-text class="ion-text-wrap ion-text-center">Settings</ion-text>
-          </ion-label>
-        </ion-item>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-  <ion-footer>
-    <ion-toolbar>
+
+<ion-content class="modern-content">
+  <!-- Quick Stats -->
+  <div class="quick-stats" *ngIf="todayExams > 0 || upcomingExams > 0">
+    <div class="stat-card">
+      <div class="stat-icon" [style.background]="houseGradient">
+        <ion-icon name="today-outline"></ion-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{todayExams}}</span>
+        <span class="stat-label">Today's Exams</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" [style.background]="houseGradient">
+        <ion-icon name="time-outline"></ion-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{upcomingExams}}</span>
+        <span class="stat-label">Upcoming</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <ion-grid>
       <ion-row>
-        <ion-col size="4"><ion-button fill="clear" size="small" width="30%" routerLink="/about">About Us</ion-button></ion-col>
-        <ion-col size="4"><ion-button fill="clear" size="small" width="30%" routerLink="/terms">Terms</ion-button></ion-col>
-        <ion-col size="4"><ion-button fill="clear" size="small" width="30%" routerLink="/privacy">Privacy</ion-button></ion-col>
+        <ion-col size="6" size-md="4" size-lg="3" *ngFor="let item of menuItems">
+          <div class="modern-menu-card" [routerLink]="item.route">
+            <div class="card-icon" [style.background]="item.gradient">
+              <ion-icon [name]="item.icon"></ion-icon>
+            </div>
+            <h4>{{item.title}}</h4>
+            <p>{{item.subtitle}}</p>
+          </div>
+        </ion-col>
       </ion-row>
-    </ion-toolbar>
-  </ion-footer>
+    </ion-grid>
+  </div>
 </ion-content>

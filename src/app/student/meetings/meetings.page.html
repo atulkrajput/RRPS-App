@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
@@ -7,31 +7,84 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-item-divider  color="primary" class="ion-margin">
-    <ion-label>
-      Upcoming Meetings
-    </ion-label>
-  </ion-item-divider>
-  <ion-list>
-    <ion-item lines="none" class="item-text-wrap" *ngFor="let meeting of newmeetingsData">
-      <ion-label>
-        {{meeting.meeting_name}}
-        <span> {{meeting.meeting_date | date}}</span>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-  <ion-item-divider  color="primary" class="ion-margin">
-    <ion-label>
-      Meetings History
-    </ion-label>
-  </ion-item-divider>
-  <ion-list>
-    <ion-item lines="none" class="item-text-wrap" *ngFor="let meeting of meetingsData">
-      <ion-label>
-        {{meeting.meeting_name}}
-        <span> {{meeting.meeting_date | date}}</span>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+<ion-content class="modern-content">
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="summary-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+        <ion-icon name="calendar-outline"></ion-icon>
+      </div>
+      <div class="summary-info">
+        <h4>{{getUpcomingCount()}}</h4>
+        <p>Upcoming</p>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+        <ion-icon name="time-outline"></ion-icon>
+      </div>
+      <div class="summary-info">
+        <h4>{{getHistoryCount()}}</h4>
+        <p>Completed</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Meetings -->
+  <div class="section-header">
+    <h3>Upcoming Meetings</h3>
+    <p>{{getUpcomingCount()}} scheduled meetings</p>
+  </div>
+
+  <div class="meetings-list">
+    <div class="meeting-card" *ngFor="let meeting of newmeetingsData">
+      <div class="meeting-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+        <ion-icon name="people-outline"></ion-icon>
+      </div>
+      <div class="meeting-info">
+        <h3>{{meeting.meeting_name}}</h3>
+        <p class="meeting-date">
+          <ion-icon name="calendar-outline"></ion-icon>
+          {{meeting.meeting_date | date:'MMM dd, yyyy'}}
+        </p>
+      </div>
+      <span class="modern-badge badge-primary">Upcoming</span>
+    </div>
+  </div>
+
+  <!-- Empty State for Upcoming -->
+  <div class="empty-state" *ngIf="!newmeetingsData || newmeetingsData.length === 0">
+    <ion-icon name="calendar-outline"></ion-icon>
+    <h3>No upcoming meetings</h3>
+    <p>You don't have any scheduled meetings</p>
+  </div>
+
+  <!-- Meeting History -->
+  <div class="section-header">
+    <h3>Meeting History</h3>
+    <p>{{getHistoryCount()}} past meetings</p>
+  </div>
+
+  <div class="meetings-list">
+    <div class="meeting-card" *ngFor="let meeting of meetingsData">
+      <div class="meeting-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+      </div>
+      <div class="meeting-info">
+        <h3>{{meeting.meeting_name}}</h3>
+        <p class="meeting-date">
+          <ion-icon name="calendar-outline"></ion-icon>
+          {{meeting.meeting_date | date:'MMM dd, yyyy'}}
+        </p>
+      </div>
+      <span class="modern-badge badge-success">Completed</span>
+    </div>
+  </div>
+
+  <!-- Empty State for History -->
+  <div class="empty-state" *ngIf="!meetingsData || meetingsData.length === 0">
+    <ion-icon name="time-outline"></ion-icon>
+    <h3>No meeting history</h3>
+    <p>Past meetings will appear here</p>
+  </div>
 </ion-content>

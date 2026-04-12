@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
@@ -7,15 +7,50 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
-    <ion-item lines="none" class="item-text-wrap" *ngFor="let feedback of feedbackData">
-      <ion-label> Hello
-        {{feedback.id}}
-        <!-- <span>{{acomplaint.complaint_desc}}</span>
-        <span>Reply: {{acomplaint.complaint_reply}}</span>
-        <span>Complain By: {{acomplaint.staff.name}}</span> -->
-      </ion-label>
-    </ion-item>
-  </ion-list>
+<ion-content class="modern-content">
+  <!-- Summary Card -->
+  <div class="summary-card-single">
+    <div class="summary-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+      <ion-icon name="chatbubbles-outline"></ion-icon>
+    </div>
+    <div class="summary-info">
+      <h4>{{getFeedbackCount()}}</h4>
+      <p>Total Feedbacks</p>
+    </div>
+  </div>
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <h3>Teacher Feedbacks</h3>
+    <p>{{getFeedbackCount()}} feedbacks received</p>
+  </div>
+
+  <!-- Feedbacks List -->
+  <div class="feedbacks-list">
+    <div class="feedback-card" *ngFor="let feedback of feedbackData; let i = index">
+      <div class="feedback-header">
+        <div class="feedback-icon" [style.background]="getFeedbackGradient(i)">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+        <div class="feedback-info">
+          <h3>Feedback #{{feedback.id}}</h3>
+          <p class="feedback-date">
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{getCurrentDate() | date:'MMM dd, yyyy'}}
+          </p>
+        </div>
+        <span class="modern-badge badge-primary">Received</span>
+      </div>
+      <div class="feedback-body">
+        <p class="feedback-content">Teacher feedback details will be displayed here once available from the API.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!feedbackData || feedbackData.length === 0">
+    <ion-icon name="chatbubbles-outline"></ion-icon>
+    <h3>No feedbacks yet</h3>
+    <p>Teacher feedbacks will appear here once available</p>
+  </div>
 </ion-content>
