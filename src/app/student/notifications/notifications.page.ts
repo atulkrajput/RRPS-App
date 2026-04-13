@@ -25,7 +25,7 @@ export class NotificationsPage implements OnInit {
     const sDetails = JSON.parse(sData.value);
     //console.log(sDetails.id);
     const loader = await this.constants.getLoader();
-    this.api.notifications(sDetails.id).subscribe(async (result: any) => {
+    this.api.getNotifications(sDetails.id).subscribe(async (result: any) => {
       await loader.dismiss();
       //console.log(result.data);
       this.notificationData = result.data;

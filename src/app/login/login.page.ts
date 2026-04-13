@@ -54,7 +54,10 @@ export class LoginPage implements OnInit {
               sname: result.data.sname,
               class: result.data.class_category.class,
               section: result.data.class_section.section_type,
-              profilePic: result.data.pic
+              profilePic: result.data.pic,
+              house_color: result.data.house_color || null,
+              house_color_code: result.data.house_color_code || null,
+              house_name: result.data.house ? result.data.house.name : null
             };
             ConstantsService.studentProfileData = {
               id: result.data.id,
@@ -67,7 +70,14 @@ export class LoginPage implements OnInit {
               father_name: result.data.father_name,
               mother_name: result.data.mother_name,
               address: result.data.address,
-              dob: result.data.dob
+              dob: result.data.dob,
+              house_color: result.data.house_color || null,
+              house_color_code: result.data.house_color_code || null,
+              house_name: result.data.house ? result.data.house.name : null,
+              class_section_id: result.data.class_section_id,
+              academic_session: result.data.academic_session ? result.data.academic_session.session_name : null,
+              mobile: result.data.mobile,
+              defaulter: result.data.defaulter || false
             };
             this.navController.navigateRoot([ '/', 'dashboard']);
           }
