@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  appVersion: '1.0.4',
+  appVersion: '1.0.5',
 
   //serverUrl: 'http://192.168.1.1/rrps/',
   serverUrl:  'https://rrpublicschool.com/',
