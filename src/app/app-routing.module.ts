@@ -88,6 +88,11 @@ const routes: Routes = [
     path: 'notifications',
     loadChildren: () => import('./student/notifications/notifications.module').then( m => m.NotificationsPageModule),
     canLoad: [AuthGuard]
+  },
+  {
+    path: 'messages',
+    loadChildren: () => import('./student/messages/messages.module').then( m => m.MessagesPageModule),
+    canLoad: [AuthGuard]
   }
 ];
 

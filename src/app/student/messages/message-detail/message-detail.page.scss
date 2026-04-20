@@ -1,0 +1,100 @@
+.modern-header {
+  ion-toolbar {
+    --background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    --color: white;
+  }
+  ion-title { color: white; font-weight: 600; }
+  ion-back-button { --color: white; }
+}
+
+.modern-content { --background: var(--bg-color); }
+
+.detail-card {
+  background: white;
+  border-radius: 16px;
+  margin: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  animation: fadeInUp 0.4s ease-out;
+
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--bg-color);
+
+    .sender-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      ion-icon { font-size: 24px; color: white; }
+    }
+
+    .sender-info {
+      flex: 1;
+      h2 {
+        margin: 0 0 4px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      .date {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+      }
+    }
+  }
+
+  .detail-title {
+    margin: 0 0 16px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+
+  .detail-body {
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+  }
+
+  .detail-footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--bg-color);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+
+    ion-icon { font-size: 1rem; color: #10b981; }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  text-align: center;
+  ion-icon { font-size: 80px; color: var(--text-light); opacity: 0.5; margin-bottom: 16px; }
+  h3 { margin: 0; font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

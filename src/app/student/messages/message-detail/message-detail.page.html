@@ -1,0 +1,38 @@
+<ion-header class="ion-no-border modern-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/messages"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Message</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="modern-content">
+  <div class="detail-card" *ngIf="message">
+    <div class="detail-header">
+      <div class="sender-icon" [style.background]="getSenderGradient(message.sender_type)">
+        <ion-icon [name]="getSenderIcon(message.sender_type)"></ion-icon>
+      </div>
+      <div class="sender-info">
+        <h2>{{message.sender_display_name}}</h2>
+        <p class="date">{{message.created | date:'MMM dd, yyyy · h:mm a'}}</p>
+      </div>
+    </div>
+
+    <h1 class="detail-title">{{message.title}}</h1>
+
+    <div class="detail-body">
+      <p>{{message.message}}</p>
+    </div>
+
+    <div class="detail-footer" *ngIf="message.read_at">
+      <ion-icon name="checkmark-done-outline"></ion-icon>
+      <span>Read on {{message.read_at | date:'MMM dd, yyyy · h:mm a'}}</span>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!message">
+    <ion-icon name="mail-outline"></ion-icon>
+    <h3>Message not found</h3>
+  </div>
+</ion-content>

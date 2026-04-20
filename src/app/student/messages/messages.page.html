@@ -1,0 +1,50 @@
+<ion-header class="ion-no-border modern-header">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button autoHide="false"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Messages</ion-title>
+    <ion-buttons slot="end" *ngIf="getUnreadCount() > 0">
+      <ion-badge color="danger" class="unread-badge">{{getUnreadCount()}} unread</ion-badge>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="modern-content">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content pullingIcon="chevron-down-outline" refreshingSpinner="crescent">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <div class="section-header">
+    <h3>School Messages</h3>
+    <p>{{messages.length}} messages</p>
+  </div>
+
+  <div class="messages-list">
+    <div class="message-card" *ngFor="let msg of messages"
+      [class.unread]="msg.is_read === 0"
+      (click)="openMessage(msg)">
+      <div class="message-header">
+        <div class="sender-icon" [style.background]="getSenderGradient(msg.sender_type)">
+          <ion-icon [name]="getSenderIcon(msg.sender_type)"></ion-icon>
+        </div>
+        <div class="message-info">
+          <h3>{{msg.title}}</h3>
+          <p class="sender-name">{{msg.sender_display_name}}</p>
+        </div>
+        <div class="message-meta">
+          <span class="time">{{getTimeAgo(msg.created)}}</span>
+          <span class="unread-dot" *ngIf="msg.is_read === 0"></span>
+        </div>
+      </div>
+      <p class="message-preview">{{msg.message}}</p>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="messages.length === 0">
+    <ion-icon name="mail-outline"></ion-icon>
+    <h3>No messages yet</h3>
+    <p>Messages from school will appear here</p>
+  </div>
+</ion-content>

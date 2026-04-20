@@ -8,6 +8,7 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Storage } from '@capacitor/storage';
 import { AlertController, MenuController, NavController, Platform } from '@ionic/angular';
+import { Router } from '@angular/router';
 import { ConstantsService } from './services/constants.service';
 import { ApiService } from './services/api.service';
 import { environment } from 'src/environments/environment';
@@ -25,9 +26,11 @@ export class AppComponent {
     private menuCtrl: MenuController,
     private constants: ConstantsService,
     private api: ApiService,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private router: Router
   ) {
     this.initializeApp();
+    this.setupBackButton();
   }
 
   initializeApp() {
@@ -120,6 +123,32 @@ export class AppComponent {
           backdropDismiss: !isForce
         });
         await alert.present();
+      }
+    });
+  }
+
+  setupBackButton() {
+    this.platform.backButton.subscribeWithPriority(10, async () => {
+      const url = this.router.url;
+      // On root pages (dashboard, login), show exit confirmation
+      if (url === '/dashboard' || url === '/login') {
+        const alert = await this.alertCtrl.create({
+          header: 'Exit App',
+          message: 'Are you sure you want to exit?',
+          buttons: [
+            { text: 'Cancel', role: 'cancel' },
+            {
+              text: 'Exit',
+              handler: () => {
+                navigator['app']?.exitApp();
+              }
+            }
+          ]
+        });
+        await alert.present();
+      } else {
+        // Navigate back for all other pages
+        this.navCtrl.back();
       }
     });
   }

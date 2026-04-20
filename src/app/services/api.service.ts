@@ -165,6 +165,22 @@ export class ApiService {
     return this.http.post(link, { student_id: id });
   }
 
+  // Messages (Broadcast)
+  getMessages(id: number) {
+    const link = this.baseUrl + 'broadcastmessages/';
+    return this.http.post(link, { student_id: id });
+  }
+
+  getMessageDetail(studentId: number, messageId: number) {
+    const link = this.baseUrl + 'broadcastmessagedetail/';
+    return this.http.post(link, { student_id: studentId, message_id: messageId });
+  }
+
+  getUnreadMessageCount(id: number) {
+    const link = this.baseUrl + 'broadcastunreadcount/';
+    return this.http.post(link, { student_id: id });
+  }
+
   // Account
   changePassword(studentId: number, oldPassword: string, newPassword: string, confirmPassword: string) {
     const link = this.baseUrl + 'changepassword/';

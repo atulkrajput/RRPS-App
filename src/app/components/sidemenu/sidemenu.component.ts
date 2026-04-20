@@ -72,6 +72,11 @@ export class SidemenuComponent implements OnInit {
       icon: 'alert'
     },
     {
+      title: 'Messages',
+      url: 'messages',
+      icon: 'chatbubbles'
+    },
+    {
       title: 'Settings',
       url: 'settings',
       icon: 'cog'

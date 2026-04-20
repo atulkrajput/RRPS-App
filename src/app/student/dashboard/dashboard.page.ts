@@ -28,6 +28,7 @@ export class DashboardPage implements OnInit {
     { title: 'Calendar', subtitle: 'Events', icon: 'today-outline', route: '/calendar', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
     { title: 'Meetings', subtitle: 'PTM schedule', icon: 'people-outline', route: '/meetings', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
     { title: 'Feedback', subtitle: 'Report card', icon: 'chatbubble-outline', route: '/feedbacks', gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)' },
+    { title: 'Messages', subtitle: 'School messages', icon: 'chatbubbles-outline', route: '/messages', gradient: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
     { title: 'Settings', subtitle: 'Preferences', icon: 'settings-outline', route: '/settings', gradient: 'linear-gradient(135deg, #c3cfe2 0%, #f5f7fa 100%)' },
   ];
 
