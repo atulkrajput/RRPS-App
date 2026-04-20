@@ -29,3 +29,7 @@ npm-debug.log*
 /platforms
 /plugins
 /www
+
+# Firebase / Google Services
+google-services.json
+**/google-services.json
