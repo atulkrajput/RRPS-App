@@ -1,7 +1,7 @@
 <ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+      <ion-menu-button autoHide="false"></ion-menu-button>
     </ion-buttons>
     <ion-title>Attendance</ion-title>
     <ion-buttons slot="end">
@@ -13,6 +13,7 @@
 </ion-header>
 
 <ion-content class="modern-content">
+ <ng-container *ngIf="isLoaded">
   <!-- Overall Stats -->
   <div class="stats-card">
     <h3>Overall Attendance</h3>
@@ -129,4 +130,5 @@
       </div>
     </div>
   </div>
+ </ng-container>
 </ion-content>

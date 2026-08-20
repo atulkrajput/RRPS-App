@@ -87,38 +87,44 @@ export class HomeworksPage implements OnInit {
     const sData = await Storage.get({ key: 'studentData' });
     const sDetails = JSON.parse(sData.value);
     const loader = await this.constants.getLoader();
+    await loader.present();
+
+    let completed = 0;
+    const checkDone = async () => {
+      completed++;
+      if (completed >= 3) {
+        await loader.dismiss();
+      }
+    };
 
     // Loading Today Homework
-    await loader.present();
     this.api.dayhomework(sDetails.id).subscribe(async (result: any) => {
-      await loader.dismiss();
       this.hwtodayData = result.data || [];
+      await checkDone();
     }, async (error) => {
-      await loader.dismiss();
       this.constants.presentToast('Unable To Fetch Today Homework Data. Check Your Internet Connection.');
       this.hwtodayData = [];
+      await checkDone();
     });
 
     // Loading Yesterday Homework
-    await loader.present();
     this.api.ydayhomework(sDetails.id).subscribe(async (result: any) => {
-      await loader.dismiss();
       this.hwydayData = result.data || [];
+      await checkDone();
     }, async (error) => {
-      await loader.dismiss();
       this.constants.presentToast('Unable To Fetch Yesterday Homework Data. Check Your Internet Connection.');
       this.hwydayData = [];
+      await checkDone();
     });
 
     // Loading Past Home Work
-    await loader.present();
     this.api.dayhomeworkhistory(sDetails.id).subscribe(async (result: any) => {
-      await loader.dismiss();
       this.hwpastData = result.data || [];
+      await checkDone();
     }, async (error) => {
-      await loader.dismiss();
       this.constants.presentToast('Unable To Fetch Past Homework Data. Check Your Internet Connection.');
       this.hwpastData = [];
+      await checkDone();
     });
   }
 }

@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="ion-no-border modern-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-menu-button autoHide="false"></ion-menu-button>
@@ -7,16 +7,80 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
-    <ion-item lines="none" class="item-text-wrap" *ngFor="let syllabus of syllabusData">
-      <ion-label>
-        {{syllabus.subjects.subject_name}}
-        <span> Units- {{syllabus.units}}, Chapters- {{syllabus.chapters}}</span>
-      </ion-label>
-      <div class="item-note" slot="end">
-        <ion-button  (click)="syllabusDetails(syllabus.subject_id)">View</ion-button>
+<ion-content class="modern-content">
+  <ng-container *ngIf="isLoaded">
+    <!-- Summary Cards -->
+    <div class="summary-cards" *ngIf="syllabusData && syllabusData.length > 0">
+      <div class="summary-card">
+        <div class="summary-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+          <ion-icon name="book-outline"></ion-icon>
+        </div>
+        <div class="summary-info">
+          <h4>{{getTotalSubjects()}}</h4>
+          <p>Subjects</p>
+        </div>
       </div>
-    </ion-item>
-  </ion-list>
+      <div class="summary-card">
+        <div class="summary-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+          <ion-icon name="layers-outline"></ion-icon>
+        </div>
+        <div class="summary-info">
+          <h4>{{getTotalUnits()}}</h4>
+          <p>Units</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
+          <ion-icon name="document-text-outline"></ion-icon>
+        </div>
+        <div class="summary-info">
+          <h4>{{getTotalChapters()}}</h4>
+          <p>Chapters</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Header -->
+    <div class="section-header" *ngIf="syllabusData && syllabusData.length > 0">
+      <h3>All Subjects</h3>
+      <p>{{getTotalSubjects()}} subjects available</p>
+    </div>
+
+    <!-- Syllabus List -->
+    <div class="syllabus-list" *ngIf="syllabusData && syllabusData.length > 0">
+      <div class="syllabus-card" *ngFor="let syllabus of syllabusData">
+        <div class="syllabus-header">
+          <div class="subject-icon" [style.background]="getSubjectGradient(syllabus.subject?.subject_name)">
+            <ion-icon [name]="getSubjectIcon(syllabus.subject?.subject_name)"></ion-icon>
+          </div>
+          <div class="subject-info">
+            <h3>{{syllabus.subject?.subject_name}}</h3>
+            <div class="subject-stats">
+              <span class="stat-item">
+                <ion-icon name="layers-outline"></ion-icon>
+                {{syllabus.units}} Units
+              </span>
+              <span class="stat-item">
+                <ion-icon name="document-text-outline"></ion-icon>
+                {{syllabus.chapters}} Chapters
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="syllabus-footer">
+          <ion-button fill="clear" size="small" (click)="syllabusDetails(syllabus.subject_id)">
+            View Notes
+            <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!syllabusData || syllabusData.length === 0">
+      <ion-icon name="library-outline"></ion-icon>
+      <h3>No syllabus available</h3>
+      <p>Syllabus and study material will appear here</p>
+    </div>
+  </ng-container>
 </ion-content>

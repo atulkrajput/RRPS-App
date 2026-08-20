@@ -6,6 +6,7 @@ import { Storage } from '@capacitor/storage';
 import { NavController } from '@ionic/angular';
 import { ApiService } from '../services/api.service';
 import { ConstantsService } from '../services/constants.service';
+import { PushNotificationService } from '../services/push-notification.service';
 
 @Component({
   selector: 'app-login',
@@ -20,6 +21,7 @@ export class LoginPage implements OnInit {
     private constants: ConstantsService,
     private api: ApiService,
     private navController: NavController,
+    private pushService: PushNotificationService,
     ) {
       this.loginForm = this.fb.group({
         regid: ['', [Validators.required]],
@@ -80,6 +82,8 @@ export class LoginPage implements OnInit {
               defaulter: result.data.defaulter || false
             };
             this.navController.navigateRoot([ '/', 'dashboard']);
+            // Register device for push notifications linked to this student
+            this.pushService.registerDeviceForStudent(result.data.id);
           }
         }, async (error) => {
           await  loader.dismiss();

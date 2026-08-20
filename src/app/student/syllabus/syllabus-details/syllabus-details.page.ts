@@ -14,6 +14,8 @@ export class SyllabusDetailsPage implements OnInit {
   syllabusId = null;
   syllabusData = null;
   subjectName = '...';
+  isLoaded = false;
+
   constructor(
     private route: ActivatedRoute,
     private constants: ConstantsService,
@@ -29,13 +31,17 @@ export class SyllabusDetailsPage implements OnInit {
     const sData = await Storage.get({ key: 'studentData'});
     const sDetails = JSON.parse(sData.value);
     const loader = await this.constants.getLoader();
-    this.api.syllabusDetails(sDetails.id,sid).subscribe(async (result: any) => {
+    await loader.present();
+    this.api.syllabusDetails(sDetails.id, sid).subscribe(async (result: any) => {
       await loader.dismiss();
-      //console.log(result.data[0].subject.subject_name);
+      this.isLoaded = true;
       this.syllabusData = result.data;
-      this.subjectName = result.data[0].subject.subject_name;
+      if (result.data && result.data.length > 0) {
+        this.subjectName = result.data[0].subject.subject_name;
+      }
     }, async (error) => {
-      await  loader.dismiss();
+      await loader.dismiss();
+      this.isLoaded = true;
       this.constants.presentToast('Unable To get Syllabus Details. Check Your Internet Connection.');
     });
   }

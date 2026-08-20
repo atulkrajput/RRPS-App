@@ -11,6 +11,8 @@ import { ConstantsService } from 'src/app/services/constants.service';
 export class TransportsPage implements OnInit {
 
   transportData = null;
+  isLoaded = false;
+
   constructor(
     private constants: ConstantsService,
     private api: ApiService,
@@ -23,16 +25,15 @@ export class TransportsPage implements OnInit {
   async getTransportData(){
     const sData = await Storage.get({ key: 'studentData'});
     const sDetails = JSON.parse(sData.value);
-    //console.log(sDetails.id);
     const loader = await this.constants.getLoader();
     await loader.present();
     this.api.transport(sDetails.id).subscribe(async (result: any) => {
       await loader.dismiss();
-      // console.log(result.data);
+      this.isLoaded = true;
       this.transportData = result.data;
-      console.log(this.transportData);
     }, async (error) => {
-      await  loader.dismiss();
+      await loader.dismiss();
+      this.isLoaded = true;
       this.constants.presentToast('Unable To Fetch Your Transport Data. Check Your Internet Connection.');
     });
   }

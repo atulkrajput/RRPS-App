@@ -10,6 +10,7 @@ import { ConstantsService } from 'src/app/services/constants.service';
 })
 export class AttendancesPage implements OnInit {
   attendancesData = [];
+  isLoaded = false;
 
   constructor(
     private constants: ConstantsService,
@@ -66,9 +67,11 @@ export class AttendancesPage implements OnInit {
     await loader.present();
     this.api.attendance(sDetails.id).subscribe(async (result: any) => {
       await loader.dismiss();
+      this.isLoaded = true;
       this.attendancesData = result.data || [];
     }, async (error) => {
       await loader.dismiss();
+      this.isLoaded = true;
       this.constants.presentToast('Unable To Fetch Your Attendance. Check Your Internet Connection.');
       this.attendancesData = [];
     });

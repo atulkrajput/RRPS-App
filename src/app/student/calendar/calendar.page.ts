@@ -63,13 +63,17 @@ export class CalendarPage implements OnInit {
   async loadCalendarEvents() {
     const sData = await Storage.get({ key: 'studentData' });
     const sDetails = JSON.parse(sData.value);
-    this.api.calendar(sDetails.id).subscribe((result: any) => {
+    const loader = await this.constants.getLoader();
+    await loader.present();
+    this.api.calendar(sDetails.id).subscribe(async (result: any) => {
+      await loader.dismiss();
       if (result.status === 1) {
         this.calendarEvents = result.data || [];
       } else {
         this.calendarEvents = [];
       }
-    }, () => {
+    }, async () => {
+      await loader.dismiss();
       this.constants.presentToast('Unable to fetch calendar events.');
       this.calendarEvents = [];
     });

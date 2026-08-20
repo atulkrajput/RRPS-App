@@ -7,7 +7,7 @@
     <ion-buttons slot="end" class="notification-btn">
       <ion-button fill="clear" routerLink="/notifications">
         <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
-        <ion-badge color="danger" class="notification-badge">3</ion-badge>
+        <ion-badge color="danger" class="notification-badge" *ngIf="unreadNotifications > 0">{{unreadNotifications}}</ion-badge>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>

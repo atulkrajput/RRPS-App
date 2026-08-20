@@ -10,6 +10,7 @@ import { Storage } from '@capacitor/storage';
 })
 export class FeedbacksPage implements OnInit {
   feedbackData = null;
+  isLoaded = false;
   
   constructor(
     private constants: ConstantsService,
@@ -24,14 +25,15 @@ export class FeedbacksPage implements OnInit {
   {
     const sData = await Storage.get({ key: 'studentData'});
     const sDetails = JSON.parse(sData.value);
-    //console.log(sDetails.id);
     const loader = await this.constants.getLoader();
+    await loader.present();
     this.api.feedback(sDetails.id).subscribe(async (result: any) => {
       await loader.dismiss();
-      console.log(result.data);
+      this.isLoaded = true;
       this.feedbackData = result.data;
     }, async (error) => {
-      await  loader.dismiss();
+      await loader.dismiss();
+      this.isLoaded = true;
       this.constants.presentToast('Unable To get Feedback Data. Check Your Internet Connection.');
     });
   }

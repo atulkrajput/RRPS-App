@@ -1,11 +1,11 @@
 # RRPS Student App - API Documentation
 
 **App:** Student App (IONIC)  
-**Features:** Student Activities, Homework, Fees, Exams, Report Card, Attendance, Transport, Notifications, Houses  
+**Features:** Student Activities, Homework, Fees, Exams, Report Card, Attendance, Transport, Notifications, Houses, Complaints  
 **Base URL:** `https://rrpublicschool.com/api/`  
 **Method:** All endpoints use `POST`  
 **Response Format:** JSON  
-**Last Updated:** April 2026
+**Last Updated:** August 2026
 
 ---
 
@@ -17,18 +17,22 @@
 5. [Fees](#fees)
 6. [Exams](#exams)
 7. [Report Card](#13b-report-card-half-yearly--yearly)
-7. [Attendance](#14-student-attendance)
-8. [Meetings](#15-meetings)
-9. [Transport](#16-transport)
-10. [Syllabus / Notes](#syllabus--notes)
-11. [Feedback](#19-feedback)
-12. [Calendar](#20-calendar)
-13. [Account](#account)
-14. [Notifications](#notifications)
-15. [App Version & Update](#24-app-version-check)
-16. [Messages (Broadcast)](#messages-broadcast)
-17. [Response Format & Status Codes](#response-format)
-18. [Ionic Integration Examples](#ionic-integration-examples)
+8. [Attendance](#14-student-attendance)
+8b. [Attendance Detail (Enhanced)](#14b-student-attendance-detail-enhanced)
+8c. [Student Leaves](#14c-student-leaves)
+9. [Meetings](#15-meetings)
+10. [Transport](#16-transport)
+11. [Syllabus / Notes](#syllabus--notes)
+12. [Feedback](#19-feedback)
+13. [Calendar](#20-calendar)
+14. [Account](#account)
+15. [Notifications](#notifications)
+16. [App Version & Update](#24-app-version-check)
+17. [Messages (Broadcast)](#messages-broadcast)
+18. [Attendance Alert Messages](#attendance-alert-messages)
+19. [Complaints](#complaints)
+20. [Response Format & Status Codes](#response-format)
+21. [Ionic Integration Examples](#ionic-integration-examples)
 
 ---
 
@@ -64,12 +68,17 @@ Authenticates a student to access the Student App.
     "house": { "id": 1, "name": "Kalam", "color": "Green", "color_code": "#28a745" },
     "defaulter": true,
     "house_color": "Green",
-    "house_color_code": "#28a745"
+    "house_color_code": "#28a745",
+    "session_token": "abc123xyz..."
   }
 }
 ```
 
 > **Theme Support:** The `house_color` and `house_color_code` fields are provided at the top level of the student data for easy access. Use `house_color_code` (hex) to set the app's primary theme color based on the student's house. If the student has no house assigned, both fields will be `null`.
+
+> **Parent & Guardian Photos:** The login response includes `father_photo`, `mother_photo`, and `guardian_photo` URLs. Guardian photo is only available when a guardian has been explicitly added via the "Add Guardian" section (with name, relation, and photo). Parent photos (father/mother) are uploaded separately. If a photo is not available, the field returns `null`.
+
+> **Session Token:** The `session_token` field is returned on successful login. This token is used for single-device enforcement — logging in from a new device invalidates any existing web session for the same student. Store this token locally and include it in subsequent requests if session validation is required.
 ```
 
 **Error:**
@@ -83,7 +92,7 @@ Authenticates a student to access the Student App.
 
 **Endpoint:** `POST /api/studentdashboard`
 
-Fetches dashboard data including exam counts, consents, and upcoming syllabus.
+Fetches dashboard data including exam counts, attendance summary, unread messages, and upcoming syllabus.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -100,10 +109,27 @@ Fetches dashboard data including exam counts, consents, and upcoming syllabus.
     "upcomingExam": 2,
     "paperHistory": 5,
     "examAttend": 3,
+    "attendance": {
+      "total_present": 165,
+      "total_absent": 15,
+      "total_late": 8,
+      "total_leaves": 5,
+      "total_working_days": 180,
+      "percentage": 91.7
+    },
+    "unread_messages": 3,
     "syllabus": [ ... ]
   }
 }
 ```
+
+> **Attendance Summary (Updated July 2026):**
+> - `attendance` object provides session-to-date attendance stats
+> - `total_present` includes students marked late (late is still present)
+> - `total_late` is a subset of present — gate-app recorded late arrivals
+> - `total_leaves` from `student_leaves` table — counted separately from absent
+> - `percentage` = (total_present / total_working_days) × 100
+> - Use this data to show an attendance ring/progress indicator on the dashboard
 
 **Error:**
 ```json
@@ -161,6 +187,8 @@ Returns list of all active houses. Used in student profile and house-wise report
 
 ## Homework
 
+> **Session Filtering (Updated August 2026):** All homework APIs now filter results to the **current academic session only**. Homework from previous sessions is no longer returned. The session date range (`from_date` to `end_date`) is used as bounds for date queries.
+
 ### 4. Daily Homework (Today)
 
 **Endpoint:** `POST /api/dailyhwtoday`
@@ -206,6 +234,11 @@ Returns list of all active houses. Used in student profile and house-wise report
 
 Same response format as Homework Today.
 
+**No Homework:**
+```json
+{ "status": -1, "msg": "No Daily homework found yesterday", "data": null }
+```
+
 ---
 
 ### 6. Homework History
@@ -216,7 +249,14 @@ Same response format as Homework Today.
 |-----------|------|----------|-------------|
 | student_id | integer | Yes | Student ID |
 
-Same response format as Homework Today (returns array of past homework).
+Returns all past homework for the current academic session, ordered by most recent first.
+
+**Success:** Same response format as Homework Today (returns array of past homework).
+
+**No Homework:**
+```json
+{ "status": -1, "msg": "No homework history found", "data": null }
+```
 
 ---
 
@@ -278,6 +318,7 @@ Returns detailed fee breakdown for the student including tuition, admission, reg
     "reg_fee": 500,
     "admission_fee": 1000,
     "tuition_fee": 15000,
+    "tuition_fee_till": "May 2026",
     "previous_payment": [
       {
         "id": 1,
@@ -300,12 +341,15 @@ Returns detailed fee breakdown for the student including tuition, admission, reg
 }
 ```
 
-> **Fee Calculation Notes:**
-> - `tuition_fee` is calculated using the session end date (not current month) to determine total months. It accounts for custom monthly fees from `student_fee_balances`, fee exemptions, and deposits already made (fee_type=1).
+> **Fee Calculation Notes (Updated May 2026):**
+> - `tuition_fee` is now calculated **till the current month only** (not the full session end date). For example, in May 2026, it calculates April 2025 to May 2026 = 14 months.
+> - `tuition_fee_till` indicates the month up to which the fee has been calculated (e.g., "May 2026").
 > - If the student has a custom `tuition_fee_monthly` in `student_fee_balances`, that is used instead of the class-level `tuition_fee`.
 > - `has_transport` indicates whether the student has an active transport subscription. If `true`, transport fee fields are populated. If `false`, `transport_fee_monthly` and `transport_fee_pending` are `0`.
-> - `transport_fee_total` = total months in session × monthly transport charge.
+> - `transport_fee_monthly` is determined using the same priority as admin panel: `route_locations.route_charges` → `road_route_details.monthly_charge` → overridden by `student_fee_balances.transport_fee_monthly` if set for current session.
+> - `transport_fee_total` = months from April to current month × monthly transport charge (also till current month only).
 > - `transport_fee_pending` = `transport_fee_total` − `transport_fee_paid`.
+> - Fee exemptions and deposits are deducted from the total.
 
 **No Transport (student did not opt for transport):**
 ```json
@@ -317,6 +361,7 @@ Returns detailed fee breakdown for the student including tuition, admission, reg
     "reg_fee": 500,
     "admission_fee": 1000,
     "tuition_fee": 15000,
+    "tuition_fee_till": "May 2026",
     "previous_payment": [],
     "payment_mode": { ... },
     "payment_type": { ... },
@@ -343,12 +388,18 @@ Returns detailed fee breakdown for the student including tuition, admission, reg
 | student_id | integer | Yes | Student ID |
 
 Returns fee receipt details.
+## Exams
+
+> **Attempt Questions Feature (Updated April 2026)**
+>
+> Exam APIs now return `total_questions`, `attempt_questions`, and `question_object` to support the *Attempt Limit* feature. A student may see 10 MCQs but only need to answer 8. Use these fields to:
+> - Show **"Attempt any X of Y"** section instructions in the UI
+> - Track per-type attempt progress to enable/disable the Submit button
+> - Verify marks correctly (server scores the best N answers per type)
 
 ---
 
-## Exams
-
-### 10. Student Exam
+### 10. Student Exam (Today)
 
 **Endpoint:** `POST /api/studentexam`
 
@@ -356,7 +407,44 @@ Returns fee receipt details.
 |-----------|------|----------|-------------|
 | student_id | integer | Yes | Student ID |
 
-Returns list of exams for the student's class scheduled for today.
+Returns exams scheduled today including full attempt configuration.
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Exams fetched successfully",
+  "data": {
+    "exam": [
+      {
+        "id": 101,
+        "exam_date": "2026-04-30",
+        "exam_duration": 60,
+        "max_marks": 50,
+        "total_questions": 20,
+        "attempt_questions": 16,
+        "question_object": {
+          "1": { "questions": 5, "marks": 1, "attempt_questions": 4 },
+          "4": { "questions": 10, "marks": 2, "attempt_questions": 8 },
+          "5": { "questions": 5, "marks": 4, "attempt_questions": 4 }
+        },
+        "subject": { "subject_name": "Mathematics" },
+        "exam_title": { "title": "Unit Test 1" },
+        "exam_students": [],
+        "exam_student_questions": []
+      }
+    ],
+    "qType": { "1": "Fill In The Blanks", "4": "Objective", "5": "VSA" }
+  }
+}
+```
+
+**No exam today:**
+```json
+{ "status": -1, "msg": "No exam found today", "data": null }
+```
+
+> **Mobile Integration:** Parse `question_object` to display per-section attempt instructions (e.g., *"Section A — Attempt any 4 of 5"*). Track attempted count per type vs `attempt_questions` to control the Submit button state.
 
 ---
 
@@ -368,7 +456,44 @@ Returns list of exams for the student's class scheduled for today.
 |-----------|------|----------|-------------|
 | student_id | integer | Yes | Student ID |
 
-Returns upcoming exams scheduled after today.
+Returns exams scheduled after today for the **current academic session** with full attempt configuration.
+
+> **Bug Fix (August 2026):** Previously, this endpoint was missing the `academic_session_id` filter, causing it to return exams from all sessions. Also, only exams with `status=3` (published) were shown, which excluded scheduled exams (`status=2`) that had questions set but weren't yet marked as published. Now includes both scheduled (status=2) and published (status=3) exams for the current session only.
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Upcoming exams were fetched successfully",
+  "data": {
+    "exam": [
+      {
+        "id": 102,
+        "exam_date": "2026-05-05",
+        "max_marks": 100,
+        "total_questions": 30,
+        "attempt_questions": 25,
+        "question_object": {
+          "1": { "questions": 10, "marks": 1, "attempt_questions": 8 },
+          "4": { "questions": 10, "marks": 2, "attempt_questions": 10 },
+          "6": { "questions": 5, "marks": 4, "attempt_questions": 4 },
+          "7": { "questions": 5, "marks": 6, "attempt_questions": 3 }
+        },
+        "subject": { "subject_name": "Science" },
+        "exam_title": { "title": "Half-Yearly" },
+        "exam_students": [],
+        "exam_student_questions": []
+      }
+    ],
+    "qType": { "1": "Fill In The Blanks", "4": "Objective", "6": "Short Answer", "7": "Long Answer" }
+  }
+}
+```
+
+**No upcoming exams:**
+```json
+{ "status": -1, "msg": "No exams were found", "data": null }
+```
 
 ---
 
@@ -379,9 +504,9 @@ Returns upcoming exams scheduled after today.
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | student_id | integer | Yes | Student ID |
-| exam_title_id | integer | No | Filter by exam title (e.g. Half-Yearly, Yearly). If omitted, returns all past exams |
+| exam_title_id | integer | No | Filter by exam title. If omitted, returns all past exams |
 
-Returns past exam papers and results for the current session, grouped by exam title.
+Returns past exam papers and results. Now includes `total_questions`, `attempt_questions`, and `max_marks` per exam for complete result context.
 
 **Success:**
 ```json
@@ -394,12 +519,25 @@ Returns past exam papers and results for the current session, grouped by exam ti
         "exam_date": "2025-09-15",
         "id": 42,
         "exam_held": 1,
+        "total_questions": 20,
+        "attempt_questions": 16,
+        "max_marks": 50,
         "subject": { "subject_name": "Mathematics" },
         "exam_title_id": 2,
         "exam_title": { "title": "Half-Yearly" },
         "staff": { "name": "Teacher Name" },
         "exam_students": [
-          { "marks_obtained": 85, "status": 1 }
+          {
+            "obtained_marks": 38,
+            "total_marks": 50,
+            "marks_by_type": {
+              "1": { "answered": 5, "counted": 4, "marks": 4 },
+              "4": { "answered": 10, "counted": 8, "marks": 14 },
+              "5": { "answered": 4, "counted": 4, "marks": 20 }
+            },
+            "percentage": 76.0,
+            "status": 2
+          }
         ]
       }
     ],
@@ -416,6 +554,11 @@ Returns past exam papers and results for the current session, grouped by exam ti
 { "status": -1, "msg": "No exams were found", "data": null }
 ```
 
+> **Mobile Integration:**
+> - Use `attempt_questions` / `total_questions` to render a badge like *"Attempted 16 of 20 questions"*
+> - `exam_students[0].obtained_marks` is the final score (after top-N scoring). Use `marks_by_type` to show per-section breakdown
+> - `marks_by_type` format: `{ "type": { "answered": N, "counted": N, "marks": N } }` where type key maps to question type (1=FIB, 4=MCQ, etc.)
+
 ---
 
 ### 13. Exam Detail
@@ -427,7 +570,7 @@ Returns past exam papers and results for the current session, grouped by exam ti
 | student_id | integer | Yes | Student ID |
 | exam_id | integer | Yes | Exam ID (from exam list) |
 
-Returns detailed exam information including syllabus chapters and student marks.
+Returns full exam configuration, syllabus, and student marks.
 
 **Success:**
 ```json
@@ -442,8 +585,16 @@ Returns detailed exam information including syllabus chapters and student marks.
       "exam_type": { "type_name": "Half-Yearly" },
       "subject": { "subject_name": "Mathematics" },
       "academic_session": { "session_name": "2025-2026" },
-      "max_marks": 100,
-      "exam_date": "2025-09-15"
+      "max_marks": 50,
+      "total_questions": 20,
+      "attempt_questions": 16,
+      "question_object": {
+        "1": { "questions": 5, "marks": 1, "attempt_questions": 4 },
+        "4": { "questions": 10, "marks": 2, "attempt_questions": 8 },
+        "5": { "questions": 5, "marks": 4, "attempt_questions": 4 }
+      },
+      "exam_date": "2025-09-15",
+      "exam_duration": 60
     },
     "syllabus": {
       "curriculum_title": "Half-Yearly Syllabus",
@@ -452,13 +603,24 @@ Returns detailed exam information including syllabus chapters and student marks.
         { "chapter_no": "1", "chapter_name": "Real Numbers", "subject_unit": { "unit_name": "Number System" } }
       ]
     },
-    "marks": {
-      "marks_obtained": 85,
-      "status": 1
-    }
+    "marks": { "marks_obtained": 38, "status": 1 }
   }
 }
 ```
+
+> **`question_object` key mapping:**
+>
+> | Key | Question Type |
+> |-----|---------------|
+> | 1   | Fill In The Blanks |
+> | 2   | True or False |
+> | 3   | Match the Following |
+> | 4   | Objective (MCQ) |
+> | 5   | Very Short Answer (VSA) |
+> | 6   | Short Answer |
+> | 7   | Long Answer |
+>
+> If `attempt_questions == questions` for a type, show *"Attempt all questions"*. Otherwise show *"Attempt any {attempt_questions} of {questions}"*.
 
 ---
 
@@ -466,7 +628,7 @@ Returns detailed exam information including syllabus chapters and student marks.
 
 **Endpoint:** `POST /api/reportcard`
 
-Returns the student's report card for the current academic session. Shows subject-wise marks for Half-Yearly and Yearly exams with totals, percentage, and teacher feedback.
+Returns subject-wise marks for Half-Yearly and Yearly exams with totals, percentage, attempt info, and teacher feedback.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -495,28 +657,25 @@ Returns the student's report card for the current academic session. Shows subjec
           {
             "subject_name": "English",
             "max_marks": 100,
+            "total_questions": 25,
+            "attempt_questions": 20,
             "marks_obtained": 82,
+            "marks_by_type": {
+              "1": { "answered": 5, "counted": 4, "marks": 4 },
+              "4": { "answered": 10, "counted": 8, "marks": 16 },
+              "6": { "answered": 5, "counted": 5, "marks": 30 },
+              "7": { "answered": 3, "counted": 3, "marks": 32 }
+            },
             "exam_date": "2025-09-15",
-            "is_absent": false
-          },
-          {
-            "subject_name": "Hindi",
-            "max_marks": 100,
-            "marks_obtained": 78,
-            "exam_date": "2025-09-16",
-            "is_absent": false
-          },
-          {
-            "subject_name": "Mathematics",
-            "max_marks": 100,
-            "marks_obtained": 91,
-            "exam_date": "2025-09-17",
             "is_absent": false
           },
           {
             "subject_name": "Science",
             "max_marks": 100,
+            "total_questions": 20,
+            "attempt_questions": 20,
             "marks_obtained": "AB",
+            "marks_by_type": null,
             "exam_date": "2025-09-18",
             "is_absent": true
           }
@@ -532,7 +691,15 @@ Returns the student's report card for the current academic session. Shows subjec
           {
             "subject_name": "English",
             "max_marks": 100,
+            "total_questions": 30,
+            "attempt_questions": 25,
             "marks_obtained": 88,
+            "marks_by_type": {
+              "1": { "answered": 8, "counted": 8, "marks": 8 },
+              "4": { "answered": 10, "counted": 10, "marks": 30 },
+              "6": { "answered": 4, "counted": 4, "marks": 20 },
+              "7": { "answered": 3, "counted": 3, "marks": 30 }
+            },
             "exam_date": "2026-03-10",
             "is_absent": false
           }
@@ -558,9 +725,10 @@ Returns the student's report card for the current academic session. Shows subjec
 > **Notes:**
 > - Only completed exams (status=3) for the current session are included.
 > - Exam types filtered: Half-Yearly (exam_type_id=2) and Yearly (exam_type_id=3).
-> - If a student was absent for a subject, `marks_obtained` returns `"AB"` and `is_absent` is `true`. Absent marks are not counted in `total_marks_obtained`.
-> - `feedback` contains the latest teacher/principal remarks for the session. Can be `null` if no feedback exists.
-> - The `report_card` array is ordered by exam type (Half-Yearly first, then Yearly).
+> - If absent, `marks_obtained` returns `"AB"` and `is_absent` is `true`. Absent marks excluded from totals.
+> - `marks_by_type`: per-section score breakdown — `{ type_key: { answered, counted, marks } }`. Will be `null` if the student was absent or the exam predates the feature. Use this to show a section-wise marks table.
+> - `total_questions` and `attempt_questions` are per-subject exam-level values. When `attempt_questions < total_questions`, marks are calculated from the **best N answers** (server-side top-N logic).
+> - `feedback` is `null` if no teacher feedback exists for the session.
 
 **Error:**
 ```json
@@ -578,6 +746,8 @@ Returns the student's report card for the current academic session. Shows subjec
 | student_id | integer | Yes | Student ID |
 
 Returns month-wise attendance summary for the current academic session.
+
+> **Note (Updated July 2026):** Holidays are class-aware — school-wide holidays (event_category 1,3,4) apply to all students, while class-specific holidays (event_category 2) only apply to students in that class. The attendance system now supports leaves (via `student_leaves` table), late arrivals (via gate app `late_arrival_passes` table), and holiday-aware calculations.
 
 **Success:**
 ```json
@@ -602,6 +772,144 @@ Returns month-wise attendance summary for the current academic session.
   ]
 }
 ```
+
+---
+
+### 14b. Student Attendance Detail (Enhanced)
+
+**Endpoint:** `POST /api/studentattendancedetail`
+
+Returns detailed month-wise attendance with working days, leaves, late arrivals, absent count, and percentage. Also includes cumulative (session till-date) totals.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| student_id | integer | Yes | Student ID |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Attendance details fetched successfully",
+  "data": {
+    "monthly": [
+      {
+        "month_name": "Apr",
+        "year": "2025",
+        "total_days": 30,
+        "working_days": 24,
+        "holidays": 6,
+        "present": 22,
+        "late": 2,
+        "leaves": 1,
+        "absent": 2,
+        "percentage": 91.7
+      },
+      {
+        "month_name": "May",
+        "year": "2025",
+        "total_days": 31,
+        "working_days": 25,
+        "holidays": 6,
+        "present": 23,
+        "late": 1,
+        "leaves": 0,
+        "absent": 2,
+        "percentage": 92.0
+      }
+    ],
+    "cumulative": {
+      "total_working_days": 180,
+      "total_present": 165,
+      "total_late": 8,
+      "total_leaves": 5,
+      "total_absent": 15,
+      "percentage": 91.7
+    },
+    "session": "2025-2026"
+  }
+}
+```
+
+**Errors:**
+```json
+{ "status": -1, "msg": "Student ID is required", "data": null }
+{ "status": -1, "msg": "Student not found", "data": null }
+```
+
+> **Notes:**
+> - `working_days` = total days − Sundays − holidays (events with `bg-cal-red`)
+> - **Holidays are class-aware**: School-wide holidays (event_category 1,3,4) apply to all classes. Class-specific holidays (event_category 2 with class_category_id) only apply to the student's class.
+> - `present` includes students marked as Late (late arrivals are counted as present)
+> - `late` is a subset of present — students who arrived late via gate app
+> - `leaves` are stored separately but counted as absent in percentage calculation
+> - `percentage` = (present / working_days) × 100
+> - `cumulative` provides session-to-date totals across all months
+> - The old `/api/studentattendance` endpoint continues to work for backward compatibility
+> - Holiday calculation uses `GeneralComponent::getHolidayDates()` which caches results per request for performance
+
+---
+
+### 14c. Student Leaves
+
+**Endpoint:** `POST /api/studentleaves`
+
+Returns all leaves recorded for a student in the current academic session.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| student_id | integer | Yes | Student ID |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Leaves fetched successfully",
+  "count": 3,
+  "data": [
+    {
+      "id": 1,
+      "student_id": 101,
+      "class_category_id": 5,
+      "class_section_id": 12,
+      "leave_date": "2025-06-15",
+      "leave_type": "medical",
+      "reason": "Fever",
+      "applied_by": "teacher",
+      "staff_id": 5,
+      "status": 1,
+      "created": "2025-06-15 08:30:00",
+      "modified": "2025-06-15 08:30:00"
+    },
+    {
+      "id": 2,
+      "student_id": 101,
+      "class_category_id": 5,
+      "class_section_id": 12,
+      "leave_date": "2025-07-20",
+      "leave_type": "family",
+      "reason": "Family function",
+      "applied_by": "teacher",
+      "staff_id": 5,
+      "status": 1,
+      "created": "2025-07-20 09:00:00",
+      "modified": "2025-07-20 09:00:00"
+    }
+  ]
+}
+```
+
+**Errors:**
+```json
+{ "status": -1, "msg": "Student ID is required", "data": null }
+{ "status": -1, "msg": "Student not found", "data": null }
+```
+
+> **Notes:**
+> - Returns leaves for the current academic session only
+> - `leave_type`: general, medical, family, other
+> - `applied_by`: teacher, parent, student
+> - All leaves are counted as absent in attendance percentage
+> - Sorted by leave_date descending (most recent first)
 
 ---
 
@@ -768,7 +1076,7 @@ Returns student report cards / feedback from teachers.
 |-----------|------|----------|-------------|
 | student_id | integer | Yes | Student ID |
 
-Returns school events and holidays for the calendar view.
+Returns school events and holidays for the calendar view. Only returns events relevant to the student's class (school-wide events + class-specific events for the student's class).
 
 **Success:**
 ```json
@@ -780,12 +1088,31 @@ Returns school events and holidays for the calendar view.
       "id": 1,
       "event_name": "Annual Day",
       "event_date": "2026-04-15",
+      "event_end_date": "2026-04-15",
       "event_category": 1,
-      "event_color": "bg-cal-green"
+      "event_color": "bg-cal-green",
+      "description": "Annual Day celebration"
+    },
+    {
+      "id": 5,
+      "event_name": "Summer Vacation",
+      "event_date": "2026-05-15",
+      "event_end_date": "2026-06-30",
+      "event_category": 1,
+      "event_color": "bg-cal-red",
+      "description": "Summer break"
     }
   ]
 }
 ```
+
+> **Notes (Updated July 2026):**
+> - `event_date` and `event_end_date` are returned as clean `YYYY-MM-DD` strings (IST date)
+> - For single-day events, `event_end_date` equals `event_date`
+> - For multi-day events, both dates define the inclusive range
+> - `event_category`: 1 = General/Holiday (all classes), 2 = Class-specific, 3 = School event (all), 4 = Special (all)
+> - `event_color` values: `bg-cal-red` (Holiday), `bg-cal-purple` (Activity), `bg-cal-blue` (Event), `bg-cal-yellow` (Competition), `bg-cal-green` (Exams), `bg-cal-gray` (Special)
+> - Class-specific events (category 2) are only returned for the student's class
 
 ---
 
@@ -817,9 +1144,124 @@ Returns school events and holidays for the calendar view.
 
 ## Notifications
 
+> **Play Store Update (August 2026):** The notification API has been completely overhauled. It now supports pagination, read/unread tracking, mark-as-read, and badge count — all required for Google Play Store compliance and a proper notification center UX.
+
 ### 22. Get Notifications
 
 **Endpoint:** `POST /api/notification`
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| student_id | integer | Yes | Student ID |
+| page | integer | No | Page number (default: 1) |
+| per_page | integer | No | Items per page (default: 20, max: 50) |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Notifications were fetched successfully",
+  "data": [
+    {
+      "id": 15,
+      "title": "Fee Reminder",
+      "description": "Please deposit pending fees for April 2026",
+      "image": "https://rrpublicschool.com/uploads/notification/fee_reminder.jpg",
+      "status": 1,
+      "is_read": 0,
+      "created": "2026-04-20 09:30:00"
+    },
+    {
+      "id": 12,
+      "title": "Annual Day Invitation",
+      "description": "You are invited to the Annual Day celebration",
+      "image": null,
+      "status": 2,
+      "is_read": 1,
+      "created": "2026-04-15 14:00:00"
+    }
+  ],
+  "count": 25,
+  "total_pages": 2,
+  "current_page": 1,
+  "per_page": 20
+}
+```
+
+**No Notifications:**
+```json
+{
+  "status": 1,
+  "msg": "No notifications were found.",
+  "data": [],
+  "count": 0,
+  "total_pages": 0,
+  "current_page": 1,
+  "per_page": 20
+}
+```
+
+**Error:**
+```json
+{ "status": -1, "msg": "Student ID is required", "data": null }
+```
+
+> **Notes:**
+> - Results ordered by `created` DESC (most recent first)
+> - `is_read`: 0 = unread, 1 = read
+> - `image` returns full URL when present, `null` when no image
+> - `status` field: 1 = unread, 2 = read (internal status used for tracking)
+> - Pagination metadata (`count`, `total_pages`, `current_page`, `per_page`) always returned
+> - Returns empty array `[]` instead of `null` when no notifications (Play Store friendly)
+
+---
+
+### 22b. Mark Notification Read
+
+**Endpoint:** `POST /api/marknotificationread`
+
+Marks a single notification or all notifications as read for a student.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| student_id | integer | Yes | Student ID |
+| notification_id | integer | No* | Notification ID (required if not marking all) |
+| mark_all | integer | No* | Pass `1` to mark all notifications as read |
+
+*Either `notification_id` or `mark_all=1` must be provided.
+
+**Success (single):**
+```json
+{ "status": 1, "msg": "Notification marked as read" }
+```
+
+**Success (mark all):**
+```json
+{ "status": 1, "msg": "All notifications marked as read" }
+```
+
+**Error (missing ID):**
+```json
+{ "status": -1, "msg": "Notification ID is required" }
+```
+
+**Error (not found):**
+```json
+{ "status": -1, "msg": "Notification not found" }
+```
+
+> **Usage:**
+> - Call with `notification_id` when user taps a notification to view it
+> - Call with `mark_all=1` for "Mark all as read" button in notification center
+> - After marking, refresh the notification list and badge count
+
+---
+
+### 22c. Notification Unread Count
+
+**Endpoint:** `POST /api/notificationunreadcount`
+
+Returns the count of unread notifications. Use for badge display on the Notifications tab/icon.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -829,17 +1271,30 @@ Returns school events and holidays for the calendar view.
 ```json
 {
   "status": 1,
-  "msg": "Notifications were fetched successfully",
-  "data": [
-    {
-      "title": "Fee Reminder",
-      "description": "Please deposit pending fees",
-      "image": "notification_image.jpg",
-      "status": 1
-    }
-  ]
+  "msg": "Unread count fetched successfully",
+  "data": {
+    "unread_count": 5
+  }
 }
 ```
+
+**No Unread:**
+```json
+{
+  "status": 1,
+  "msg": "Unread count fetched successfully",
+  "data": {
+    "unread_count": 0
+  }
+}
+```
+
+**Error:**
+```json
+{ "status": -1, "msg": "Student ID is required", "data": null }
+```
+
+> **Usage:** Call on app launch, after returning from background, and after viewing/marking notifications to keep the badge count updated.
 
 ---
 
@@ -1142,6 +1597,95 @@ Returns the count of unread messages. Use this to show a badge on the Messages t
 
 ---
 
+### Attendance Alert Messages
+
+When a student has short attendance, the class teacher can send an attendance alert message from the Monthly Attendance Register. These messages appear in the broadcast messages list with:
+- `sender_type`: `class_teacher`
+- `title`: "Attendance Alert - Student Name"
+- `message`: A predefined or custom message about the student's attendance status
+
+Common message templates used by teachers:
+1. Telephonic conversation held with father/mother/guardian regarding short attendance
+2. Parents informed and requested to meet the Principal
+3. Phone call not answered
+4. Mobile number switched off/not reachable
+
+These messages are delivered via push notification and appear in the Messages section of the app alongside other broadcast messages.
+
+---
+
+## Complaints
+
+### 29. Student Complaints
+
+**Endpoint:** `POST /api/complaint`
+
+Returns active complaints and complaint history for a student. Active complaints are those with status 1 (New), 2 (In Progress), or 3 (Under Review). History includes resolved (4) and closed (5) complaints.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| student_id | integer | Yes | Student ID |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Complaints were fetched successfully",
+  "data": {
+    "activeComplaint": [
+      {
+        "complaint_title": "Bus Route Issue",
+        "complaint_desc": "Bus is not arriving on time for route A",
+        "complaint_reply": "We are looking into it",
+        "closure_msg": null,
+        "status": 2,
+        "staff": { "name": "Admin Name" }
+      }
+    ],
+    "complaintHistory": [
+      {
+        "complaint_title": "Fee Query",
+        "complaint_desc": "Discrepancy in fee receipt",
+        "complaint_reply": "Issue has been resolved",
+        "closure_msg": "Verified and corrected",
+        "status": 4,
+        "staff": { "name": "Admin Name" }
+      }
+    ],
+    "complaintType": { "1": "Academic", "2": "Transport", "3": "Fees", "4": "General" },
+    "complaintFor": { "1": "Student", "2": "Teachers", "3": "Others" }
+  }
+}
+```
+
+> **Complaint Status Codes:**
+> | Status | Meaning |
+> |--------|---------|
+> | 1 | New |
+> | 2 | In Progress |
+> | 3 | Under Review |
+> | 4 | Resolved |
+> | 5 | Closed |
+>
+> **Notes:**
+> - `activeComplaint` contains complaints with status 1, 2, or 3
+> - `complaintHistory` contains complaints with status 4 or 5
+> - `complaintType` and `complaintFor` are lookup maps for rendering dropdowns
+> - Staff name is the assigned handler for the complaint
+> - This endpoint is accessible via CakePHP fallback routing (no explicit route definition)
+
+---
+
+## Feedback Detail
+
+### 30. Feedback Detail
+
+**Endpoint:** `POST /api/feedbackdetail`
+
+> **⚠️ WARNING (August 2026):** This endpoint has a route defined in `config/routes.php` but the corresponding `feedbackDetail()` method is **NOT implemented** in `ApiController.php`. Calling this endpoint will result in a "Missing Method" error. This needs to be implemented or the route should be removed.
+
+---
+
 ## Response Format
 
 All APIs return JSON:
@@ -1239,6 +1783,12 @@ export class StudentApiService {
   getAttendance(studentId: number) {
     return this.postForm('studentattendance', { student_id: studentId });
   }
+  getAttendanceDetail(studentId: number) {
+    return this.postForm('studentattendancedetail', { student_id: studentId });
+  }
+  getLeaves(studentId: number) {
+    return this.postForm('studentleaves', { student_id: studentId });
+  }
   getMeetings(classSectionId: number) {
     return this.postForm('meetings', { class_section_id: classSectionId });
   }
@@ -1275,8 +1825,17 @@ export class StudentApiService {
   }
 
   // Notifications
-  getNotifications(studentId: number) {
-    return this.postForm('notification', { student_id: studentId });
+  getNotifications(studentId: number, page: number = 1, perPage: number = 20) {
+    return this.postForm('notification', { student_id: studentId, page, per_page: perPage });
+  }
+  markNotificationRead(studentId: number, notificationId: number) {
+    return this.postForm('marknotificationread', { student_id: studentId, notification_id: notificationId });
+  }
+  markAllNotificationsRead(studentId: number) {
+    return this.postForm('marknotificationread', { student_id: studentId, mark_all: 1 });
+  }
+  getNotificationUnreadCount(studentId: number) {
+    return this.postForm('notificationunreadcount', { student_id: studentId });
   }
   updateFCM(studentId: number, fcmToken: string, uid?: string, appVersion?: string, os?: string, model?: string) {
     return this.postForm('updateFCMDetails', {
@@ -1310,6 +1869,11 @@ export class StudentApiService {
   }
   getUnreadCount(studentId: number) {
     return this.postForm('broadcastunreadcount', { student_id: studentId });
+  }
+
+  // Complaints
+  getComplaints(studentId: number) {
+    return this.postForm('complaint', { student_id: studentId });
   }
 }
 ```
@@ -1377,6 +1941,8 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 | 13 | Exam Detail | `/api/examdetail` | student_id, exam_id |
 | 13b | Report Card | `/api/reportcard` | student_id |
 | 14 | Attendance | `/api/studentattendance` | student_id |
+| 14b | Attendance Detail | `/api/studentattendancedetail` | student_id |
+| 14c | Student Leaves | `/api/studentleaves` | student_id |
 | 15 | Meetings | `/api/meetings` | class_section_id |
 | 16 | Transport | `/api/transport` | student_id |
 | 17 | Syllabus | `/api/syllabus` | student_id |
@@ -1384,7 +1950,9 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 | 19 | Feedback | `/api/feedback` | student_id |
 | 20 | Calendar | `/api/calendar` | student_id |
 | 21 | Change Password | `/api/changepassword` | student_id, oldPassword, newPassword, confirmPassword |
-| 22 | Notifications | `/api/notification` | student_id |
+| 22 | Notifications | `/api/notification` | student_id, page, per_page |
+| 22b | Mark Notification Read | `/api/marknotificationread` | student_id, notification_id OR mark_all |
+| 22c | Notification Unread Count | `/api/notificationunreadcount` | student_id |
 | 23 | Update FCM | `/api/updateFCMDetails` | student_id, fcm_token, uid, app_version, os, model |
 | 23b | Register Device | `/api/registerDevice` | uid, fcm_token, student_id (optional) |
 | 24 | App Version | `/api/appversioncheck` | current_version, app_type=student, platform |
@@ -1392,6 +1960,8 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 | 26 | Messages List | `/api/broadcastmessages` | student_id |
 | 27 | Message Detail | `/api/broadcastmessagedetail` | student_id, message_id |
 | 28 | Unread Count | `/api/broadcastunreadcount` | student_id |
+| 29 | Complaints | `/api/complaint` | student_id |
+| 30 | Feedback Detail | `/api/feedbackdetail` | ⚠️ NOT IMPLEMENTED |
 
 ---
 
@@ -1407,14 +1977,19 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 - [ ] Verify response contains class_category, class_section, academic_session objects
 - [ ] Verify response contains house object with id, name, color, color_code
 - [ ] Verify defaulter field is returned
+- [ ] Verify session_token is returned on successful login
+- [ ] Verify father_photo, mother_photo, guardian_photo URLs are present (or null)
 
 ### 2. Student Dashboard (`/api/studentdashboard`)
-- [ ] Valid student_id → status 1, returns consents, todayExam, upcomingExam, paperHistory, examAttend, syllabus
+- [ ] Valid student_id → status 1, returns consents, todayExam, upcomingExam, paperHistory, examAttend, attendance, unread_messages, syllabus
 - [ ] Non-existent student_id → status -1, "No such student exists"
 - [ ] Verify todayExam count matches exams scheduled for today
 - [ ] Verify upcomingExam count matches future exams
 - [ ] Verify paperHistory count matches past exams in current session
 - [ ] Verify syllabus array contains exam details with curriculum
+- [ ] Verify attendance object has total_present, total_absent, total_late, total_leaves, total_working_days, percentage
+- [ ] Verify attendance.percentage = (total_present / total_working_days) × 100
+- [ ] Verify unread_messages count matches unread broadcast messages
 
 ### 3. Houses (`/api/houses`)
 - [ ] Returns status 1 with array of active houses
@@ -1428,14 +2003,19 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 - [ ] Valid student_id with no homework today → status -1, "No Daily homework found today"
 - [ ] Verify each record has subject_name, staff name, homework text, chapter, topic
 - [ ] Verify homework is filtered by student's class_category_id and class_section_id
+- [ ] Verify homework only returns records within current academic session date range
 
 ### 5. Homework Yesterday (`/api/dailyhwyesterday`)
 - [ ] Valid student_id with homework yesterday → status 1, returns homework array
-- [ ] No homework yesterday → status -1
+- [ ] No homework yesterday → status -1, "No Daily homework found yesterday"
+- [ ] Verify homework only returns records within current academic session date range
 
 ### 6. Homework History (`/api/dailyhwhistory`)
 - [ ] Valid student_id → status 1, returns past homework
-- [ ] No history → status -1
+- [ ] No history → status -1, "No homework history found"
+- [ ] Verify results ordered by start_date DESC (most recent first)
+- [ ] Verify homework only from current academic session (not previous sessions)
+- [ ] Verify no future homework is included
 
 ### 7. Fee History (`/api/feehistory`)
 - [ ] Valid student_id with fee records → status 1, returns fee array + months list
@@ -1445,12 +2025,13 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 
 ### 8. Fee Detail (`/api/feedetail`)
 - [ ] Valid student_id → status 1, returns detailed fee breakdown
-- [ ] Verify tuition_fee uses session end date for total months (not current month)
+- [ ] Verify tuition_fee calculates from April to current month only (not session end)
+- [ ] Verify tuition_fee_till field shows current month and year (e.g., "May 2026")
 - [ ] Verify tuition_fee accounts for custom monthly fee from student_fee_balances
 - [ ] Verify tuition_fee deducts fee exemptions (fee_type=1, fees_deposited=0)
 - [ ] Verify tuition_fee deducts already deposited amounts
 - [ ] Student with transport → has_transport=true, transport_fee_monthly > 0
-- [ ] Verify transport_fee_total = total_months × monthly_charge
+- [ ] Verify transport_fee_total = months from April to current month × monthly_charge
 - [ ] Verify transport_fee_pending = transport_fee_total − transport_fee_paid
 - [ ] Verify transport_route and transport_stop are populated
 - [ ] Student without transport → has_transport=false, transport_fee_monthly=0, transport_fee_pending=0
@@ -1465,8 +2046,12 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 - [ ] No exams → verify error response
 
 ### 11. Upcoming Exam (`/api/upcomingexam`)
-- [ ] Valid student_id → status 1, returns future exams
-- [ ] No upcoming exams → verify response
+- [ ] Valid student_id → status 1, returns future exams for current session only
+- [ ] Verify only exams with status 2 (scheduled) or 3 (published) are returned
+- [ ] Verify exams are filtered by current academic_session_id
+- [ ] Verify exams from previous sessions are NOT included
+- [ ] Verify exams are ordered by exam_date ASC (nearest first)
+- [ ] No upcoming exams → status -1, "No exams were found"
 
 ### 12. Exam History (`/api/examhistory`)
 - [ ] Valid student_id → status 1, returns past exam papers
@@ -1529,7 +2114,10 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 
 ### 20. Calendar (`/api/calendar`)
 - [ ] Valid student_id → status 1, returns events array
-- [ ] Verify events have event_name, event_date, event_category, event_color
+- [ ] Verify events have id, event_name, event_date, event_end_date, event_category, event_color, description
+- [ ] Verify event_date and event_end_date are YYYY-MM-DD format strings (not objects)
+- [ ] Verify single-day events have event_end_date == event_date
+- [ ] Verify multi-day events have correct date range
 - [ ] Verify class-specific events (category=2) filtered by student's class
 - [ ] Verify general events (category 1,3,4) included for all students
 - [ ] No events → status -1, "No Events found"
@@ -1542,9 +2130,33 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 - [ ] Verify cannot login with old password after change
 
 ### 22. Notifications (`/api/notification`)
-- [ ] Valid student_id with notifications → status 1, returns notification array
-- [ ] Verify each notification has title, description, image, status
-- [ ] No notifications → status -1, "No notifications were found"
+- [ ] Valid student_id with notifications → status 1, returns paginated notification array
+- [ ] Verify each notification has id, title, description, image, is_read, created, status
+- [ ] No notifications → status 1, empty data array `[]` (NOT null or status -1)
+- [ ] Verify notifications ordered by created DESC (newest first)
+- [ ] Verify `is_read` = 0 for unread, 1 for read
+- [ ] Verify `image` returns full URL (with domain prefix) or null
+- [ ] Verify pagination: page=1, per_page=20 default
+- [ ] Verify page=2 returns next set of notifications
+- [ ] Verify per_page max cap at 50
+- [ ] Verify count, total_pages, current_page, per_page in response
+- [ ] Missing student_id → status -1, "Student ID is required"
+
+### 22b. Mark Notification Read (`/api/marknotificationread`)
+- [ ] Valid student_id + notification_id (unread) → status 1, "Notification marked as read"
+- [ ] Verify notification status changes to 2 in DB after marking
+- [ ] Valid student_id + mark_all=1 → status 1, "All notifications marked as read"
+- [ ] Verify all notifications for student now have status=2
+- [ ] Invalid notification_id → status -1, "Notification not found"
+- [ ] Notification belongs to different student → status -1, "Notification not found"
+- [ ] Missing student_id → status -1, "Student ID is required"
+- [ ] Missing both notification_id and mark_all → status -1, "Notification ID is required"
+
+### 22c. Notification Unread Count (`/api/notificationunreadcount`)
+- [ ] Valid student_id with unread notifications → status 1, unread_count > 0
+- [ ] Valid student_id with all read → status 1, unread_count = 0
+- [ ] Missing student_id → status -1, "Student ID is required"
+- [ ] Verify count decreases after marking a notification as read
 
 ### 23. Update FCM Details (`/api/updateFCMDetails`)
 - [ ] New student (no existing token) → status 1, "FCM Token Updated Successfully", creates new record
@@ -1611,6 +2223,19 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 - [ ] Missing student_id → status -1, "Student ID is required"
 - [ ] Verify count decreases after reading a message via detail API
 
+### 29. Complaints (`/api/complaint`)
+- [ ] Valid student_id with active complaints → status 1, activeComplaint array populated
+- [ ] Valid student_id with resolved complaints → status 1, complaintHistory array populated
+- [ ] Verify activeComplaint contains only status 1, 2, 3
+- [ ] Verify complaintHistory contains only status 4, 5
+- [ ] Verify complaintType and complaintFor lookup maps are returned
+- [ ] Verify staff name is included for each complaint
+- [ ] Verify complaint_reply and closure_msg fields present
+
+### 30. Feedback Detail (`/api/feedbackdetail`)
+- [ ] ⚠️ BLOCKED: Method not implemented — calling returns "Missing Method" error
+- [ ] TODO: Implement method or remove route from config/routes.php
+
 ### General
 - [ ] All endpoints return JSON with status, msg, data fields
 - [ ] All endpoints only accept POST method
@@ -1624,4 +2249,4 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 
 ---
 
-**Version:** 2.2 | **Last Updated:** April 2026
+**Version:** 2.7 | **Last Updated:** August 2026

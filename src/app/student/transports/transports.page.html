@@ -9,7 +9,7 @@
 
 <ion-content class="modern-content">
   <!-- Transport Info Card -->
-  <div class="transport-info-card" *ngIf="transportData !== null">
+  <div class="transport-info-card" *ngIf="isLoaded && transportData !== null">
     <div class="card-header">
       <div class="icon-wrapper">
         <ion-icon name="bus-outline"></ion-icon>
@@ -85,7 +85,7 @@
   </div>
 
   <!-- No Transport State -->
-  <div class="empty-state" *ngIf="transportData === null">
+  <div class="empty-state" *ngIf="isLoaded && transportData === null">
     <div class="empty-icon">
       <ion-icon name="bus-outline"></ion-icon>
     </div>

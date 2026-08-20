@@ -17,18 +17,23 @@ export class DashboardPage implements OnInit {
   houseName = 'No House';
   todayExams = 0;
   upcomingExams = 0;
+  unreadNotifications = 0;
 
   menuItems = [
-    { title: 'Homework', subtitle: 'Daily tasks', icon: 'book-outline', route: '/homeworks', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-    { title: 'Exams', subtitle: 'Tests & results', icon: 'document-text-outline', route: '/exams', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
-    { title: 'Fees', subtitle: 'Payment info', icon: 'card-outline', route: '/fees', gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
-    { title: 'Attendance', subtitle: 'Your records', icon: 'calendar-outline', route: '/attendances', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-    { title: 'Transport', subtitle: 'Bus details', icon: 'bus-outline', route: '/transports', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+    // Daily
+    { title: 'Homework', subtitle: 'Daily tasks', icon: 'book-outline', route: '/homework', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+    { title: 'Attendance', subtitle: 'Your attendance', icon: 'calendar-outline', route: '/attendance', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+    { title: 'Calendar', subtitle: 'Classes & events', icon: 'today-outline', route: '/calender', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
+    { title: 'Messages', subtitle: 'School updates', icon: 'chatbubbles-outline', route: '/messages', gradient: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
+    // Academics
+    { title: 'Exams & Results', subtitle: 'Tests & results', icon: 'document-text-outline', route: '/exams', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
     { title: 'Syllabus', subtitle: 'Study material', icon: 'library-outline', route: '/syllabus', gradient: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)' },
-    { title: 'Calendar', subtitle: 'Events', icon: 'today-outline', route: '/calendar', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
-    { title: 'Meetings', subtitle: 'PTM schedule', icon: 'people-outline', route: '/meetings', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
-    { title: 'Feedback', subtitle: 'Report card', icon: 'chatbubble-outline', route: '/feedbacks', gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)' },
-    { title: 'Messages', subtitle: 'School messages', icon: 'chatbubbles-outline', route: '/messages', gradient: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
+    // School Services
+    { title: 'Fees & Payments', subtitle: 'Fee status & payments', icon: 'card-outline', route: '/fees', gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
+    { title: 'Transport', subtitle: 'Bus details', icon: 'bus-outline', route: '/transports', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+    { title: 'PTM & Meetings', subtitle: 'Parent meetings', icon: 'people-outline', route: '/meetings', gradient: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)' },
+    { title: 'Report Card', subtitle: 'Academic performance', icon: 'chatbubble-outline', route: '/feedbacks', gradient: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)' },
+    // Account
     { title: 'Settings', subtitle: 'Preferences', icon: 'settings-outline', route: '/settings', gradient: 'linear-gradient(135deg, #c3cfe2 0%, #f5f7fa 100%)' },
   ];
 
@@ -61,6 +66,14 @@ export class DashboardPage implements OnInit {
       if (result.status === 1) {
         this.todayExams = result.data.todayExam || 0;
         this.upcomingExams = result.data.upcomingExam || 0;
+        this.unreadNotifications = result.data.unread_messages || 0;
+      }
+    });
+
+    // Fetch notification unread count
+    this.api.getNotificationUnreadCount(this.studentBasicData.id).subscribe((result: any) => {
+      if (result.status === 1 && result.data) {
+        this.unreadNotifications = result.data.unread_count || 0;
       }
     });
   }

@@ -12,6 +12,7 @@ export class ComplaintsPage implements OnInit {
 
   activeComplainData = null;
   complainData = null;
+  isLoaded = false;
 
   constructor(
     private constants: ConstantsService,
@@ -26,16 +27,17 @@ export class ComplaintsPage implements OnInit {
   {
     const sData = await Storage.get({ key: 'studentData'});
     const sDetails = JSON.parse(sData.value);
-    //console.log(sDetails.id);
     const loader = await this.constants.getLoader();
+    await loader.present();
     this.api.complaint(sDetails.id).subscribe(async (result: any) => {
       await loader.dismiss();
-      console.log(result.data);
-      this.activeComplainData = result.data.activeComplaint;
-      this.complainData = result.data.complaintHistory;
+      this.isLoaded = true;
+      this.activeComplainData = result.data?.activeComplaint || [];
+      this.complainData = result.data?.complaintHistory || [];
     }, async (error) => {
-      await  loader.dismiss();
-      this.constants.presentToast('Unable To get Meetings Data. Check Your Internet Connection.');
+      await loader.dismiss();
+      this.isLoaded = true;
+      this.constants.presentToast('Unable To get Complaints Data. Check Your Internet Connection.');
     });
   }
 

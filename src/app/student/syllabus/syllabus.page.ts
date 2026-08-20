@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 })
 export class SyllabusPage implements OnInit {
   syllabusData = null;
+  isLoaded = false;
   
   constructor(
     private router: Router,
@@ -27,12 +28,14 @@ export class SyllabusPage implements OnInit {
     const sData = await Storage.get({ key: 'studentData'});
     const sDetails = JSON.parse(sData.value);
     const loader = await this.constants.getLoader();
+    await loader.present();
     this.api.syllabus(sDetails.id).subscribe(async (result: any) => {
       await loader.dismiss();
+      this.isLoaded = true;
       this.syllabusData = result.data;
-      //console.log(result.data);
     }, async (error) => {
-      await  loader.dismiss();
+      await loader.dismiss();
+      this.isLoaded = true;
       this.constants.presentToast('Unable To get Syllabus Data. Check Your Internet Connection.');
     });
   }

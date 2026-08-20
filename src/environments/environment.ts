@@ -12,7 +12,7 @@ export const environment = {
 
   storeAppURL : {
     //ios: '1019083868',
-    android: 'market://details?id=com.doonportal.rrps'
+    android: 'market://details?id=com.rrps.app'
   },
 };
 

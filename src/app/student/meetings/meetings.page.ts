@@ -11,6 +11,7 @@ import { Storage } from '@capacitor/storage';
 export class MeetingsPage implements OnInit {
   newmeetingsData = null;
   meetingsData = null;
+  isLoaded = false;
   
   constructor(
     private constants: ConstantsService,
@@ -24,15 +25,16 @@ export class MeetingsPage implements OnInit {
   async getMeetings(){
     const sData = await Storage.get({ key: 'studentData'});
     const sDetails = JSON.parse(sData.value);
-    //console.log(sDetails.id);
     const loader = await this.constants.getLoader();
+    await loader.present();
     this.api.meetings(sDetails.class_section_id).subscribe(async (result: any) => {
       await loader.dismiss();
-      //console.log(sDetails.class_section_id);
-      this.newmeetingsData = result.data.upcomingmeeting;
-      this.meetingsData = result.data.meetinghistory;
+      this.isLoaded = true;
+      this.newmeetingsData = result.data?.upcomingmeeting || [];
+      this.meetingsData = result.data?.meetinghistory || [];
     }, async (error) => {
-      await  loader.dismiss();
+      await loader.dismiss();
+      this.isLoaded = true;
       this.constants.presentToast('Unable To get Meetings Data. Check Your Internet Connection.');
     });
   }

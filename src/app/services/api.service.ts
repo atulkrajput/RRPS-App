@@ -118,6 +118,16 @@ export class ApiService {
     return this.http.post(link, { student_id: id });
   }
 
+  attendanceDetail(id: number) {
+    const link = this.baseUrl + 'studentattendancedetail/';
+    return this.http.post(link, { student_id: id });
+  }
+
+  studentLeaves(id: number) {
+    const link = this.baseUrl + 'studentleaves/';
+    return this.http.post(link, { student_id: id });
+  }
+
   // Meetings
   meetings(id: number) {
     const link = this.baseUrl + 'meetings/';
@@ -159,10 +169,25 @@ export class ApiService {
     return this.http.post(link, { student_id: id });
   }
 
-  // Notifications
-  getNotifications(id: number) {
+  // Notifications (with pagination support)
+  getNotifications(id: number, page: number = 1, perPage: number = 20) {
     const link = this.baseUrl + 'notification/';
-    return this.http.post(link, { student_id: id });
+    return this.http.post(link, { student_id: id, page, per_page: perPage });
+  }
+
+  markNotificationRead(studentId: number, notificationId: number) {
+    const link = this.baseUrl + 'marknotificationread/';
+    return this.http.post(link, { student_id: studentId, notification_id: notificationId });
+  }
+
+  markAllNotificationsRead(studentId: number) {
+    const link = this.baseUrl + 'marknotificationread/';
+    return this.http.post(link, { student_id: studentId, mark_all: 1 });
+  }
+
+  getNotificationUnreadCount(studentId: number) {
+    const link = this.baseUrl + 'notificationunreadcount/';
+    return this.http.post(link, { student_id: studentId });
   }
 
   // Messages (Broadcast)
