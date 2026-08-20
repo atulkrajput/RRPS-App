@@ -26,8 +26,9 @@
 13. [Account](#account)
 14. [Notifications](#notifications)
 15. [App Version & Update](#24-app-version-check)
-16. [Response Format & Status Codes](#response-format)
-17. [Ionic Integration Examples](#ionic-integration-examples)
+16. [Messages (Broadcast)](#messages-broadcast)
+17. [Response Format & Status Codes](#response-format)
+18. [Ionic Integration Examples](#ionic-integration-examples)
 
 ---
 
@@ -982,6 +983,165 @@ Downloads the latest APK file directly from the server. This endpoint serves the
 
 ---
 
+## Messages (Broadcast)
+
+The Messages feature allows students to receive broadcast messages from teachers (class teacher, subject teacher), reception, and principal. Messages are delivered via push notification and stored for in-app viewing.
+
+### 26. Messages List
+
+**Endpoint:** `POST /api/broadcastmessages`
+
+Returns all broadcast messages for a student, ordered by most recent first.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| student_id | integer | Yes | Student ID |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Broadcast messages fetched successfully",
+  "data": [
+    {
+      "id": 5,
+      "sender_type": "class_teacher",
+      "sender_display_name": "GAURAV KUMAR (Class Teacher)",
+      "title": "Parent Teacher Meeting",
+      "message": "PTM scheduled for 25th April. Please attend.",
+      "system_category": null,
+      "is_read": 0,
+      "created": "2026-04-20 10:30:00"
+    },
+    {
+      "id": 3,
+      "sender_type": "subject_teacher",
+      "sender_display_name": "PRIYA SHARMA (Mathematics)",
+      "title": "Homework Reminder",
+      "message": "Complete exercise 5.3 by tomorrow.",
+      "system_category": null,
+      "is_read": 1,
+      "created": "2026-04-18 14:15:00"
+    },
+    {
+      "id": 1,
+      "sender_type": "system",
+      "sender_display_name": "School",
+      "title": "Absent Notification",
+      "message": "Dear Student, you have been marked absent on 17-Apr-2026.",
+      "system_category": "absent_notification",
+      "is_read": 1,
+      "created": "2026-04-17 09:00:00"
+    }
+  ]
+}
+```
+
+**No Messages:**
+```json
+{ "status": 1, "msg": "Broadcast messages fetched successfully", "data": [] }
+```
+
+**Error:**
+```json
+{ "status": -1, "msg": "Student not found", "data": null }
+```
+
+> **Sender Types:**
+> - `class_teacher` — Sent by the class teacher for the student's section
+> - `subject_teacher` — Sent by a subject teacher for a specific class/section
+> - `reception` — Sent by school reception
+> - `principal` — Sent by the principal (can target all classes)
+> - `system` — Auto-generated (absent notifications, fee reminders, birthday wishes)
+>
+> **System Categories** (when `sender_type` = `system`):
+> - `absent_notification` — Student marked absent
+> - `fee_reminder` — Fee payment reminder
+> - `fee_receipt` — Fee receipt confirmation
+> - `birthday_wish` — Birthday greeting
+
+---
+
+### 27. Message Detail
+
+**Endpoint:** `POST /api/broadcastmessagedetail`
+
+Returns full message detail and **automatically marks it as read**.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| student_id | integer | Yes | Student ID |
+| message_id | integer | Yes | Broadcast message ID (from messages list) |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Broadcast message detail fetched successfully",
+  "data": {
+    "id": 5,
+    "sender_type": "class_teacher",
+    "sender_display_name": "GAURAV KUMAR (Class Teacher)",
+    "title": "Parent Teacher Meeting",
+    "message": "PTM scheduled for 25th April. Please attend with your ward's report card.",
+    "system_category": null,
+    "is_read": 1,
+    "read_at": "2026-04-21 08:45:00",
+    "created": "2026-04-20 10:30:00"
+  }
+}
+```
+
+**Error (message not found):**
+```json
+{ "status": -1, "msg": "Message not found", "data": null }
+```
+
+> **Note:** Calling this endpoint marks the message as read (`is_read = 1`) and records the `read_at` timestamp. Subsequent calls return the same data with the already-set `read_at`.
+
+---
+
+### 28. Unread Message Count
+
+**Endpoint:** `POST /api/broadcastunreadcount`
+
+Returns the count of unread messages. Use this to show a badge on the Messages tab/icon.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| student_id | integer | Yes | Student ID |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Unread count fetched successfully",
+  "data": {
+    "unread_count": 3
+  }
+}
+```
+
+**No Unread:**
+```json
+{
+  "status": 1,
+  "msg": "Unread count fetched successfully",
+  "data": {
+    "unread_count": 0
+  }
+}
+```
+
+**Error:**
+```json
+{ "status": -1, "msg": "Student not found", "data": null }
+```
+
+> **Usage:** Call this on app launch and after returning from background to update the badge count. Also call after viewing a message to refresh the count.
+
+---
+
 ## Response Format
 
 All APIs return JSON:
@@ -1140,6 +1300,17 @@ export class StudentApiService {
   getApkDownloadUrl(appType: string = 'student') {
     return `${this.baseUrl}/downloadapk?app_type=${appType}`;
   }
+
+  // Messages (Broadcast)
+  getMessages(studentId: number) {
+    return this.postForm('broadcastmessages', { student_id: studentId });
+  }
+  getMessageDetail(studentId: number, messageId: number) {
+    return this.postForm('broadcastmessagedetail', { student_id: studentId, message_id: messageId });
+  }
+  getUnreadCount(studentId: number) {
+    return this.postForm('broadcastunreadcount', { student_id: studentId });
+  }
 }
 ```
 
@@ -1218,6 +1389,9 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 | 23b | Register Device | `/api/registerDevice` | uid, fcm_token, student_id (optional) |
 | 24 | App Version | `/api/appversioncheck` | current_version, app_type=student, platform |
 | 25 | Download APK | `/api/downloadapk` | app_type (query param, GET) |
+| 26 | Messages List | `/api/broadcastmessages` | student_id |
+| 27 | Message Detail | `/api/broadcastmessagedetail` | student_id, message_id |
+| 28 | Unread Count | `/api/broadcastunreadcount` | student_id |
 
 ---
 
@@ -1410,6 +1584,32 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 - [ ] APK config exists but file deleted from server → status -1, "APK file not found on server"
 - [ ] Verify downloaded file is a valid APK
 - [ ] Verify file can be installed on Android device
+
+### 26. Messages List (`/api/broadcastmessages`)
+- [ ] Valid student_id with messages → status 1, returns array of messages
+- [ ] Valid student_id with no messages → status 1, returns empty array
+- [ ] Invalid student_id → status -1, "Student not found"
+- [ ] Missing student_id → status -1, "Student ID is required"
+- [ ] Verify messages ordered by created DESC (newest first)
+- [ ] Verify each message has id, sender_type, sender_display_name, title, message, is_read, created
+- [ ] Verify is_read = 0 for unread, 1 for read messages
+- [ ] Verify system messages have system_category field populated
+
+### 27. Message Detail (`/api/broadcastmessagedetail`)
+- [ ] Valid student_id + message_id (unread) → status 1, marks as read, returns detail with read_at
+- [ ] Valid student_id + message_id (already read) → status 1, returns detail with existing read_at
+- [ ] Invalid message_id → status -1, "Message not found"
+- [ ] Message belongs to different student → status -1, "Message not found"
+- [ ] Missing student_id → status -1, "Student ID is required"
+- [ ] Missing message_id → status -1, "Message ID is required"
+- [ ] Verify read_at timestamp is set after first view
+
+### 28. Unread Count (`/api/broadcastunreadcount`)
+- [ ] Valid student_id with unread messages → status 1, unread_count > 0
+- [ ] Valid student_id with all read → status 1, unread_count = 0
+- [ ] Invalid student_id → status -1, "Student not found"
+- [ ] Missing student_id → status -1, "Student ID is required"
+- [ ] Verify count decreases after reading a message via detail API
 
 ### General
 - [ ] All endpoints return JSON with status, msg, data fields
