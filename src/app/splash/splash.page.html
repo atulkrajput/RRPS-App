@@ -1,0 +1,74 @@
+<ion-content [fullscreen]="true">
+  <div class="splash-container">
+    <div class="circle circle-one"></div>
+    <div class="circle circle-two"></div>
+
+    <div class="header">
+      <img
+        src="assets/images/school-logo.png"
+        class="school-logo"
+        alt="R.R. Sr. Sec. Public School"
+      />
+      <div class="portal-label">
+        <span>RRPS</span>
+        <span>STUDENT PANEL</span>
+      </div>
+    </div>
+
+    <div class="welcome">
+      <div class="welcome-badge">
+        <ion-icon name="school-outline"></ion-icon>
+        <span>SMART SCHOOL</span>
+      </div>
+      <h1>
+        Everything you need,
+        <strong>in one place.</strong>
+      </h1>
+      <p>
+        Access everything you need for your academics.
+      </p>
+    </div>
+
+    <div class="feature-wrapper">
+      <div class="feature-card">
+        <div class="feature-number">
+          {{ (currentSlide + 1).toString().padStart(2, '0') }}
+        </div>
+        <div class="feature-icon">
+          <ion-icon [name]="features[currentSlide].icon"></ion-icon>
+        </div>
+        <div class="feature-content">
+          <div class="feature-label">STUDENT PANEL</div>
+          <h2>{{ features[currentSlide].title }}</h2>
+          <p>{{ features[currentSlide].description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress">
+      <button
+        type="button"
+        *ngFor="let feature of features; let i = index"
+        [class.active]="i === currentSlide"
+        (click)="goToSlide(i)"
+        [attr.aria-label]="'Go to slide ' + (i + 1)"
+      ></button>
+    </div>
+
+    <div class="navigation">
+      <button type="button" class="skip-button" (click)="skip()">
+        Skip
+      </button>
+      <button type="button" class="next-button" (click)="next()">
+        <span>{{ currentSlide === features.length - 1 ? 'Get Started' : 'Next' }}</span>
+        <ion-icon [name]="currentSlide === features.length - 1 ? 'arrow-forward-outline' : 'chevron-forward-outline'"></ion-icon>
+      </button>
+    </div>
+
+    <div class="footer">
+      <span>R.R. Sr. Sec. Public School</span>
+      <span>&bull;</span>
+      <span>Learn &bull; Grow &bull; Succeed</span>
+    </div>
+  </div>
+</ion-content>

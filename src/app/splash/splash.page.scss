@@ -1,0 +1,289 @@
+:host {
+  --rrps-red: #C71919;
+  --rrps-red-dark: #9F1111;
+  --rrps-yellow: #F5C400;
+  --rrps-yellow-light: #FFF7CF;
+  --rrps-dark: #171717;
+  --rrps-muted: #6B6B6B;
+}
+
+ion-content {
+  --background: #FFFDF5;
+}
+
+.splash-container {
+  min-height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding:
+    calc(24px + env(safe-area-inset-top))
+    24px
+    calc(20px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.circle-one {
+  width: 260px;
+  height: 260px;
+  top: -130px;
+  right: -100px;
+  background: rgba(199, 25, 25, 0.08);
+}
+
+.circle-two {
+  width: 180px;
+  height: 180px;
+  bottom: -100px;
+  left: -90px;
+  background: rgba(245, 196, 0, 0.12);
+}
+
+.header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.school-logo {
+  width: 62px;
+  height: 62px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.12));
+}
+
+.portal-label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.portal-label span:first-child {
+  color: var(--rrps-red);
+  font-size: 22px;
+}
+
+.portal-label span:last-child {
+  color: var(--rrps-dark);
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+.welcome {
+  position: relative;
+  z-index: 2;
+}
+
+.welcome-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 30px;
+  background: var(--rrps-yellow-light);
+  color: var(--rrps-red);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.welcome-badge ion-icon {
+  font-size: 15px;
+}
+
+.welcome h1 {
+  margin: 16px 0 8px;
+  font-size: clamp(30px, 8vw, 42px);
+  line-height: 1.08;
+  font-weight: 500;
+  color: var(--rrps-dark);
+}
+
+.welcome h1 strong {
+  display: block;
+  color: var(--rrps-red);
+  font-weight: 800;
+}
+
+.welcome p {
+  margin: 0;
+  max-width: 340px;
+  color: var(--rrps-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.feature-wrapper {
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  margin-bottom: 18px;
+}
+
+.feature-card {
+  position: relative;
+  min-height: 190px;
+  padding: 26px 24px;
+  border-radius: 26px;
+  background: linear-gradient(145deg, #ffffff 0%, #fffbea 100%);
+  border: 1px solid rgba(199, 25, 25, 0.08);
+  box-shadow: 0 16px 40px rgba(120, 30, 20, 0.10);
+  overflow: hidden;
+  animation: cardIn 0.35s ease;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.feature-number {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(199, 25, 25, 0.35);
+}
+
+.feature-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rrps-red);
+  color: white;
+  box-shadow: 0 8px 20px rgba(199, 25, 25, 0.22);
+}
+
+.feature-icon ion-icon {
+  font-size: 28px;
+}
+
+.feature-content {
+  margin-top: 18px;
+}
+
+.feature-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--rrps-yellow);
+}
+
+.feature-content h2 {
+  margin: 5px 0 6px;
+  color: var(--rrps-dark);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.feature-content p {
+  margin: 0;
+  color: var(--rrps-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 300px;
+}
+
+.progress {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.progress button {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: #dedede;
+  transition: width 0.25s ease, background 0.25s ease;
+  cursor: pointer;
+}
+
+.progress button.active {
+  width: 25px;
+  background: var(--rrps-red);
+}
+
+.navigation {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.skip-button {
+  min-height: 48px;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  color: #777;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.next-button {
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--rrps-red);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(199, 25, 25, 0.22);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.next-button:active {
+  transform: scale(0.96);
+}
+
+.next-button ion-icon {
+  font-size: 19px;
+}
+
+.footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 20px;
+  color: #999;
+  font-size: 9px;
+}

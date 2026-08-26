@@ -16,6 +16,7 @@ import { PushNotificationService } from '../services/push-notification.service';
 export class LoginPage implements OnInit {
   loginForm: FormGroup;
   loginFormSubmit = false;
+  showPassword = false;
   constructor(
     private fb: FormBuilder,
     private constants: ConstantsService,

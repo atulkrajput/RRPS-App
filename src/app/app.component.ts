@@ -89,7 +89,7 @@ export class AppComponent {
         this.navCtrl.navigateRoot(['/', 'dashboard']);
       } else {
         this.menuCtrl.enable(false);
-        this.navCtrl.navigateRoot(['login']);
+        this.navCtrl.navigateRoot(['splash']);
       }
       this.initializePushNotifications();
     });
@@ -155,17 +155,24 @@ export class AppComponent {
       ];
       if (rootPages.some(p => url === p || url.startsWith(p + '?'))) {
         const alert = await this.alertCtrl.create({
-          header: 'Exit App',
-          message: 'Are you sure you want to exit?',
+          cssClass: 'exit-alert',
+          header: 'Leaving So Soon?',
+          message: '<div class="exit-alert-content"><ion-icon name="sad-outline" class="exit-icon"></ion-icon><p>We\'ll miss you! Are you sure you want to exit the app?</p></div>',
           buttons: [
-            { text: 'Cancel', role: 'cancel' },
             {
-              text: 'Exit',
+              text: 'Stay',
+              role: 'cancel',
+              cssClass: 'stay-btn'
+            },
+            {
+              text: 'Exit App',
+              cssClass: 'exit-btn',
               handler: () => {
                 navigator['app']?.exitApp();
               }
             }
-          ]
+          ],
+          backdropDismiss: true
         });
         await alert.present();
       } else {

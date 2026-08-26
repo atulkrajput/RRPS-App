@@ -1,62 +1,85 @@
-<ion-header class="login-bg">
-  <ion-toolbar>
-    <ion-title></ion-title>
-  </ion-toolbar>
-  <img src="assets/imgs/logo.png" width="150px">
-  <h3>Welcome Dear Student/Guardian</h3>
-</ion-header>
+<ion-content class="login-content" [scrollY]="false">
+  <div class="login-wrapper">
 
-<ion-content fullscreen>
-  <div class="form">
-    <h4>Please enter your details to continue.</h4>
-    <form [formGroup]="loginForm" (ngSubmit)="login()">
-      <ion-list lines="none">
-        <ion-item>
-          <div class="item_inner d-flex">
-            <ion-icon name="person-circle-outline"></ion-icon>
-            <div class="input_field">
-              <ion-label mode="md" position="floating">Reg Id</ion-label>
-              <ion-input mode="md" type="text" formControlName="regid"></ion-input>
-            </div>
+    <!-- Logo Section -->
+    <div class="login-header">
+      <div class="logo-container">
+        <img src="assets/imgs/icon.png" alt="RR Public School">
+      </div>
+      <h1 class="app-title">R.R. Public School, Noorpur</h1>
+      <p class="login-subtitle">Student Panel</p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card">
+      <h2 class="card-title">Welcome Back</h2>
+      <p class="card-subtitle">Sign in to continue</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
+        <!-- Registration ID -->
+        <div class="input-group" [class.error]="loginForm.get('regid').invalid && (loginForm.get('regid').touched || loginFormSubmit)">
+          <div class="input-icon">
+            <ion-icon name="person-outline"></ion-icon>
           </div>
-        </ion-item>
-        <div class="error-div" *ngIf="loginForm.get('regid').errors && ( loginForm.get('regid').dirty || loginForm.get('regid').touched || loginFormSubmit)">
-          <p class='error' *ngIf="loginForm.get('regid').hasError('required')">Enter your registration id.</p>
+          <ion-input
+            type="text"
+            formControlName="regid"
+            placeholder="Registration ID"
+            class="modern-input">
+          </ion-input>
         </div>
-        <ion-item>
-          <div class="item_inner d-flex">
-            <ion-icon name="key-outline"></ion-icon>
-            <div class="input_field">
-              <ion-label mode="md" position="floating">Password</ion-label>
-              <ion-input mode="md" formControlName='password' type="password"></ion-input>
-            </div>
+        <p class="error-msg" *ngIf="loginForm.get('regid').hasError('required') && (loginForm.get('regid').touched || loginFormSubmit)">
+          Registration ID is required
+        </p>
+
+        <!-- Password -->
+        <div class="input-group" [class.error]="loginForm.get('password').invalid && (loginForm.get('password').touched || loginFormSubmit)">
+          <div class="input-icon">
+            <ion-icon name="lock-closed-outline"></ion-icon>
           </div>
-        </ion-item>
-        <div class="error-div" *ngIf="loginForm.get('password').errors && (loginForm.get('password').dirty || loginForm.get('password').touched || loginFormSubmit)">
-          <p class='error' *ngIf="loginForm.get('password').hasError('required')">Enter your password.</p>
+          <ion-input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Password"
+            class="modern-input">
+          </ion-input>
+          <div class="toggle-password" (click)="showPassword = !showPassword">
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </div>
         </div>
-        <div lines="none">
-          <ion-button expand='block' type="submit" color="primary">Login</ion-button>
-        </div>
-      </ion-list>
-    </form>
+        <p class="error-msg" *ngIf="loginForm.get('password').hasError('required') && (loginForm.get('password').touched || loginFormSubmit)">
+          Password is required
+        </p>
+
+        <!-- Login Button -->
+        <ion-button expand="block" type="submit" class="login-btn">
+          <ion-icon slot="start" name="log-in-outline"></ion-icon>
+          Sign In
+        </ion-button>
+      </form>
+
+      <p class="help-note">
+        Don't know your credentials? Contact School.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <div class="footer-links">
+        <ion-button fill="clear" size="small" routerLink="/about">
+          <ion-icon slot="start" name="information-circle-outline"></ion-icon>
+          About
+        </ion-button>
+        <ion-button fill="clear" size="small" routerLink="/terms">
+          <ion-icon slot="start" name="document-text-outline"></ion-icon>
+          Terms
+        </ion-button>
+        <ion-button fill="clear" size="small" routerLink="/privacy">
+          <ion-icon slot="start" name="shield-checkmark-outline"></ion-icon>
+          Privacy
+        </ion-button>
+      </div>
+      <p class="powered-by">Powered by LALogix Enterprises</p>
+    </div>
   </div>
-  <p>Please contact school admin in case you don't know your regid/password. <br> By login user is Agree to our terms
-    &conditions.</p>
-  <p>Powered By: Doon Portal</p>
-  <ion-footer>
-    <ion-toolbar>
-      <ion-row>
-        <ion-col size="4">
-          <ion-button fill="clear" size="small" width="30%" routerLink="/about">About Us</ion-button>
-        </ion-col>
-        <ion-col size="4">
-          <ion-button fill="clear" size="small" width="30%" routerLink="/terms">Terms</ion-button>
-        </ion-col>
-        <ion-col size="4">
-          <ion-button fill="clear" size="small" width="30%" routerLink="/privacy">Privacy</ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-toolbar>
-  </ion-footer>
 </ion-content>
