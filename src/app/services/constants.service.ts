@@ -97,10 +97,12 @@ export class ConstantsService {
   async presentToast(msg: string) {
     const toast = await this.toastController.create({
       message: msg,
-      duration:3000,
+      duration: 3000,
+      position: 'bottom',
+      cssClass: 'modern-toast',
       buttons: [
         {
-          text: 'Close',
+          text: 'OK',
           role: 'cancel'
         }
       ]

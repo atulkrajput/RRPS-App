@@ -14,6 +14,15 @@
   ion-button {
     --color: white;
   }
+
+  .session-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 10px;
+    border-radius: 12px;
+    color: white;
+  }
 }
 
 // Modern Content
@@ -24,7 +33,7 @@
 // Stats Card
 .stats-card {
   background: white;
-  border-radius: var(--border-radius);
+  border-radius: var(--border-radius-lg);
   padding: 20px;
   margin: 16px;
   box-shadow: var(--shadow);
@@ -32,7 +41,7 @@
   h3 {
     margin: 0 0 16px 0;
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
     text-align: center;
   }
@@ -45,6 +54,10 @@
     .stat-item {
       text-align: center;
 
+      &.stat-main {
+        grid-column: 1;
+      }
+
       .stat-circle {
         width: 80px;
         height: 80px;
@@ -53,27 +66,50 @@
         align-items: center;
         justify-content: center;
         margin: 0 auto 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 
         span {
           color: white;
-          font-size: 1.4rem;
+          font-size: 1.3rem;
           font-weight: 700;
+        }
+
+        &.excellent {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        &.good {
+          background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        }
+        &.warning {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        &.poor {
+          background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
       }
 
       .stat-value {
         h2 {
           margin: 0;
-          font-size: 2rem;
+          font-size: 1.8rem;
           font-weight: 700;
         }
 
         p {
           margin: 4px 0 0 0;
-          font-size: 0.8rem;
+          font-size: 0.78rem;
           color: var(--text-secondary);
           font-weight: 500;
+        }
+
+        &.present-value h2 {
+          color: var(--success);
+        }
+        &.absent-value h2 {
+          color: var(--danger);
+        }
+        &.total-value h2 {
+          color: var(--text-primary);
         }
       }
 
@@ -85,6 +121,42 @@
       }
     }
   }
+
+  .extra-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--bg-color);
+
+    .extra-stat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      ion-icon {
+        font-size: 20px;
+      }
+
+      div {
+        display: flex;
+        flex-direction: column;
+
+        .extra-value {
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: var(--text-primary);
+        }
+
+        .extra-label {
+          font-size: 0.7rem;
+          color: var(--text-secondary);
+          font-weight: 500;
+        }
+      }
+    }
+  }
 }
 
 // Section Header
@@ -93,8 +165,8 @@
 
   h3 {
     margin: 0 0 4px 0;
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.15rem;
+    font-weight: 700;
     color: var(--text-primary);
   }
 
@@ -122,11 +194,11 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 
     .month-icon {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       border-radius: 12px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       display: flex;
@@ -137,7 +209,7 @@
 
       ion-icon {
         color: white;
-        font-size: 24px;
+        font-size: 22px;
       }
     }
 
@@ -146,23 +218,23 @@
       min-width: 0;
 
       h3 {
-        margin: 0 0 4px 0;
-        font-size: 1rem;
+        margin: 0 0 3px 0;
+        font-size: 0.95rem;
         font-weight: 600;
         color: var(--text-primary);
       }
 
       p {
         margin: 0;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         color: var(--text-secondary);
       }
     }
 
     .percentage-badge {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
-      padding: 8px 12px;
+      padding: 6px 12px;
       border-radius: 10px;
 
       &.excellent {
@@ -191,21 +263,21 @@
     margin-bottom: 12px;
 
     .stat-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
 
       .stat-col {
-        flex: 1;
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 10px;
+        gap: 6px;
+        padding: 8px;
         border-radius: 8px;
         background: var(--bg-color);
 
         ion-icon {
-          font-size: 24px;
+          font-size: 20px;
+          flex-shrink: 0;
         }
 
         div {
@@ -213,72 +285,73 @@
           flex-direction: column;
 
           .value {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
           }
 
           .label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--text-secondary);
+            font-weight: 500;
           }
         }
 
         &.present {
-          ion-icon {
-            color: var(--success);
-          }
-          .value {
-            color: var(--success);
-          }
+          ion-icon { color: var(--success); }
+          .value { color: var(--success); }
         }
 
         &.absent {
-          ion-icon {
-            color: var(--danger);
-          }
-          .value {
-            color: var(--danger);
-          }
+          ion-icon { color: var(--danger); }
+          .value { color: var(--danger); }
+        }
+
+        &.late {
+          ion-icon { color: var(--warning); }
+          .value { color: var(--warning); }
         }
 
         &.holiday {
-          ion-icon {
-            color: var(--warning);
-          }
-          .value {
-            color: var(--warning);
-          }
+          ion-icon { color: #8b5cf6; }
+          .value { color: #8b5cf6; }
         }
       }
     }
   }
 
+  .leaves-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    margin-bottom: 10px;
+    background: #fef3c7;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    color: #92400e;
+    font-weight: 500;
+
+    ion-icon {
+      font-size: 16px;
+      color: #d97706;
+    }
+  }
+
   .progress-bar {
-    height: 8px;
+    height: 6px;
     background: var(--bg-color);
-    border-radius: 4px;
+    border-radius: 3px;
     overflow: hidden;
 
     .progress-fill {
       height: 100%;
-      border-radius: 4px;
-      transition: width 0.5s ease;
+      border-radius: 3px;
+      transition: width 0.6s ease;
 
-      &.excellent {
-        background: var(--success);
-      }
-
-      &.good {
-        background: var(--primary);
-      }
-
-      &.warning {
-        background: var(--warning);
-      }
-
-      &.poor {
-        background: var(--danger);
-      }
+      &.excellent { background: linear-gradient(90deg, #10b981, #34d399); }
+      &.good { background: linear-gradient(90deg, #6366f1, #818cf8); }
+      &.warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+      &.poor { background: linear-gradient(90deg, #ef4444, #f87171); }
     }
   }
 }
@@ -288,7 +361,7 @@
   background: white;
   border-radius: var(--border-radius);
   padding: 16px;
-  margin: 8px 16px 16px;
+  margin: 8px 16px 24px;
   box-shadow: var(--shadow);
 
   h4 {
@@ -301,37 +374,49 @@
   .legend-items {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
 
     .legend-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-secondary);
+      font-weight: 500;
 
       .legend-dot {
-        width: 12px;
-        height: 12px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
         flex-shrink: 0;
 
-        &.excellent {
-          background: var(--success);
-        }
-
-        &.good {
-          background: var(--primary);
-        }
-
-        &.warning {
-          background: var(--warning);
-        }
-
-        &.poor {
-          background: var(--danger);
-        }
+        &.excellent { background: var(--success); }
+        &.good { background: var(--primary); }
+        &.warning { background: var(--warning); }
+        &.poor { background: var(--danger); }
       }
+    }
+  }
+
+  .legend-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--bg-color);
+
+    ion-icon {
+      font-size: 16px;
+      color: var(--text-light);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    span {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      line-height: 1.4;
     }
   }
 }
@@ -346,15 +431,15 @@
   text-align: center;
 
   ion-icon {
-    font-size: 80px;
+    font-size: 72px;
     color: var(--text-light);
     margin-bottom: 16px;
-    opacity: 0.5;
+    opacity: 0.4;
   }
 
   h3 {
     margin: 0 0 8px 0;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 600;
     color: var(--text-primary);
   }
@@ -362,7 +447,7 @@
   p {
     margin: 0;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.88rem;
   }
 }
 
@@ -370,12 +455,16 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.stats-card {
+  animation: fadeInUp 0.4s ease-out;
 }
 
 .attendance-card {
@@ -387,40 +476,40 @@
 .attendance-card:nth-child(2) { animation-delay: 0.1s; }
 .attendance-card:nth-child(3) { animation-delay: 0.15s; }
 .attendance-card:nth-child(4) { animation-delay: 0.2s; }
+.attendance-card:nth-child(5) { animation-delay: 0.25s; }
 
 // Responsive Design
-@media (max-width: 576px) {
+@media (max-width: 380px) {
+  .attendance-card {
+    .card-stats {
+      .stat-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+    }
+  }
+
   .stats-card {
     .stats-grid {
       .stat-item {
         .stat-circle {
-          width: 70px;
-          height: 70px;
+          width: 68px;
+          height: 68px;
 
           span {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
           }
         }
 
         .stat-value h2 {
-          font-size: 1.6rem;
+          font-size: 1.5rem;
         }
       }
     }
   }
+}
 
-  .attendance-card {
-    .card-stats {
-      .stat-row {
-        flex-direction: column;
-
-        .stat-col {
-          justify-content: center;
-        }
-      }
-    }
-  }
-
+@media (max-width: 576px) {
   .legend-card {
     .legend-items {
       grid-template-columns: 1fr;

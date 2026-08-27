@@ -17,7 +17,7 @@
 5. [Fees](#fees)
 6. [Exams](#exams)
 7. [Report Card](#13b-report-card-half-yearly--yearly)
-8. [Attendance](#14-student-attendance)
+8. [Attendance (Basic)](#14a-student-attendance-basic)
 8b. [Attendance Detail (Enhanced)](#14b-student-attendance-detail-enhanced)
 8c. [Student Leaves](#14c-student-leaves)
 9. [Meetings](#15-meetings)
@@ -26,13 +26,18 @@
 12. [Feedback](#19-feedback)
 13. [Calendar](#20-calendar)
 14. [Account](#account)
+  - [Change Password](#21-change-password)
+  - [Forgot Password (Request OTP)](#21b-forgot-password-request-otp)
+  - [Verify OTP](#21c-verify-otp)
+  - [Reset Password](#21d-reset-password)
 15. [Notifications](#notifications)
 16. [App Version & Update](#24-app-version-check)
 17. [Messages (Broadcast)](#messages-broadcast)
 18. [Attendance Alert Messages](#attendance-alert-messages)
 19. [Complaints](#complaints)
-20. [Response Format & Status Codes](#response-format)
-21. [Ionic Integration Examples](#ionic-integration-examples)
+20. [Device Registration (V2)](#device-registration-v2)
+21. [Response Format & Status Codes](#response-format)
+22. [Ionic Integration Examples](#ionic-integration-examples)
 
 ---
 
@@ -739,15 +744,26 @@ Returns subject-wise marks for Half-Yearly and Yearly exams with totals, percent
 
 ## 14. Student Attendance
 
+> **Attendance System Overview (Updated August 2026)**
+>
+> The attendance module provides three levels of data:
+> 1. **Basic (monthly summary)** — `/api/studentattendance` — simple month-by-month counts
+> 2. **Enhanced (monthly detail)** — `/api/studentattendancedetail` — working days, late, leaves, absent, percentage per month + cumulative session totals
+> 3. **Dashboard (cumulative only)** — `/api/studentdashboard` → `attendance` object — session-to-date summary
+>
+> **Recommended:** Use the Enhanced endpoint (`/api/studentattendancedetail`) for the attendance screen. It matches the web panel calculations exactly.
+
+---
+
+### 14a. Student Attendance (Basic)
+
 **Endpoint:** `POST /api/studentattendance`
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | student_id | integer | Yes | Student ID |
 
-Returns month-wise attendance summary for the current academic session.
-
-> **Note (Updated July 2026):** Holidays are class-aware — school-wide holidays (event_category 1,3,4) apply to all students, while class-specific holidays (event_category 2) only apply to students in that class. The attendance system now supports leaves (via `student_leaves` table), late arrivals (via gate app `late_arrival_passes` table), and holiday-aware calculations.
+Returns a simplified month-wise attendance summary for the current academic session. This is the legacy endpoint retained for backward compatibility.
 
 **Success:**
 ```json
@@ -773,13 +789,31 @@ Returns month-wise attendance summary for the current academic session.
 }
 ```
 
+> **Calculation Logic (Basic Endpoint):**
+>
+> For each month from session start to current month:
+> | Field | Calculation |
+> |-------|-------------|
+> | `total` | If current month → today's date (day of month). Otherwise → total calendar days in that month |
+> | `present` | Count of `student_attendances` records where `present = 1` for that month. **Note:** Does NOT exclude Sundays from the count |
+> | `holidays` | Sundays in that month + school/class-specific holiday days (via `GeneralComponent::countHolidayDays()`) |
+>
+> **Limitations of this endpoint:**
+> - No `working_days` field — only raw `total` (calendar days)
+> - No `absent`, `late`, `leaves`, or `percentage` fields
+> - Present count does not exclude Sunday attendance records (if any exist in DB, they are counted)
+> - No cumulative totals
+> - Cannot distinguish between late arrivals and regular present
+>
+> **Use `/api/studentattendancedetail` instead** for accurate attendance matching the web panel.
+
 ---
 
 ### 14b. Student Attendance Detail (Enhanced)
 
 **Endpoint:** `POST /api/studentattendancedetail`
 
-Returns detailed month-wise attendance with working days, leaves, late arrivals, absent count, and percentage. Also includes cumulative (session till-date) totals.
+Returns detailed month-wise attendance with working days, leaves, late arrivals, absent count, and percentage. Also includes cumulative (session-to-date) totals. This is the recommended endpoint for the app's attendance screen.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -836,16 +870,72 @@ Returns detailed month-wise attendance with working days, leaves, late arrivals,
 { "status": -1, "msg": "Student not found", "data": null }
 ```
 
-> **Notes:**
-> - `working_days` = total days − Sundays − holidays (events with `bg-cal-red`)
-> - **Holidays are class-aware**: School-wide holidays (event_category 1,3,4) apply to all classes. Class-specific holidays (event_category 2 with class_category_id) only apply to the student's class.
-> - `present` includes students marked as Late (late arrivals are counted as present)
-> - `late` is a subset of present — students who arrived late via gate app
-> - `leaves` are stored separately but counted as absent in percentage calculation
-> - `percentage` = (present / working_days) × 100
-> - `cumulative` provides session-to-date totals across all months
-> - The old `/api/studentattendance` endpoint continues to work for backward compatibility
-> - Holiday calculation uses `GeneralComponent::getHolidayDates()` which caches results per request for performance
+> **Monthly Calculation Logic:**
+>
+> For each month from session start to current month:
+> | Field | Calculation |
+> |-------|-------------|
+> | `total_days` | If current month → today's date. Otherwise → calendar days in month |
+> | `working_days` | `total_days` − Sundays − holidays (non-Sunday holidays only) |
+> | `holidays` | Sundays + non-Sunday holidays (school-wide + class-specific) |
+> | `present` | Count of `student_attendances` where `present = 1` AND excludes Sundays (`WEEKDAY != 6`) |
+> | `late` | Count of `student_attendances` where `is_late = 1` AND excludes Sundays |
+> | `leaves` | Count of `student_leaves` where `status = 1` for that month |
+> | `absent` | `working_days` − `present` |
+> | `percentage` | (`present` / `working_days`) × 100, rounded to 1 decimal |
+>
+> **Cumulative Calculation Logic:**
+>
+> Sums across all months from session start to today:
+> | Field | Calculation |
+> |-------|-------------|
+> | `total_working_days` | Sum of all monthly `working_days` |
+> | `total_present` | Sum of all monthly `present` |
+> | `total_late` | Sum of all monthly `late` |
+> | `total_leaves` | Sum of all monthly `leaves` |
+> | `total_absent` | `total_working_days` − `total_present` |
+> | `percentage` | (`total_present` / `total_working_days`) × 100, rounded to 1 decimal |
+>
+> **Important Notes:**
+> - **Holidays are class-aware**: School-wide holidays (event_category 1,3,4) apply to all classes. Class-specific holidays (event_category 2 with `class_category_id`) only apply to the student's class.
+> - `present` includes students marked as Late (late arrivals are counted as present in attendance)
+> - `late` is a **subset** of `present` — students who arrived late via gate app (`is_late = 1`)
+> - `leaves` are from the `student_leaves` table — they contribute to absent count (absent = working_days − present)
+> - Holiday calculation uses `GeneralComponent::countHolidayDays()` which only counts non-Sunday holidays (prevents double-counting Sundays that fall on holidays)
+> - `GeneralComponent::getHolidayDates()` caches results per request for performance
+> - Future months (beyond current month) are skipped entirely
+>
+> **Dashboard Attendance (for reference):**
+>
+> The `/api/studentdashboard` endpoint returns an `attendance` object with the same cumulative logic:
+> ```json
+> "attendance": {
+>   "total_present": 165,
+>   "total_absent": 15,
+>   "total_late": 8,
+>   "total_leaves": 5,
+>   "total_working_days": 180,
+>   "percentage": 91.7
+> }
+> ```
+> Dashboard calculation uses the same month-by-month loop: for each month, calculates days − Sundays − holidays, sums working days, then `total_absent = total_working_days − total_present`.
+
+---
+
+### Differences Between Basic and Enhanced Attendance Endpoints
+
+| Aspect | `/api/studentattendance` | `/api/studentattendancedetail` |
+|--------|--------------------------|--------------------------------|
+| Days field | `total` (raw calendar days) | `total_days` + `working_days` (Sundays & holidays removed) |
+| Present count | Includes Sunday records if present in DB | Excludes Sundays (`WEEKDAY != 6`) |
+| Late arrivals | Not tracked | `late` field (subset of present) |
+| Leaves | Not tracked | `leaves` field (from `student_leaves`) |
+| Absent | Not calculated | `absent` = working_days − present |
+| Percentage | Not calculated | Per-month + cumulative |
+| Cumulative totals | Not available | `cumulative` object with session totals |
+| Session name | Not returned | `session` field included |
+| Validation | Minimal (student lookup) | Full (student_id required, student must exist with status=1) |
+| Matches web panel | No | Yes |
 
 ---
 
@@ -1142,6 +1232,189 @@ Returns school events and holidays for the calendar view. Only returns events re
 
 ---
 
+### 21b. Forgot Password (Request OTP)
+
+**Endpoint:** `POST /api/forgotpassword`
+
+Initiates the password reset flow for a student who cannot remember their current password. Sends a 6-digit OTP to the registered mobile number and returns the masked mobile (last 4 digits visible).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| regid | string | Yes | Student registration ID (e.g. "4311") |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "OTP sent successfully to registered mobile number XXXXXX5678",
+  "data": {
+    "reg_id": "4311",
+    "mobile_masked": "XXXXXX5678",
+    "otp_expiry": 300
+  }
+}
+```
+
+**Errors:**
+```json
+{ "status": -1, "msg": "Registration ID is required", "data": null }
+{ "status": -1, "msg": "No student found with this registration ID", "data": null }
+{ "status": -1, "msg": "No mobile number registered. Please contact school administrator", "data": null }
+```
+
+> **Notes:**
+> - OTP is 6-digit numeric, valid for 5 minutes (300 seconds)
+> - Sent to the mobile number registered in the student's profile via SMS gateway
+> - Only the last 4 digits of the mobile number are returned (masked as `XXXXXX` + last 4)
+> - Student must be active (`status=1`, `publish=1`)
+> - OTP is stored in `students.reset_otp` column with expiry in `students.reset_otp_expiry`
+> - Calling this endpoint again generates a new OTP (previous one is overwritten)
+> - SMS text format: "Please use OTP {OTP} to reset password for your ward ID No. {regid}. RRPSCH"
+
+---
+
+### 21c. Verify OTP
+
+**Endpoint:** `POST /api/verifyotp`
+
+Verifies the OTP sent during forgot password flow. Returns a temporary reset token (SHA1 hash) on success.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| regid | string | Yes | Student registration ID |
+| otp | string | Yes | 6-digit OTP received via SMS |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "OTP verified successfully",
+  "data": {
+    "reset_token": "a1b2c3d4e5f6789...",
+    "token_expiry": 600
+  }
+}
+```
+
+**Errors:**
+```json
+{ "status": -1, "msg": "Registration ID and OTP are required", "data": null }
+{ "status": -1, "msg": "No student found with this registration ID", "data": null }
+{ "status": -1, "msg": "No OTP request found. Please request a new OTP", "data": null }
+{ "status": -1, "msg": "OTP has expired. Please request a new OTP", "data": null }
+{ "status": -1, "msg": "Invalid OTP. Please try again", "data": null }
+```
+
+> **Notes:**
+> - `reset_token` is a SHA1 hash, valid for 10 minutes (600 seconds)
+> - Token replaces the OTP in `students.reset_otp` field (OTP is consumed)
+> - If OTP has expired (>5 min since request), it is cleared and error returned
+> - The token must be passed to the reset password endpoint
+> - Token is single-use — once used for password reset, it is cleared
+
+---
+
+### 21d. Reset Password
+
+**Endpoint:** `POST /api/resetpassword`
+
+Sets a new password using the reset token obtained from OTP verification. This endpoint does NOT require the old password.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| reset_token | string | Yes | Token from verify OTP step |
+| newPassword | string | Yes | New password (minimum 4 characters) |
+| confirmPassword | string | Yes | Confirm new password |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Password reset successfully. Please login with your new password.",
+  "data": null
+}
+```
+
+**Errors:**
+```json
+{ "status": -1, "msg": "Reset token is required", "data": null }
+{ "status": -1, "msg": "New password and confirmation are required", "data": null }
+{ "status": -1, "msg": "New password and confirmation do not match", "data": null }
+{ "status": -1, "msg": "Password must be at least 4 characters", "data": null }
+{ "status": -1, "msg": "Invalid or expired reset token. Please request a new OTP", "data": null }
+{ "status": -1, "msg": "Reset token has expired. Please request a new OTP", "data": null }
+{ "status": -1, "msg": "Error resetting password. Please try again", "data": null }
+```
+
+> **Notes:**
+> - Token is invalidated after use (`reset_otp` and `reset_otp_expiry` cleared)
+> - If token expires (>10 min since OTP verification), it is cleared and error returned
+> - After successful reset, `session_token` is cleared to force re-login on all devices
+> - Student must log in again with the new password
+> - Password is hashed using `sha1(md5(password))` (same as all student passwords)
+
+---
+
+### Forgot Password Flow (Complete)
+
+```
+┌──────────────┐     ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│  App Screen  │     │  Forgot Password │     │    Verify OTP    │     │  Reset Password  │
+│   (Login)    │────>│  Enter RegID     │────>│  Enter 6-digit   │────>│  New Password    │
+│              │     │                  │     │  OTP from SMS    │     │  + Confirm       │
+│              │     │ POST             │     │ POST             │     │ POST             │
+│              │     │ /api/forgotpwd   │     │ /api/verifyotp   │     │ /api/resetpwd    │
+└──────────────┘     └──────────────────┘     └──────────────────┘     └──────────────────┘
+                           │                         │                         │
+                           ▼                         ▼                         ▼
+                      SMS OTP sent              reset_token              Password saved
+                      Shows: XXXXXX1234        returned (SHA1)          session_token cleared
+                      (last 4 digits)          Valid 10 min             → Redirect to Login
+```
+
+> **Implementation Status (August 2026):** These APIs are implemented in `ApiController.php`. Requires the following DB migration to be run on the server:
+> ```sql
+> -- File: config/schema/add_password_reset_otp.sql
+> ALTER TABLE `students`
+> ADD COLUMN `reset_otp` VARCHAR(50) NULL DEFAULT NULL AFTER `password`,
+> ADD COLUMN `reset_otp_expiry` DATETIME NULL DEFAULT NULL AFTER `reset_otp`;
+> ALTER TABLE `students` ADD INDEX `idx_reset_otp` (`reg_id`, `reset_otp`);
+> ```
+>
+> **Ionic Integration:**
+> ```typescript
+> // Forgot Password Flow
+> forgotPassword(regid: string) {
+>   return this.postForm('forgotpassword', { regid });
+> }
+> verifyOtp(regid: string, otp: string) {
+>   return this.postForm('verifyotp', { regid, otp });
+> }
+> resetPassword(resetToken: string, newPwd: string, confirmPwd: string) {
+>   return this.postForm('resetpassword', {
+>     reset_token: resetToken,
+>     newPassword: newPwd,
+>     confirmPassword: confirmPwd
+>   });
+> }
+> ```
+>
+> **Testing (RegID 4311):**
+> ```bash
+> # Step 1: Request OTP
+> POST /api/forgotpassword  →  { "regid": "4311" }
+> # Response shows masked mobile: XXXXXX + last 4 digits
+>
+> # Step 2: Verify OTP (use OTP received via SMS)
+> POST /api/verifyotp  →  { "regid": "4311", "otp": "123456" }
+> # Response returns reset_token
+>
+> # Step 3: Reset Password
+> POST /api/resetpassword  →  { "reset_token": "abc...", "newPassword": "newpass", "confirmPassword": "newpass" }
+> ```
+
+---
+
 ## Notifications
 
 > **Play Store Update (August 2026):** The notification API has been completely overhauled. It now supports pagination, read/unread tracking, mark-as-read, and badge count — all required for Google Play Store compliance and a proper notification center UX.
@@ -1361,6 +1634,192 @@ Registers a device for push notifications. Can be called **before or after login
 > 1. On app install/open → call `registerDevice` with `uid` + `fcm_token` (no student_id)  
 > 2. After student login → call `registerDevice` again with `uid` + `fcm_token` + `student_id` to link device  
 > 3. On FCM token refresh → call `registerDevice` with updated `fcm_token`
+
+---
+
+## Device Registration (V2)
+
+> **Multi-Student Device Support (August 2026)**
+>
+> The new Device Registration V2 system separates device registration from student linking. This supports the use case where **one device is shared by multiple students** (e.g., siblings using the same parent phone).
+>
+> **Architecture:**
+> - `devices` table — one row per physical device (identified by `uid`). Stores FCM token, device type, model, OS version, app version.
+> - `device_students` table — relation table mapping devices to students (many-to-many). A device can have multiple students, and notifications are sent per-student.
+> - `notification_transactions` table — remains based on `student_id`. To send notifications, query `device_students` to find all active devices for a student, then push via each device's FCM token.
+>
+> **Migration from V1:** The legacy `/api/registerDevice` (uses `student_tokens` table) continues to work. New apps should use V2 endpoints. During migration, both systems can coexist.
+
+---
+
+### 23c. Register Device V2
+
+**Endpoint:** `POST /api/registerdevicev2`
+
+Registers a physical device. If the device (by `uid`) already exists, updates its FCM token and details. Optionally links a student to the device in one call.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| uid | string | Yes | Unique device identifier (Android ID, IDFV, etc.) |
+| fcm_token | string | Yes | Firebase Cloud Messaging token |
+| device_type | string | Yes | `android` or `iphone` |
+| model | string | No | Device model name (e.g., Samsung Galaxy S24, iPhone 15) |
+| os_version | string | No | OS version (e.g., Android 14, iOS 17.4) |
+| app_version | string | No | App version installed |
+| student_id | integer | No | If provided, links the student to the device |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Device registered successfully.",
+  "data": {
+    "device_id": 12,
+    "uid": "a1b2c3d4-e5f6-7890",
+    "device_type": "android"
+  }
+}
+```
+
+**Errors:**
+```json
+{ "status": -1, "msg": "Device UID is required." }
+{ "status": -1, "msg": "FCM token is required." }
+{ "status": -1, "msg": "device_type is required and must be android or iphone." }
+{ "status": -1, "msg": "Unable to register device. Please try again." }
+```
+
+> **Flow:**
+> 1. On app install/open → call `registerdevicev2` with `uid`, `fcm_token`, `device_type`
+> 2. After student login → call `linkdevicestudent` with returned `device_id` + `student_id`
+> 3. On FCM token refresh → call `registerdevicev2` again (same uid, new fcm_token)
+> 4. If parent has multiple children → call `linkdevicestudent` for each child
+
+---
+
+### 23d. Link Device to Student
+
+**Endpoint:** `POST /api/linkdevicestudent`
+
+Links a student to an existing registered device. Allows one device to serve multiple students (e.g., siblings sharing a parent's phone). If the link already exists, reactivates it.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| device_id | integer | Yes | Device ID (from registerdevicev2 response) |
+| student_id | integer | Yes | Student ID to link |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Student linked to device successfully.",
+  "data": { "id": 5, "device_id": 12, "student_id": 101 }
+}
+```
+
+**Already linked:**
+```json
+{
+  "status": 1,
+  "msg": "Student already linked to this device.",
+  "data": { "id": 5, "device_id": 12, "student_id": 101 }
+}
+```
+
+**Errors:**
+```json
+{ "status": -1, "msg": "device_id is required." }
+{ "status": -1, "msg": "student_id is required." }
+{ "status": -1, "msg": "Device not found or inactive." }
+{ "status": -1, "msg": "Student not found or inactive." }
+{ "status": -1, "msg": "Unable to link student to device. Please try again." }
+```
+
+---
+
+### 23e. Unlink Device from Student
+
+**Endpoint:** `POST /api/unlinkdevicestudent`
+
+Removes the link between a student and a device (soft-delete, sets status=0). The device itself remains active. Use this when a student logs out or is removed from the device.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| device_id | integer | Yes | Device ID |
+| student_id | integer | Yes | Student ID to unlink |
+
+**Success:**
+```json
+{ "status": 1, "msg": "Student unlinked from device successfully." }
+```
+
+**Errors:**
+```json
+{ "status": -1, "msg": "device_id is required." }
+{ "status": -1, "msg": "student_id is required." }
+{ "status": -1, "msg": "No active link found between this device and student." }
+{ "status": -1, "msg": "Unable to unlink student from device. Please try again." }
+```
+
+---
+
+### 23f. Get Device Students
+
+**Endpoint:** `POST /api/getdevicestudents`
+
+Returns all students linked to a device. Use this to show a student-switcher on the app (when one device is shared by multiple students).
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| device_id | integer | Conditional | Device ID (either this or uid required) |
+| uid | string | Conditional | Device UID (either this or device_id required) |
+
+**Success:**
+```json
+{
+  "status": 1,
+  "msg": "Students fetched successfully.",
+  "data": [
+    {
+      "student_id": 101,
+      "reg_id": "RRPS2025001",
+      "sname": "Student Name",
+      "father_name": "Father Name",
+      "class": "Class 5",
+      "section": "A",
+      "link_id": 5
+    },
+    {
+      "student_id": 202,
+      "reg_id": "RRPS2025042",
+      "sname": "Sibling Name",
+      "father_name": "Father Name",
+      "class": "Class 3",
+      "section": "B",
+      "link_id": 8
+    }
+  ],
+  "device_id": 12,
+  "count": 2
+}
+```
+
+**No students linked:**
+```json
+{
+  "status": 1,
+  "msg": "No students linked to this device.",
+  "data": [],
+  "device_id": 12,
+  "count": 0
+}
+```
+
+**Errors:**
+```json
+{ "status": -1, "msg": "device_id or uid is required." }
+{ "status": -1, "msg": "Device not found or inactive." }
+```
 
 ---
 
@@ -1824,6 +2283,21 @@ export class StudentApiService {
     });
   }
 
+  // Forgot / Reset Password
+  forgotPassword(regid: string) {
+    return this.postForm('forgotpassword', { regid });
+  }
+  verifyOtp(regid: string, otp: string) {
+    return this.postForm('verifyotp', { regid, otp });
+  }
+  resetPassword(resetToken: string, newPwd: string, confirmPwd: string) {
+    return this.postForm('resetpassword', {
+      reset_token: resetToken,
+      newPassword: newPwd,
+      confirmPassword: confirmPwd
+    });
+  }
+
   // Notifications
   getNotifications(studentId: number, page: number = 1, perPage: number = 20) {
     return this.postForm('notification', { student_id: studentId, page, per_page: perPage });
@@ -1847,6 +2321,25 @@ export class StudentApiService {
     const params: any = { uid, fcm_token: fcmToken, app_version: appVersion, os, model };
     if (studentId) params.student_id = studentId;
     return this.postForm('registerDevice', params);
+  }
+
+  // Device Registration V2 (Multi-Student Support)
+  registerDeviceV2(uid: string, fcmToken: string, deviceType: 'android' | 'iphone', model?: string, osVersion?: string, appVersion?: string, studentId?: number) {
+    const params: any = { uid, fcm_token: fcmToken, device_type: deviceType, model, os_version: osVersion, app_version: appVersion };
+    if (studentId) params.student_id = studentId;
+    return this.postForm('registerdevicev2', params);
+  }
+  linkDeviceStudent(deviceId: number, studentId: number) {
+    return this.postForm('linkdevicestudent', { device_id: deviceId, student_id: studentId });
+  }
+  unlinkDeviceStudent(deviceId: number, studentId: number) {
+    return this.postForm('unlinkdevicestudent', { device_id: deviceId, student_id: studentId });
+  }
+  getDeviceStudents(deviceId?: number, uid?: string) {
+    const params: any = {};
+    if (deviceId) params.device_id = deviceId;
+    if (uid) params.uid = uid;
+    return this.postForm('getdevicestudents', params);
   }
 
   // Version Check
@@ -1880,31 +2373,42 @@ export class StudentApiService {
 
 ### Usage: Login Flow
 ```typescript
-// On app init (before login) — register device for broadcast notifications
-this.api.registerDevice(this.deviceUuid, this.fcmToken, undefined, '1.0.0', 'android', 'Samsung')
-  .subscribe();
+// On app init (before login) — register device for notifications
+this.api.registerDeviceV2(this.deviceUuid, this.fcmToken, this.platform, this.deviceModel, this.osVersion, '1.0.0')
+  .subscribe((res: any) => {
+    if (res.status === 1) {
+      this.deviceId = res.data.device_id; // Store for later use
+    }
+  });
 
-// On login
+// On login — link device to student
 this.api.login('RRPS2025001', 'password123').subscribe((res: any) => {
   if (res.status === 1) {
     this.student = res.data;
     localStorage.setItem('student', JSON.stringify(res.data));
-    // Link device to student after login
-    this.api.registerDevice(this.deviceUuid, this.fcmToken, res.data.id, '1.0.0', 'android', 'Samsung')
-      .subscribe();
+    // Link student to device
+    this.api.linkDeviceStudent(this.deviceId, res.data.id).subscribe();
     // Check app version
     this.api.checkAppVersion('1.0.0').subscribe((v: any) => {
       if (v.status === 1 && v.data.needs_update && v.data.force_update) {
-        // Force update dialog — download APK from server
         this.showForceUpdateDialog(v.data.download_url, v.data.changelog);
       } else if (v.status === 1 && v.data.needs_update) {
-        // Optional update — user can skip
         this.showOptionalUpdateDialog(v.data.download_url, v.data.changelog);
       }
     });
     this.router.navigate(['/dashboard']);
   } else {
     this.showError(res.msg);
+  }
+});
+
+// On logout — unlink student from device
+this.api.unlinkDeviceStudent(this.deviceId, this.student.id).subscribe();
+
+// Multi-student: Show student switcher
+this.api.getDeviceStudents(this.deviceId).subscribe((res: any) => {
+  if (res.status === 1 && res.count > 1) {
+    this.showStudentSwitcher(res.data); // Let parent choose which child
   }
 });
 ```
@@ -1940,8 +2444,8 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 | 12 | Exam History | `/api/examhistory` | student_id |
 | 13 | Exam Detail | `/api/examdetail` | student_id, exam_id |
 | 13b | Report Card | `/api/reportcard` | student_id |
-| 14 | Attendance | `/api/studentattendance` | student_id |
-| 14b | Attendance Detail | `/api/studentattendancedetail` | student_id |
+| 14 | Attendance (Basic) | `/api/studentattendance` | student_id |
+| 14b | Attendance Detail (Enhanced) | `/api/studentattendancedetail` | student_id |
 | 14c | Student Leaves | `/api/studentleaves` | student_id |
 | 15 | Meetings | `/api/meetings` | class_section_id |
 | 16 | Transport | `/api/transport` | student_id |
@@ -1950,11 +2454,18 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 | 19 | Feedback | `/api/feedback` | student_id |
 | 20 | Calendar | `/api/calendar` | student_id |
 | 21 | Change Password | `/api/changepassword` | student_id, oldPassword, newPassword, confirmPassword |
+| 21b | Forgot Password | `/api/forgotpassword` | regid |
+| 21c | Verify OTP | `/api/verifyotp` | regid, otp |
+| 21d | Reset Password | `/api/resetpassword` | reset_token, newPassword, confirmPassword |
 | 22 | Notifications | `/api/notification` | student_id, page, per_page |
 | 22b | Mark Notification Read | `/api/marknotificationread` | student_id, notification_id OR mark_all |
 | 22c | Notification Unread Count | `/api/notificationunreadcount` | student_id |
 | 23 | Update FCM | `/api/updateFCMDetails` | student_id, fcm_token, uid, app_version, os, model |
-| 23b | Register Device | `/api/registerDevice` | uid, fcm_token, student_id (optional) |
+| 23b | Register Device (Legacy) | `/api/registerDevice` | uid, fcm_token, student_id (optional) |
+| 23c | Register Device V2 | `/api/registerdevicev2` | uid, fcm_token, device_type, student_id (optional) |
+| 23d | Link Device to Student | `/api/linkdevicestudent` | device_id, student_id |
+| 23e | Unlink Device from Student | `/api/unlinkdevicestudent` | device_id, student_id |
+| 23f | Get Device Students | `/api/getdevicestudents` | device_id OR uid |
 | 24 | App Version | `/api/appversioncheck` | current_version, app_type=student, platform |
 | 25 | Download APK | `/api/downloadapk` | app_type (query param, GET) |
 | 26 | Messages List | `/api/broadcastmessages` | student_id |
@@ -2165,7 +2676,7 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 - [ ] Missing student_id → verify error handling
 - [ ] Missing fcm_token → verify error handling
 
-### 23b. Register Device (`/api/registerDevice`)
+### 23b. Register Device (Legacy) (`/api/registerDevice`)
 - [ ] uid + fcm_token only (no student_id) → status 1, "Device registered successfully", student_id=0 in DB
 - [ ] uid + fcm_token + student_id → status 1, device linked to student
 - [ ] Same uid called again → updates existing record (upsert)
@@ -2175,6 +2686,41 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 - [ ] Verify app_version, os, model saved correctly
 - [ ] Verify response contains `data.id` and `data.uid`
 - [ ] FCM token refresh scenario: same uid, new fcm_token → updates token
+
+### 23c. Register Device V2 (`/api/registerdevicev2`)
+- [ ] uid + fcm_token + device_type → status 1, device registered in `devices` table
+- [ ] Same uid called again → updates existing device record (upsert by uid)
+- [ ] With student_id → device registered AND linked in `device_students` table
+- [ ] Without student_id → device registered only (no student link)
+- [ ] Missing uid → status -1, "Device UID is required."
+- [ ] Missing fcm_token → status -1, "FCM token is required."
+- [ ] Missing/invalid device_type → status -1, "device_type is required and must be android or iphone."
+- [ ] Verify model, os_version, app_version saved correctly
+- [ ] Verify response contains device_id, uid, device_type
+
+### 23d. Link Device to Student (`/api/linkdevicestudent`)
+- [ ] Valid device_id + student_id → status 1, "Student linked to device successfully."
+- [ ] Same device_id + student_id again → status 1, "Student already linked to this device."
+- [ ] Previously unlinked pair → reactivates link (status set back to 1)
+- [ ] Invalid device_id → status -1, "Device not found or inactive."
+- [ ] Invalid student_id → status -1, "Student not found or inactive."
+- [ ] Missing device_id → status -1, "device_id is required."
+- [ ] Missing student_id → status -1, "student_id is required."
+
+### 23e. Unlink Device from Student (`/api/unlinkdevicestudent`)
+- [ ] Valid device_id + student_id with active link → status 1, "Student unlinked from device successfully."
+- [ ] No active link → status -1, "No active link found between this device and student."
+- [ ] Missing device_id → status -1, "device_id is required."
+- [ ] Missing student_id → status -1, "student_id is required."
+- [ ] Verify link status changes to 0 (soft-delete)
+
+### 23f. Get Device Students (`/api/getdevicestudents`)
+- [ ] Valid device_id with linked students → status 1, returns students array
+- [ ] Valid uid with linked students → status 1, returns students array
+- [ ] Device with no linked students → status 1, empty array, count=0
+- [ ] Invalid device_id/uid → status -1, "Device not found or inactive."
+- [ ] Missing both device_id and uid → status -1, "device_id or uid is required."
+- [ ] Verify each student in array has student_id, reg_id, sname, father_name, class, section, link_id
 
 ### 24. App Version Check (`/api/appversioncheck`)
 - [ ] current_version older than latest → status 1, needs_update = true
@@ -2249,4 +2795,4 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 
 ---
 
-**Version:** 2.7 | **Last Updated:** August 2026
+**Version:** 2.8 | **Last Updated:** August 2026

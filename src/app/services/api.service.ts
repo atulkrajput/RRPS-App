@@ -3,8 +3,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { LoginFormData } from '../interfaces/login_form_data';
-import { Device } from '@capacitor/device';
-import { Storage } from '@capacitor/storage';
 
 @Injectable({
   providedIn: 'root'
@@ -15,24 +13,6 @@ export class ApiService {
   profilePicUrl = environment.serverUrl + 'uploads/students/';
 
   constructor(public http: HttpClient) { }
-
-  // FCM — called from app.component after push registration
-  async updateFCMDetails(token: any) {
-    const info = await Device.getInfo();
-    const uuid = await Device.getId();
-    const sData = await Storage.get({ key: 'studentData' });
-    const sDetails = JSON.parse(sData.value);
-    const data = {
-      student_id: sDetails ? sDetails.id : null,
-      fcm_token: token.value || token,
-      uid: (uuid as any).uuid || (uuid as any).identifier,
-      app_version: environment.appVersion,
-      os: info.platform,
-      model: info.model,
-    };
-    const link = this.baseUrl + 'updateFCMDetails/';
-    return this.http.post(link, data).subscribe();
-  }
 
   // Auth
   login(formData: LoginFormData) {
@@ -217,6 +197,22 @@ export class ApiService {
     });
   }
 
+  // Forgot Password Flow
+  forgotPassword(regid: string) {
+    const link = this.baseUrl + 'forgot_password/';
+    return this.http.post(link, { regid });
+  }
+
+  verifyOtp(regid: string, otp: string) {
+    const link = this.baseUrl + 'verify_otp/';
+    return this.http.post(link, { regid, otp });
+  }
+
+  resetPassword(resetToken: string, newPassword: string, confirmPassword: string) {
+    const link = this.baseUrl + 'reset_password/';
+    return this.http.post(link, { reset_token: resetToken, newPassword, confirmPassword });
+  }
+
   // App Version
   checkAppVersion(currentVersion: string, platform: string = 'android') {
     const link = this.baseUrl + 'appversioncheck/';
@@ -231,11 +227,32 @@ export class ApiService {
     return this.baseUrl + 'downloadapk?app_type=' + appType;
   }
 
-  // Device Registration
-  registerDevice(uid: string, fcmToken: string, studentId?: number, appVersion?: string, os?: string, model?: string) {
-    const link = this.baseUrl + 'registerDevice/';
-    const params: any = { uid, fcm_token: fcmToken, app_version: appVersion, os, model };
+  // Device Registration V2
+  registerDeviceV2(uid: string, fcmToken: string, deviceType: string, model?: string, osVersion?: string, appVersion?: string, studentId?: number) {
+    const link = this.baseUrl + 'registerdevicev2/';
+    const params: any = { uid, fcm_token: fcmToken, device_type: deviceType };
+    if (model) { params.model = model; }
+    if (osVersion) { params.os_version = osVersion; }
+    if (appVersion) { params.app_version = appVersion; }
     if (studentId) { params.student_id = studentId; }
+    return this.http.post(link, params);
+  }
+
+  linkDeviceStudent(deviceId: number, studentId: number) {
+    const link = this.baseUrl + 'linkdevicestudent/';
+    return this.http.post(link, { device_id: deviceId, student_id: studentId });
+  }
+
+  unlinkDeviceStudent(deviceId: number, studentId: number) {
+    const link = this.baseUrl + 'unlinkdevicestudent/';
+    return this.http.post(link, { device_id: deviceId, student_id: studentId });
+  }
+
+  getDeviceStudents(deviceId?: number, uid?: string) {
+    const link = this.baseUrl + 'getdevicestudents/';
+    const params: any = {};
+    if (deviceId) { params.device_id = deviceId; }
+    if (uid) { params.uid = uid; }
     return this.http.post(link, params);
   }
 }

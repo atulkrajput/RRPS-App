@@ -83,8 +83,8 @@ export class LoginPage implements OnInit {
               defaulter: result.data.defaulter || false
             };
             this.navController.navigateRoot([ '/', 'dashboard']);
-            // Register device for push notifications linked to this student
-            this.pushService.registerDeviceForStudent(result.data.id);
+            // Link device to student for targeted push notifications (V2)
+            this.pushService.linkStudentToDevice(result.data.id);
           }
         }, async (error) => {
           await  loader.dismiss();

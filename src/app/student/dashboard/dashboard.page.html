@@ -45,10 +45,20 @@
 </ion-header>
 
 <ion-content class="modern-content">
+  <!-- Pull to refresh -->
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="chevron-down-circle-outline"
+      pullingText="Pull to refresh"
+      refreshingSpinner="crescent"
+      refreshingText="Updating...">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <!-- Quick Stats -->
-  <div class="quick-stats" *ngIf="todayExams > 0 || upcomingExams > 0">
-    <div class="stat-card">
-      <div class="stat-icon" [style.background]="houseGradient">
+  <div class="quick-stats">
+    <div class="stat-card" routerLink="/exams" *ngIf="todayExams > 0">
+      <div class="stat-icon exam-icon">
         <ion-icon name="today-outline"></ion-icon>
       </div>
       <div class="stat-info">
@@ -56,17 +66,37 @@
         <span class="stat-label">Today's Exams</span>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon" [style.background]="houseGradient">
+    <div class="stat-card" routerLink="/exams">
+      <div class="stat-icon upcoming-icon">
         <ion-icon name="time-outline"></ion-icon>
       </div>
       <div class="stat-info">
         <span class="stat-value">{{upcomingExams}}</span>
-        <span class="stat-label">Upcoming</span>
+        <span class="stat-label">Upcoming Exams</span>
+      </div>
+    </div>
+    <div class="stat-card" routerLink="/attendance" *ngIf="attendancePercentage > 0">
+      <div class="stat-icon attendance-icon">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{attendancePercentage}}%</span>
+        <span class="stat-label">Attendance</span>
       </div>
     </div>
   </div>
 
+  <!-- Fee Defaulter Alert -->
+  <div class="alert-card fee-alert" *ngIf="isDefaulter" routerLink="/fees">
+    <ion-icon name="alert-circle"></ion-icon>
+    <div class="alert-content">
+      <h4>Fee Payment Pending</h4>
+      <p>You have pending fees. Tap to view details.</p>
+    </div>
+    <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+  </div>
+
+  <!-- Menu Grid -->
   <div class="dashboard-grid">
     <ion-grid>
       <ion-row>

@@ -460,6 +460,11 @@ ion-header {
     background: rgba(239, 68, 68, 0.1);
     color: var(--danger);
   }
+
+  &.badge-info {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+  }
 }
 
 // Modern Grid Layout
@@ -477,9 +482,51 @@ ion-header {
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-// Smooth Transitions
-* {
-  transition: background-color 0.2s ease, color 0.2s ease;
+// Smooth Transitions — limited to interactive elements only
+button, ion-button, a, .modern-menu-card, .stat-card, .alert-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+// Smooth page transitions
+ion-router-outlet {
+  .ion-page {
+    --animation-duration: 300ms;
+  }
+}
+
+// Better Toast Styling
+ion-toast {
+  --background: #1e293b;
+  --color: #ffffff;
+  --border-radius: 12px;
+  --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --button-color: #818cf8;
+  font-weight: 500;
+
+  &.modern-toast {
+    --start: 16px;
+    --end: 16px;
+    --bottom: 16px;
+  }
+}
+
+// Better Loading Spinner
+.loader-css {
+  --background: rgba(255, 255, 255, 0.95);
+  --spinner-color: var(--primary);
+
+  .loading-wrapper {
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
+}
+
+// Pull-to-refresh styling
+ion-refresher {
+  ion-refresher-content {
+    --color: var(--primary);
+  }
 }
 
 

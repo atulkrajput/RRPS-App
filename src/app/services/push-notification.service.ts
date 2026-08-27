@@ -19,6 +19,7 @@ import { environment } from 'src/environments/environment';
 export class PushNotificationService {
   private fcmToken: string = null;
   private deviceUid: string = null;
+  private deviceId: number = null; // Server-side device_id from V2 registration
 
   constructor(
     private platform: Platform,
@@ -28,7 +29,7 @@ export class PushNotificationService {
 
   /**
    * Initialize push notifications — call on app startup.
-   * Registers the device (without student_id) for broadcast notifications.
+   * Registers the device via V2 API for broadcast notifications.
    */
   async initPushNotifications() {
     if (!this.platform.is('capacitor')) { return; }
@@ -36,6 +37,12 @@ export class PushNotificationService {
     try {
       // Get device UID
       this.deviceUid = await this.getDeviceUid();
+
+      // Restore device_id from storage if available
+      const storedDeviceId = await Storage.get({ key: 'device_id' });
+      if (storedDeviceId.value) {
+        this.deviceId = parseInt(storedDeviceId.value, 10);
+      }
 
       // Request permission
       let permStatus = await PushNotifications.checkPermissions();
@@ -97,73 +104,127 @@ export class PushNotificationService {
   }
 
   /**
-   * Call after login to link the device to a student for targeted notifications.
+   * Register device using V2 API. Called on FCM token receive.
+   * Stores the returned device_id for subsequent link/unlink calls.
    */
-  async registerDeviceForStudent(studentId: number) {
-    if (!this.platform.is('capacitor')) { return; }
+  private async registerDeviceV2(studentId?: number) {
     try {
       if (!this.deviceUid) {
         this.deviceUid = await this.getDeviceUid();
       }
       const token = this.fcmToken || 'pending';
       const info = await Device.getInfo();
+      const deviceType = info.platform === 'ios' ? 'iphone' : 'android';
 
-      this.api.registerDevice(
+      this.api.registerDeviceV2(
         this.deviceUid,
         token,
-        studentId,
+        deviceType,
+        info.model || undefined,
+        info.osVersion || undefined,
         environment.appVersion,
-        info.platform || 'android',
-        info.model || 'unknown'
+        studentId
       ).subscribe(
-        (res: any) => console.log('Device registered for student:', res?.msg),
-        (err) => console.warn('Device registration failed:', err)
+        async (res: any) => {
+          if (res?.status === 1 && res?.data?.device_id) {
+            this.deviceId = res.data.device_id;
+            await Storage.set({ key: 'device_id', value: String(this.deviceId) });
+            console.log('Device registered V2, device_id:', this.deviceId);
+
+            // If student is logged in and we got a device_id, link them
+            if (!studentId) {
+              const sData = await Storage.get({ key: 'studentData' });
+              if (sData.value) {
+                const student = JSON.parse(sData.value);
+                if (student?.id) {
+                  this.linkStudentToDevice(student.id);
+                }
+              }
+            }
+          }
+        },
+        (err) => console.warn('Device V2 registration failed:', err)
       );
     } catch (error) {
-      console.warn('registerDeviceForStudent error:', error);
+      console.warn('registerDeviceV2 error:', error);
     }
+  }
+
+  /**
+   * Link a student to the registered device. Call after login.
+   */
+  async linkStudentToDevice(studentId: number) {
+    if (!this.platform.is('capacitor')) { return; }
+    try {
+      // Ensure we have a device_id
+      if (!this.deviceId) {
+        const storedDeviceId = await Storage.get({ key: 'device_id' });
+        if (storedDeviceId.value) {
+          this.deviceId = parseInt(storedDeviceId.value, 10);
+        }
+      }
+
+      // If still no device_id, register device with student_id in one call
+      if (!this.deviceId) {
+        await this.registerDeviceV2(studentId);
+        return;
+      }
+
+      this.api.linkDeviceStudent(this.deviceId, studentId).subscribe(
+        (res: any) => console.log('Student linked to device:', res?.msg),
+        (err) => console.warn('Link device student failed:', err)
+      );
+    } catch (error) {
+      console.warn('linkStudentToDevice error:', error);
+    }
+  }
+
+  /**
+   * Unlink a student from the device. Call on logout.
+   */
+  async unlinkStudentFromDevice(studentId: number) {
+    if (!this.platform.is('capacitor')) { return; }
+    try {
+      if (!this.deviceId) {
+        const storedDeviceId = await Storage.get({ key: 'device_id' });
+        if (storedDeviceId.value) {
+          this.deviceId = parseInt(storedDeviceId.value, 10);
+        }
+      }
+
+      if (!this.deviceId) {
+        console.warn('Cannot unlink: no device_id available');
+        return;
+      }
+
+      this.api.unlinkDeviceStudent(this.deviceId, studentId).subscribe(
+        (res: any) => console.log('Student unlinked from device:', res?.msg),
+        (err) => console.warn('Unlink device student failed:', err)
+      );
+    } catch (error) {
+      console.warn('unlinkStudentFromDevice error:', error);
+    }
+  }
+
+  /**
+   * Get the current device_id (for external use if needed).
+   */
+  getDeviceId(): number | null {
+    return this.deviceId;
   }
 
   /**
    * Setup all push notification listeners.
    */
   private addListeners() {
-    // Token received — register device (without student_id for broadcast)
+    // Token received — register device via V2 API
     PushNotifications.addListener('registration', async (token: Token) => {
       console.log('FCM token received:', token.value);
       this.fcmToken = token.value;
       await Storage.set({ key: 'fcm_token', value: token.value });
 
-      // Register device for broadcast notifications (no student_id yet)
-      try {
-        const info = await Device.getInfo();
-        this.api.registerDevice(
-          this.deviceUid,
-          token.value,
-          undefined,
-          environment.appVersion,
-          info.platform || 'android',
-          info.model || 'unknown'
-        ).subscribe();
-
-        // If student is already logged in, also link device to student
-        const sData = await Storage.get({ key: 'studentData' });
-        if (sData.value) {
-          const student = JSON.parse(sData.value);
-          if (student && student.id) {
-            this.api.registerDevice(
-              this.deviceUid,
-              token.value,
-              student.id,
-              environment.appVersion,
-              info.platform || 'android',
-              info.model || 'unknown'
-            ).subscribe();
-          }
-        }
-      } catch (e) {
-        console.warn('registerDevice on token error:', e);
-      }
+      // Register device via V2 (handles linking if student already logged in)
+      await this.registerDeviceV2();
     });
 
     // Registration error

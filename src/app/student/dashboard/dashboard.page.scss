@@ -140,22 +140,35 @@
 // Quick Stats
 .quick-stats {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   padding: 16px 16px 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   .stat-card {
     flex: 1;
+    min-width: 100px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     background: white;
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: scale(0.97);
+    }
 
     .stat-icon {
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -163,8 +176,20 @@
       flex-shrink: 0;
 
       ion-icon {
-        font-size: 20px;
+        font-size: 18px;
         color: white;
+      }
+
+      &.exam-icon {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      }
+
+      &.upcoming-icon {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      }
+
+      &.attendance-icon {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       }
     }
 
@@ -173,17 +198,69 @@
       flex-direction: column;
 
       .stat-value {
-        font-size: 1.2rem;
+        font-size: 1.15rem;
         font-weight: 700;
         color: var(--text-primary);
+        line-height: 1.2;
       }
 
       .stat-label {
-        font-size: 0.7rem;
+        font-size: 0.68rem;
         color: var(--text-secondary);
         font-weight: 500;
       }
     }
+  }
+}
+
+// Fee Alert Card
+.alert-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 16px 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.fee-alert {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 1px solid #fecaca;
+
+    > ion-icon:first-child {
+      font-size: 24px;
+      color: #dc2626;
+      flex-shrink: 0;
+    }
+  }
+
+  .alert-content {
+    flex: 1;
+
+    h4 {
+      margin: 0 0 2px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #991b1b;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.75rem;
+      color: #b91c1c;
+      font-weight: 500;
+    }
+  }
+
+  .arrow-icon {
+    font-size: 18px;
+    color: #dc2626;
+    opacity: 0.6;
   }
 }
 

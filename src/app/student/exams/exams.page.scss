@@ -1,16 +1,18 @@
 // Modern Header
 .modern-header {
   ion-toolbar {
-    --background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    --background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     --color: white;
   }
 
   ion-title {
     color: white;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 1.15rem;
   }
 
   ion-back-button,
+  ion-menu-button,
   ion-button {
     --color: white;
   }
@@ -25,13 +27,13 @@
 .filter-tabs {
   background: white;
   padding: 12px 16px;
-  margin-bottom: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 
   ion-segment {
     --background: var(--bg-color);
     border-radius: 10px;
-    padding: 4px;
+    padding: 3px;
 
     ion-segment-button {
       --color: var(--text-secondary);
@@ -41,12 +43,13 @@
       border-radius: 8px;
       min-height: 36px;
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       text-transform: none;
       transition: all 0.3s ease;
 
       ion-label {
         margin: 0;
+        font-size: 0.82rem;
       }
     }
   }
@@ -57,367 +60,18 @@
   padding: 16px 16px 8px;
 
   h3 {
-    margin: 0 0 4px 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-
-  p {
-    margin: 0;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-  }
-}
-
-// Exams List
-.exams-list,
-.results-list {
-  padding: 8px 16px 16px;
-}
-
-.exam-card {
-  background: white;
-  border-radius: var(--border-radius);
-  padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow);
-  transition: all 0.3s ease;
-
-  &:active {
-    transform: scale(0.98);
-  }
-
-  .exam-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 12px;
-
-    .exam-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-      ion-icon {
-        color: white;
-        font-size: 24px;
-      }
-    }
-
-    .exam-info {
-      flex: 1;
-      min-width: 0;
-
-      h3 {
-        margin: 0 0 4px 0;
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--text-primary);
-      }
-
-      .exam-type {
-        margin: 0;
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-      }
-    }
-  }
-
-  .exam-details {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 12px;
-
-    .detail-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-
-      ion-icon {
-        font-size: 1rem;
-        color: var(--primary);
-      }
-    }
-  }
-
-  .exam-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 12px;
-    border-top: 1px solid var(--bg-color);
-
-    .marks-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      font-weight: 500;
-
-      ion-icon {
-        font-size: 1rem;
-      }
-    }
-
-    ion-button {
-      --color: var(--primary);
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: none;
-    }
-  }
-}
-
-// Performance Card
-.performance-card {
-  background: white;
-  border-radius: var(--border-radius);
-  padding: 20px;
-  margin: 8px 16px 16px;
-  box-shadow: var(--shadow);
-
-  h4 {
-    margin: 0 0 16px 0;
+    margin: 0 0 2px 0;
     font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    text-align: center;
-  }
-
-  .performance-stats {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-
-    .stat-item {
-      text-align: center;
-
-      .stat-circle {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-        span {
-          color: white;
-          font-size: 1.2rem;
-          font-weight: 700;
-        }
-      }
-
-      p {
-        margin: 0;
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-        font-weight: 500;
-      }
-    }
-  }
-}
-
-// Result Card
-.result-card {
-  background: white;
-  border-radius: var(--border-radius);
-  padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow);
-  transition: all 0.3s ease;
-
-  &:active {
-    transform: scale(0.98);
-  }
-
-  .result-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-
-    .subject-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-      ion-icon {
-        color: white;
-        font-size: 24px;
-      }
-    }
-
-    .result-info {
-      flex: 1;
-      min-width: 0;
-
-      h3 {
-        margin: 0 0 4px 0;
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--text-primary);
-      }
-
-      .exam-date {
-        margin: 0;
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-      }
-    }
-
-    .result-score {
-      text-align: right;
-
-      h2 {
-        margin: 0 0 4px 0;
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--text-primary);
-      }
-
-      .percentage {
-        font-size: 0.9rem;
-        font-weight: 600;
-        padding: 4px 8px;
-        border-radius: 6px;
-
-        &.excellent {
-          background: rgba(16, 185, 129, 0.1);
-          color: var(--success);
-        }
-
-        &.good {
-          background: rgba(99, 102, 241, 0.1);
-          color: var(--primary);
-        }
-
-        &.average {
-          background: rgba(245, 158, 11, 0.1);
-          color: var(--warning);
-        }
-
-        &.poor {
-          background: rgba(239, 68, 68, 0.1);
-          color: var(--danger);
-        }
-      }
-    }
-  }
-
-  .result-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 12px;
-    border-top: 1px solid var(--bg-color);
-
-    .grade-badge {
-      font-size: 0.85rem;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 8px;
-
-      &.excellent {
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--success);
-      }
-
-      &.good {
-        background: rgba(99, 102, 241, 0.1);
-        color: var(--primary);
-      }
-
-      &.average {
-        background: rgba(245, 158, 11, 0.1);
-        color: var(--warning);
-      }
-
-      &.poor {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
-      }
-    }
-
-    ion-button {
-      --color: var(--primary);
-      font-weight: 600;
-      font-size: 0.8rem;
-      text-transform: none;
-    }
-  }
-}
-
-// Empty State
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-
-  ion-icon {
-    font-size: 80px;
-    color: var(--text-light);
-    margin-bottom: 16px;
-    opacity: 0.5;
-  }
-
-  h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
   }
 
   p {
     margin: 0;
+    font-size: 0.82rem;
     color: var(--text-secondary);
-    font-size: 0.9rem;
   }
 }
-
-// Animations
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.exam-card,
-.result-card {
-  animation: fadeInUp 0.4s ease-out;
-  animation-fill-mode: both;
-}
-
-.exam-card:nth-child(1),
-.result-card:nth-child(1) { animation-delay: 0.05s; }
-.exam-card:nth-child(2),
-.result-card:nth-child(2) { animation-delay: 0.1s; }
-.exam-card:nth-child(3),
-.result-card:nth-child(3) { animation-delay: 0.15s; }
 
 // Filter Chips
 .filter-chips {
@@ -433,36 +87,370 @@
 
   ion-chip {
     flex-shrink: 0;
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 0.8rem;
+    font-weight: 600;
+    height: 32px;
   }
 }
 
-// Exam Teacher
-.exam-teacher {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
+// =========================
+// UPCOMING EXAMS
+// =========================
+.exams-list {
+  padding: 8px 16px 16px;
+}
 
-  ion-icon {
-    font-size: 0.9rem;
+.exam-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.985);
+  }
+
+  .exam-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .exam-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+
+      ion-icon {
+        color: white;
+        font-size: 22px;
+      }
+    }
+
+    .exam-info {
+      flex: 1;
+      min-width: 0;
+
+      .exam-subject {
+        margin: 0 0 2px 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .exam-type {
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+    }
+
+    .status-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+
+      &.upcoming-badge {
+        background: rgba(245, 158, 11, 0.1);
+        color: #d97706;
+      }
+    }
+  }
+
+  .exam-meta {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--bg-color);
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+
+      ion-icon {
+        font-size: 16px;
+        color: var(--primary);
+        flex-shrink: 0;
+      }
+
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
   }
 }
 
-// Report Card Styles
+// =========================
+// EXAM RESULTS / HISTORY
+// =========================
+.results-list {
+  padding: 8px 16px 16px;
+}
+
+.result-card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.985);
+  }
+
+  &.absent-card {
+    border-left: 4px solid var(--danger);
+    opacity: 0.85;
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .subject-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+
+      ion-icon {
+        color: white;
+        font-size: 20px;
+      }
+    }
+
+    .result-info {
+      flex: 1;
+      min-width: 0;
+
+      .result-subject {
+        margin: 0 0 3px 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .result-meta {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .exam-title-label {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: var(--primary);
+          background: rgba(99, 102, 241, 0.08);
+          padding: 2px 8px;
+          border-radius: 4px;
+        }
+
+        .exam-date-label {
+          font-size: 0.75rem;
+          color: var(--text-secondary);
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // Marks display — the key fix for "marks not showing"
+  .marks-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--bg-color);
+    border-radius: 10px;
+    margin-bottom: 10px;
+
+    .marks-main {
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+
+      .marks-obtained {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        line-height: 1;
+      }
+
+      .marks-separator {
+        font-size: 1.1rem;
+        color: var(--text-light);
+        font-weight: 400;
+        margin: 0 2px;
+      }
+
+      .marks-total {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+    }
+
+    .marks-percentage {
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 8px;
+
+      &.excellent {
+        background: rgba(16, 185, 129, 0.1);
+        color: #059669;
+      }
+      &.good {
+        background: rgba(99, 102, 241, 0.1);
+        color: #4f46e5;
+      }
+      &.average {
+        background: rgba(245, 158, 11, 0.1);
+        color: #d97706;
+      }
+      &.poor {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+      }
+    }
+  }
+
+  // Absent display
+  .absent-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px dashed rgba(239, 68, 68, 0.3);
+    border-radius: 10px;
+    margin-bottom: 10px;
+
+    ion-icon {
+      font-size: 20px;
+      color: var(--danger);
+    }
+
+    span {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--danger);
+    }
+  }
+
+  // Pending display
+  .pending-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(148, 163, 184, 0.08);
+    border: 1px dashed rgba(148, 163, 184, 0.3);
+    border-radius: 10px;
+    margin-bottom: 10px;
+
+    ion-icon {
+      font-size: 20px;
+      color: var(--text-light);
+    }
+
+    span {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+  }
+
+  // Section-wise marks breakdown
+  .marks-breakdown {
+    padding: 8px 0;
+    margin-bottom: 8px;
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--bg-color);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .breakdown-type {
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .breakdown-marks {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+    }
+  }
+
+  .result-footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px solid var(--bg-color);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+
+    ion-icon {
+      font-size: 14px;
+    }
+  }
+}
+
+// =========================
+// REPORT CARD
+// =========================
 .report-student-card {
   background: white;
   border-radius: var(--border-radius);
   margin: 16px;
   padding: 16px;
   box-shadow: var(--shadow);
-  animation: fadeInUp 0.4s ease-out;
+  animation: fadeInUp 0.3s ease-out;
 
   .student-info-row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 8px 0;
     border-bottom: 1px solid var(--bg-color);
 
@@ -471,13 +459,13 @@
     }
 
     .label {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-secondary);
       font-weight: 500;
     }
 
     .value {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       color: var(--text-primary);
     }
@@ -490,7 +478,7 @@
   margin: 0 16px 16px;
   padding: 16px;
   box-shadow: var(--shadow);
-  animation: fadeInUp 0.4s ease-out;
+  animation: fadeInUp 0.3s ease-out;
 
   .report-section-header {
     display: flex;
@@ -502,38 +490,50 @@
 
     h3 {
       margin: 0;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: var(--text-primary);
     }
 
     .percentage-badge {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 700;
-      padding: 6px 12px;
+      padding: 5px 12px;
       border-radius: 8px;
 
       &.excellent {
         background: rgba(16, 185, 129, 0.1);
-        color: #10b981;
+        color: #059669;
       }
       &.good {
         background: rgba(99, 102, 241, 0.1);
-        color: #6366f1;
+        color: #4f46e5;
       }
       &.average {
         background: rgba(245, 158, 11, 0.1);
-        color: #f59e0b;
+        color: #d97706;
       }
       &.poor {
         background: rgba(239, 68, 68, 0.1);
-        color: #ef4444;
+        color: #dc2626;
       }
     }
   }
 
-  .report-subjects {
-    .report-subject-row {
+  .report-table {
+    .table-header {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 2px solid var(--bg-color);
+      font-weight: 700;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .table-row {
       display: flex;
       align-items: center;
       padding: 10px 0;
@@ -543,54 +543,46 @@
         border-bottom: none;
       }
 
-      &.header-row {
-        font-weight: 700;
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding-bottom: 8px;
-        border-bottom: 2px solid var(--bg-color);
-      }
-
       &.total-row {
-        font-weight: 700;
         border-top: 2px solid var(--bg-color);
         padding-top: 12px;
         margin-top: 4px;
+        font-weight: 700;
 
-        .subject-col {
+        .col-subject {
           color: var(--text-primary);
+          font-weight: 700;
         }
 
-        .marks-col {
+        .total-marks {
           color: var(--primary);
-          font-size: 1rem;
+          font-size: 0.95rem;
         }
       }
 
       &.absent-row {
-        opacity: 0.7;
+        opacity: 0.65;
       }
+    }
 
-      .subject-col {
-        flex: 2;
-        font-size: 0.9rem;
-        color: var(--text-primary);
-        font-weight: 500;
-      }
+    .col-subject {
+      flex: 2.5;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      font-weight: 500;
+      padding-right: 8px;
+    }
 
-      .marks-col {
-        flex: 1;
-        text-align: center;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text-primary);
+    .col-marks {
+      flex: 1;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
 
-        &.absent-mark {
-          color: #ef4444;
-          font-weight: 700;
-        }
+      &.marks-absent {
+        color: var(--danger);
+        font-weight: 700;
       }
     }
   }
@@ -599,14 +591,14 @@
 .report-feedback-card {
   background: white;
   border-radius: var(--border-radius);
-  margin: 0 16px 16px;
+  margin: 0 16px 24px;
   padding: 16px;
   box-shadow: var(--shadow);
-  animation: fadeInUp 0.4s ease-out 0.1s both;
+  animation: fadeInUp 0.3s ease-out 0.1s both;
 
   h3 {
-    margin: 0 0 16px 0;
-    font-size: 1.1rem;
+    margin: 0 0 14px 0;
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--text-primary);
   }
@@ -615,6 +607,7 @@
     .rating-item {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       padding: 10px 0;
       border-bottom: 1px solid var(--bg-color);
 
@@ -623,13 +616,13 @@
       }
 
       .label {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         color: var(--text-secondary);
         font-weight: 500;
       }
 
-      .value {
-        font-size: 0.85rem;
+      .rating-value {
+        font-size: 0.82rem;
         font-weight: 600;
         color: var(--primary);
       }
@@ -637,13 +630,13 @@
   }
 
   .remarks-section {
-    margin-top: 16px;
+    margin-top: 14px;
     padding-top: 12px;
     border-top: 2px solid var(--bg-color);
 
     .remarks-label {
       margin: 0 0 4px 0;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 600;
       color: var(--text-secondary);
       text-transform: uppercase;
@@ -652,44 +645,111 @@
 
     .remarks-text {
       margin: 0;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--text-primary);
       line-height: 1.5;
     }
   }
 }
 
-// Responsive Design
-@media (max-width: 576px) {
-  .performance-card {
-    .performance-stats {
-      .stat-item {
-        .stat-circle {
-          width: 60px;
-          height: 60px;
+// =========================
+// EMPTY STATE
+// =========================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 24px;
+  text-align: center;
 
-          span {
-            font-size: 1rem;
-          }
-        }
-      }
+  ion-icon {
+    font-size: 64px;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    opacity: 0.4;
+  }
+
+  h3 {
+    margin: 0 0 6px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+  }
+
+  &.loading-state {
+    ion-icon {
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
+}
+
+// =========================
+// ANIMATIONS
+// =========================
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+.exam-card,
+.result-card {
+  animation: fadeInUp 0.35s ease-out;
+  animation-fill-mode: both;
+}
+
+.exam-card:nth-child(1),
+.result-card:nth-child(1) { animation-delay: 0.03s; }
+.exam-card:nth-child(2),
+.result-card:nth-child(2) { animation-delay: 0.06s; }
+.exam-card:nth-child(3),
+.result-card:nth-child(3) { animation-delay: 0.09s; }
+.exam-card:nth-child(4),
+.result-card:nth-child(4) { animation-delay: 0.12s; }
+
+// =========================
+// RESPONSIVE
+// =========================
+@media (max-width: 360px) {
+  .result-card .marks-display {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+
+    .marks-percentage {
+      align-self: flex-end;
     }
   }
 
-  .result-card {
-    .result-header {
-      .subject-icon {
-        width: 40px;
-        height: 40px;
-
-        ion-icon {
-          font-size: 20px;
-        }
-      }
-
-      .result-score h2 {
-        font-size: 1.1rem;
-      }
+  .report-section .report-table {
+    .col-subject {
+      flex: 2;
+      font-size: 0.8rem;
     }
+
+    .col-marks {
+      font-size: 0.8rem;
+    }
+  }
+
+  .exam-card .exam-meta {
+    grid-template-columns: 1fr;
   }
 }

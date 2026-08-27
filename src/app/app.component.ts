@@ -96,16 +96,16 @@ export class AppComponent {
   }
 
   async initializePushNotifications() {
-    // Initialize push notifications (registers device for broadcast)
+    // Initialize push notifications (registers device via V2 for broadcast)
     await this.pushService.initPushNotifications();
 
-    // If student is logged in, also register device for that student
+    // If student is logged in, also link device to that student
     try {
       const sData = await Storage.get({ key: 'studentData' });
       if (sData.value) {
         const student = JSON.parse(sData.value);
         if (student && student.id) {
-          await this.pushService.registerDeviceForStudent(student.id);
+          await this.pushService.linkStudentToDevice(student.id);
         }
       }
     } catch (e) {
