@@ -36,7 +36,12 @@ export class ConstantsService {
   }
 
   static getHouseName(): string {
-    return ConstantsService.studentBasicData?.house_name || 'No House';
+    const houseName = ConstantsService.studentBasicData?.house_name;
+    if (!houseName) {
+      return 'No House';
+    }
+    // Strip a trailing "House" so templates that append " House" don't double it up
+    return houseName.replace(/\s*house\s*$/i, '').trim() || 'No House';
   }
 
   private static darkenColor(hex: string, percent: number): string {
