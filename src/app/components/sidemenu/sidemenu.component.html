@@ -1,40 +1,31 @@
-<div class="header">
-  <div class="logo">
-      <img src="./assets/menulogo.png">
-  </div>
-</div>
-<div class="nav">
-  <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
-    <!-- <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
-      <ion-icon slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
-      <ion-label>{{ p.title }}</ion-label>
-    </ion-item> -->
-    <div class="nav-item" [routerLink]="[p.url]">
-      <!-- <span class="icon">{{p.icon}}</span> -->
-      <ion-icon class="icon" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
-      {{p.title}}
-      <span class="divider"></span>
+<div class="menu-wrapper">
+  <div class="profile-header" [style.background]="houseGradient">
+    <div class="profile-avatar">
+      <img [src]="profilePic" onerror='this.src="assets/imgs/profile.png"' alt="Profile">
     </div>
-  </ion-menu-toggle>
+    <h2 class="ion-text-capitalize" *ngIf="studentName">{{studentName}}</h2>
+    <p class="reg-id" *ngIf="regId">
+      <ion-icon name="card-outline"></ion-icon>
+      {{regId}}
+    </p>
+    <span class="class-badge" *ngIf="classSection">
+      <ion-icon name="school-outline"></ion-icon>
+      {{classSection}}
+    </span>
+  </div>
+
+  <div class="nav">
+    <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages">
+      <div class="nav-item" [routerLink]="[p.url]" routerLinkActive="active">
+        <span class="nav-icon">
+          <ion-icon [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
+        </span>
+        <span class="nav-label">{{p.title}}</span>
+      </div>
+    </ion-menu-toggle>
+  </div>
+
+  <div class="footer">
+    <span class="app-version">RRPS v{{appVersion}}</span>
+  </div>
 </div>
-<!-- <ion-content>
-  <ion-list id="inbox-list">
-    <ion-list-header>Inbox</ion-list-header>
-    <ion-note>hi@ionicframework.com</ion-note>
-  </ion-list>
-</ion-content> -->
-<!-- <div class="footer">
-  <div class="footer-nav">
-      <ul>
-          <li (click)="leaveAReview()">Like this app? Leave a review!</li>
-      </ul>
-  </div>
-   <div class="footer-social">
-      <ion-icon (click)="openInstagramProfile()" name="logo-instagram"></ion-icon>
-      <ion-icon (click)="openFacebookProfile()" name="logo-facebook"></ion-icon>
-      <ion-icon (click)="openWebsite()" name="globe"></ion-icon>
-  </div>
-   <div class="footer-app-version">
-      Version v{{version}}
-  </div>
-</div> -->

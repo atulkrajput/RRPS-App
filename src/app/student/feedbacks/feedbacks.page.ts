@@ -30,10 +30,11 @@ export class FeedbacksPage implements OnInit {
     this.api.feedback(sDetails.id).subscribe(async (result: any) => {
       await loader.dismiss();
       this.isLoaded = true;
-      this.feedbackData = result.data;
+      this.feedbackData = Array.isArray(result.data) ? result.data : [];
     }, async (error) => {
       await loader.dismiss();
       this.isLoaded = true;
+      this.feedbackData = [];
       this.constants.presentToast('Unable To get Feedback Data. Check Your Internet Connection.');
     });
   }
@@ -53,8 +54,9 @@ export class FeedbacksPage implements OnInit {
     return gradients[index % gradients.length];
   }
 
-  getCurrentDate(): Date {
-    return new Date();
+  // Ratings are given out of 5; used to size the fill bar as a percentage.
+  ratingPercent(value: number): number {
+    return Math.max(0, Math.min(5, value || 0)) / 5 * 100;
   }
 
 }

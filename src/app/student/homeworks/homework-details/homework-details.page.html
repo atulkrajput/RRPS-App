@@ -1,12 +1,59 @@
-<ion-header>
-  <ion-toolbar>
+<ion-header class="ion-no-border modern-header">
+  <ion-toolbar [style.--background]="homework ? getSubjectGradient(homework.subject?.subject_name) : null">
     <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
+      <ion-back-button defaultHref="/homework"></ion-back-button>
     </ion-buttons>
-    <ion-title>Details</ion-title>
+    <ion-title>Homework Details</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content class="modern-content">
+  <ng-container *ngIf="homework; else noHomework">
+    <div class="detail-card">
+      <div class="detail-header">
+        <div class="subject-icon" [style.background]="getSubjectGradient(homework.subject?.subject_name)">
+          <ion-icon [name]="getSubjectIcon(homework.subject?.subject_name)"></ion-icon>
+        </div>
+        <div class="header-info">
+          <h2>{{homework.subject?.subject_name}}</h2>
+          <p class="teacher-name">
+            <ion-icon name="person-outline"></ion-icon>
+            {{homework.staff?.name}}
+          </p>
+        </div>
+        <span class="modern-badge" [ngClass]="homework.status === 1 ? 'badge-success' : 'badge-warning'">
+          {{homework.status === 1 ? 'Completed' : 'Pending'}}
+        </span>
+      </div>
 
+      <div class="detail-meta" *ngIf="homework.subject_chapter || homework.subject_topic">
+        <div class="meta-item" *ngIf="homework.subject_chapter?.chapter_no">
+          <ion-icon name="bookmark-outline"></ion-icon>
+          <span>Chapter {{homework.subject_chapter.chapter_no}}</span>
+        </div>
+        <div class="meta-item" *ngIf="homework.subject_topic?.topic_name">
+          <ion-icon name="pricetag-outline"></ion-icon>
+          <span>{{homework.subject_topic.topic_name}}</span>
+        </div>
+      </div>
+
+      <div class="detail-dates">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <span>{{homework.start_date}} — {{homework.end_date}}</span>
+      </div>
+
+      <div class="detail-divider"></div>
+
+      <h3 class="section-label">Assignment</h3>
+      <div class="detail-content" [innerHTML]="homework.homework"></div>
+    </div>
+  </ng-container>
+
+  <ng-template #noHomework>
+    <div class="empty-state">
+      <ion-icon name="document-text-outline"></ion-icon>
+      <h3>No details to show</h3>
+      <p>Go back and open this homework again from the list</p>
+    </div>
+  </ng-template>
 </ion-content>

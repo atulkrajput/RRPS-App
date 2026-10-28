@@ -116,6 +116,15 @@
         font-size: 1rem;
         font-weight: 600;
         color: var(--text-primary);
+
+        &.credit-value {
+          color: var(--success);
+        }
+
+        .credit-tag {
+          font-size: 0.7rem;
+          font-weight: 600;
+        }
       }
     }
   }

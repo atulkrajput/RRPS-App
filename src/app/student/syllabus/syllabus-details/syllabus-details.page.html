@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border modern-header">
-  <ion-toolbar>
+  <ion-toolbar [style.--background]="getSubjectGradient(subjectName)">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/syllabus"></ion-back-button>
     </ion-buttons>
@@ -7,23 +7,41 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-card (click)="show(i)" *ngFor="let syllabus of syllabusData; let i = index">
-    <ion-card-header>
-      <ion-card-title>
-        {{syllabus.subject_unit.unit_no}} - {{syllabus.subject_unit.unit_name}}
-      </ion-card-title>
-      <ion-icon slot="end" name="arrow-down-circle-outline" color="light"></ion-icon>
-    </ion-card-header>
-    <ion-card-content *ngIf="sylExpand[i]">
-      <ion-text *ngFor="let inner of syllabus.chapter_notes">
-        <p>
-          {{inner.subject_chapter.chapter_name}} -  {{inner.subject_chapter.chapter_no}}
-        </p>
-        <ul class="ion-text-wrap ion-text-left">
-          <li><a [href]="syllabus.noteURL+inner.notes">Download Notes</a></li>
-        </ul>
-      </ion-text>
-    </ion-card-content>
-  </ion-card>
+<ion-content class="modern-content">
+  <ng-container *ngIf="isLoaded">
+    <div class="unit-list" *ngIf="syllabusData && syllabusData.length > 0">
+      <div class="unit-card" *ngFor="let syllabus of syllabusData; let i = index" [class.expanded]="sylExpand[i]">
+        <div class="unit-header" (click)="show(i)">
+          <div class="unit-icon" [style.background]="getSubjectGradient(subjectName)">
+            <ion-icon name="layers-outline"></ion-icon>
+          </div>
+          <div class="unit-info">
+            <span class="unit-label">{{syllabus.subject_unit.unit_name}}</span>
+            <h3>{{syllabus.subject_unit.unit_no}}</h3>
+          </div>
+          <ion-icon name="chevron-down-outline" class="expand-icon"></ion-icon>
+        </div>
+
+        <div class="unit-content" *ngIf="sylExpand[i]">
+          <div class="chapter-row" *ngFor="let inner of syllabus.chapter_notes">
+            <div class="chapter-info">
+              <ion-icon name="document-text-outline"></ion-icon>
+              <span><strong>{{inner.subject_chapter.chapter_name}}:</strong> {{inner.subject_chapter.chapter_no}}</span>
+            </div>
+            <a class="download-link" [href]="syllabus.noteURL+inner.notes">
+              <ion-icon name="download-outline"></ion-icon>
+              Download
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!syllabusData || syllabusData.length === 0">
+      <ion-icon name="library-outline"></ion-icon>
+      <h3>No units available</h3>
+      <p>Syllabus units for this subject will appear here</p>
+    </div>
+  </ng-container>
 </ion-content>

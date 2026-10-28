@@ -33,7 +33,9 @@
       </div>
       <div class="fee-item">
         <span class="label">Tuition Fee</span>
-        <span class="value">₹ {{pendingFees.tuitionFee | number}}</span>
+        <span class="value" [class.credit-value]="pendingFees.tuitionFee < 0">
+          ₹ {{ (pendingFees.tuitionFee < 0 ? -pendingFees.tuitionFee : pendingFees.tuitionFee) | number }}<span *ngIf="pendingFees.tuitionFee < 0" class="credit-tag"> Credit</span>
+        </span>
       </div>
       <div class="fee-item" *ngIf="pendingFees.regFee > 0">
         <span class="label">Registration Fee</span>
@@ -121,24 +123,25 @@
   <div class="payment-list">
     <div class="payment-card" *ngFor="let fee of feeHistoryData">
       <div class="payment-header">
-        <div class="payment-icon" [style.background]="getFeeTypeGradient(fee.fee_type)">
-          <ion-icon [name]="getFeeTypeIcon(fee.fee_type)"></ion-icon>
+        <div class="payment-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+          <ion-icon name="calendar-outline"></ion-icon>
         </div>
         <div class="payment-info">
-          <h3>{{getFeeTypeName(fee.fee_type)}}</h3>
+          <h3>Tuition Fee</h3>
           <p class="payment-date">
             <ion-icon name="calendar-outline"></ion-icon>
-            {{fee.fee_deposit_date | date:'MMM dd, yyyy'}}
+            {{monthData?.[fee.month]}} {{fee.year}}
           </p>
         </div>
         <div class="payment-amount">
           <h2>₹ {{fee.fees_deposited}}</h2>
-          <span class="payment-method">CASH</span>
         </div>
       </div>
       <div class="payment-footer">
-        <span class="modern-badge badge-success">Paid</span>
-        <ion-button fill="clear" size="small" disabled>
+        <span class="modern-badge" [ngClass]="fee.fees_deposited > 0 ? 'badge-success' : 'badge-warning'">
+          {{ fee.fees_deposited > 0 ? 'Paid' : 'Due' }}
+        </span>
+        <ion-button fill="clear" size="small" disabled *ngIf="fee.fees_deposited > 0">
           <ion-icon slot="start" name="document-text-outline"></ion-icon>
           Receipt
         </ion-button>

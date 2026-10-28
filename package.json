@@ -1,6 +1,6 @@
 {
   "name": "RRPS",
-  "version": "1.0.5",
+  "version": "1.1.6",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
@@ -25,7 +25,6 @@
     "@awesome-cordova-plugins/in-app-browser": "^5.46.0",
     "@awesome-cordova-plugins/native-storage": "^5.46.0",
     "@capacitor-community/firebase-analytics": "^1.0.1",
-    "@capacitor-community/sqlite": "^2.4.6",
     "@capacitor/android": "^3.4.3",
     "@capacitor/app": "1.0.6",
     "@capacitor/browser": "^1.0.7",

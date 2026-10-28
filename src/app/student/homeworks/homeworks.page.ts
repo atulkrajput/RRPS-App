@@ -26,7 +26,7 @@ export class HomeworksPage implements OnInit {
   }
 
   homeworkDetails(homework?: any) {
-    this.router.navigate(['/homework/homework-details']);
+    this.router.navigate(['/homework/homework-details'], { state: { homework } });
   }
 
   getTotalCount(): number {

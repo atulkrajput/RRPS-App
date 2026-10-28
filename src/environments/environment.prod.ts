@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  appVersion: '1.0.5',
+  appVersion: '1.1.6',
   serverUrl:  'https://rrpublicschool.com/'
 };

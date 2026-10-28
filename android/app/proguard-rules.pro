@@ -1,21 +1,54 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# ============================================================
+# RRPS App ProGuard Rules
+# ============================================================
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep line numbers for readable crash stack traces
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Keep annotations used by Capacitor / Ionic
+-keepattributes *Annotation*
+-keepattributes Signature
+-keepattributes Exceptions
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# ---- Capacitor ----
+-keep class com.getcapacitor.** { *; }
+-keep class com.getcapacitor.plugin.** { *; }
+-dontwarn com.getcapacitor.**
+
+# ---- Cordova plugins ----
+-keep class org.apache.cordova.** { *; }
+-dontwarn org.apache.cordova.**
+
+# ---- App package ----
+-keep class com.rrps.app.** { *; }
+
+# ---- Firebase / Google services ----
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.firebase.**
+-dontwarn com.google.android.gms.**
+
+# ---- WebView JavaScript interface ----
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+# ---- Prevent stripping enums ----
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# ---- Prevent stripping Parcelable ----
+-keep class * implements android.os.Parcelable {
+    public static final android.os.Parcelable$Creator *;
+}
+
+# ---- OkHttp / Okio (used by networking) ----
+-dontwarn okhttp3.**
+-dontwarn okio.**
+
+# ---- Suppress misc warnings ----
+-dontwarn javax.annotation.**
+-dontwarn sun.misc.Unsafe

@@ -1,20 +1,44 @@
-h3{
-  font-size: 1rem;
-  color: gray;
+.legal-page {
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 20px 16px;
+  margin: 16px;
 }
-p{
-  font-size: 0.65rem;
-  color: gray;
-  width: 100%;
-  padding: 2px 10px;
-  text-align: left;
-  span{
-    color: var(--secondary);
+
+h3 {
+  margin: 20px 0 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+
+  &:first-child {
+    margin-top: 0;
   }
 }
-ul{
-  li{
-    font-size: 0.65rem;
-    color: gray;
+
+p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  width: 100%;
+  padding: 0 0 10px;
+  text-align: left;
+
+  span {
+    color: var(--primary);
+    font-weight: 600;
+  }
+}
+
+ul {
+  margin: 0 0 10px;
+  padding-left: 20px;
+
+  li {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
   }
 }

@@ -1234,7 +1234,7 @@ Returns school events and holidays for the calendar view. Only returns events re
 
 ### 21b. Forgot Password (Request OTP)
 
-**Endpoint:** `POST /api/forgotpassword`
+**Endpoint:** `POST /api/forgot_password`
 
 Initiates the password reset flow for a student who cannot remember their current password. Sends a 6-digit OTP to the registered mobile number and returns the masked mobile (last 4 digits visible).
 
@@ -1260,6 +1260,7 @@ Initiates the password reset flow for a student who cannot remember their curren
 { "status": -1, "msg": "Registration ID is required", "data": null }
 { "status": -1, "msg": "No student found with this registration ID", "data": null }
 { "status": -1, "msg": "No mobile number registered. Please contact school administrator", "data": null }
+{ "status": -1, "msg": "Unable to process password reset. Please contact school administrator.", "data": null }
 ```
 
 > **Notes:**
@@ -1269,13 +1270,17 @@ Initiates the password reset flow for a student who cannot remember their curren
 > - Student must be active (`status=1`, `publish=1`)
 > - OTP is stored in `students.reset_otp` column with expiry in `students.reset_otp_expiry`
 > - Calling this endpoint again generates a new OTP (previous one is overwritten)
-> - SMS text format: "Please use OTP {OTP} to reset password for your ward ID No. {regid}. RRPSCH"
+> - SMS text format: "Please use OTP {OTP} to regenerate password for your ward ID No. {regid}. RRPSCH"
+>
+> **SMS Template (DLT) Note:** The wording **"regenerate password"** must match the DLT-approved template registered with the SMS operator exactly. Changing it (e.g. to "reset password") causes the gateway to silently drop the message even though the API returns success.
+>
+> **OTP Persistence Note:** The OTP is written to the DB and then read back to confirm it was actually stored. If the `reset_otp` / `reset_otp_expiry` columns are missing or the ORM metadata cache is stale, the endpoint returns `"Unable to process password reset. Please contact school administrator."` instead of sending an OTP that could never be verified. If you hit this, ensure the columns exist and clear the schema cache on the server: `php bin/cake.php schema_cache clear`.
 
 ---
 
 ### 21c. Verify OTP
 
-**Endpoint:** `POST /api/verifyotp`
+**Endpoint:** `POST /api/verify_otp`
 
 Verifies the OTP sent during forgot password flow. Returns a temporary reset token (SHA1 hash) on success.
 
@@ -1316,7 +1321,7 @@ Verifies the OTP sent during forgot password flow. Returns a temporary reset tok
 
 ### 21d. Reset Password
 
-**Endpoint:** `POST /api/resetpassword`
+**Endpoint:** `POST /api/reset_password`
 
 Sets a new password using the reset token obtained from OTP verification. This endpoint does NOT require the old password.
 
@@ -1349,7 +1354,6 @@ Sets a new password using the reset token obtained from OTP verification. This e
 > **Notes:**
 > - Token is invalidated after use (`reset_otp` and `reset_otp_expiry` cleared)
 > - If token expires (>10 min since OTP verification), it is cleared and error returned
-> - After successful reset, `session_token` is cleared to force re-login on all devices
 > - Student must log in again with the new password
 > - Password is hashed using `sha1(md5(password))` (same as all student passwords)
 
@@ -1363,12 +1367,12 @@ Sets a new password using the reset token obtained from OTP verification. This e
 │   (Login)    │────>│  Enter RegID     │────>│  Enter 6-digit   │────>│  New Password    │
 │              │     │                  │     │  OTP from SMS    │     │  + Confirm       │
 │              │     │ POST             │     │ POST             │     │ POST             │
-│              │     │ /api/forgotpwd   │     │ /api/verifyotp   │     │ /api/resetpwd    │
+│              │     │/api/forgot_pass..│     │ /api/verify_otp  │     │/api/reset_pass.. │
 └──────────────┘     └──────────────────┘     └──────────────────┘     └──────────────────┘
                            │                         │                         │
                            ▼                         ▼                         ▼
                       SMS OTP sent              reset_token              Password saved
-                      Shows: XXXXXX1234        returned (SHA1)          session_token cleared
+                      Shows: XXXXXX1234        returned (SHA1)          OTP/token cleared
                       (last 4 digits)          Valid 10 min             → Redirect to Login
 ```
 
@@ -1381,17 +1385,25 @@ Sets a new password using the reset token obtained from OTP verification. This e
 > ALTER TABLE `students` ADD INDEX `idx_reset_otp` (`reg_id`, `reset_otp`);
 > ```
 >
+> **After running the migration, clear the ORM metadata cache** so CakePHP picks up the new columns (otherwise the cached schema causes OTP writes to be silently dropped, and Verify OTP returns "No OTP request found"):
+> ```bash
+> php bin/cake.php schema_cache clear
+> ```
+> The OTP endpoints write these columns via raw `updateAll()` and verify persistence, so they are resilient to a stale cache — but clearing it is still recommended after any schema change.
+>
+> **Endpoint Naming (verified against live server, August 2026):** The actual server routes use **underscores**: `forgot_password`, `verify_otp`, `reset_password`. The app's `ApiService` calls these underscore endpoints. Do not use camelCase/no-underscore variants (`forgotpassword`, etc.) — the server returns a CakePHP "Missing Method in ApiController" error for those.
+>
 > **Ionic Integration:**
 > ```typescript
 > // Forgot Password Flow
 > forgotPassword(regid: string) {
->   return this.postForm('forgotpassword', { regid });
+>   return this.postForm('forgot_password', { regid });
 > }
 > verifyOtp(regid: string, otp: string) {
->   return this.postForm('verifyotp', { regid, otp });
+>   return this.postForm('verify_otp', { regid, otp });
 > }
 > resetPassword(resetToken: string, newPwd: string, confirmPwd: string) {
->   return this.postForm('resetpassword', {
+>   return this.postForm('reset_password', {
 >     reset_token: resetToken,
 >     newPassword: newPwd,
 >     confirmPassword: confirmPwd
@@ -1402,15 +1414,15 @@ Sets a new password using the reset token obtained from OTP verification. This e
 > **Testing (RegID 4311):**
 > ```bash
 > # Step 1: Request OTP
-> POST /api/forgotpassword  →  { "regid": "4311" }
+> POST /api/forgot_password  →  { "regid": "4311" }
 > # Response shows masked mobile: XXXXXX + last 4 digits
 >
 > # Step 2: Verify OTP (use OTP received via SMS)
-> POST /api/verifyotp  →  { "regid": "4311", "otp": "123456" }
+> POST /api/verify_otp  →  { "regid": "4311", "otp": "123456" }
 > # Response returns reset_token
 >
 > # Step 3: Reset Password
-> POST /api/resetpassword  →  { "reset_token": "abc...", "newPassword": "newpass", "confirmPassword": "newpass" }
+> POST /api/reset_password  →  { "reset_token": "abc...", "newPassword": "newpass", "confirmPassword": "newpass" }
 > ```
 
 ---
@@ -2285,13 +2297,13 @@ export class StudentApiService {
 
   // Forgot / Reset Password
   forgotPassword(regid: string) {
-    return this.postForm('forgotpassword', { regid });
+    return this.postForm('forgot_password', { regid });
   }
   verifyOtp(regid: string, otp: string) {
-    return this.postForm('verifyotp', { regid, otp });
+    return this.postForm('verify_otp', { regid, otp });
   }
   resetPassword(resetToken: string, newPwd: string, confirmPwd: string) {
-    return this.postForm('resetpassword', {
+    return this.postForm('reset_password', {
       reset_token: resetToken,
       newPassword: newPwd,
       confirmPassword: confirmPwd
@@ -2454,9 +2466,9 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 | 19 | Feedback | `/api/feedback` | student_id |
 | 20 | Calendar | `/api/calendar` | student_id |
 | 21 | Change Password | `/api/changepassword` | student_id, oldPassword, newPassword, confirmPassword |
-| 21b | Forgot Password | `/api/forgotpassword` | regid |
-| 21c | Verify OTP | `/api/verifyotp` | regid, otp |
-| 21d | Reset Password | `/api/resetpassword` | reset_token, newPassword, confirmPassword |
+| 21b | Forgot Password | `/api/forgot_password` | regid |
+| 21c | Verify OTP | `/api/verify_otp` | regid, otp |
+| 21d | Reset Password | `/api/reset_password` | reset_token, newPassword, confirmPassword |
 | 22 | Notifications | `/api/notification` | student_id, page, per_page |
 | 22b | Mark Notification Read | `/api/marknotificationread` | student_id, notification_id OR mark_all |
 | 22c | Notification Unread Count | `/api/notificationunreadcount` | student_id |
@@ -2795,4 +2807,4 @@ this.api.getDashboard(this.student.id).subscribe((res: any) => {
 
 ---
 
-**Version:** 2.8 | **Last Updated:** August 2026
+**Version:** 2.9 | **Last Updated:** August 2026

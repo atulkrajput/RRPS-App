@@ -33,16 +33,58 @@
           <ion-icon name="person-outline"></ion-icon>
         </div>
         <div class="feedback-info">
-          <h3>Feedback #{{feedback.id}}</h3>
+          <h3>Teacher Feedback</h3>
           <p class="feedback-date">
             <ion-icon name="calendar-outline"></ion-icon>
-            {{getCurrentDate() | date:'MMM dd, yyyy'}}
+            {{feedback.created | date:'MMM dd, yyyy'}}
           </p>
         </div>
         <span class="modern-badge badge-primary">Received</span>
       </div>
       <div class="feedback-body">
-        <p class="feedback-content">Teacher feedback details will be displayed here once available from the API.</p>
+        <div class="rating-list">
+          <div class="rating-row">
+            <span class="rating-label">Discipline</span>
+            <div class="rating-bar"><div class="rating-fill" [style.width.%]="ratingPercent(feedback.discipline)"></div></div>
+            <span class="rating-value">{{feedback.discipline}}/5</span>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">Responsibility</span>
+            <div class="rating-bar"><div class="rating-fill" [style.width.%]="ratingPercent(feedback.responsibility)"></div></div>
+            <span class="rating-value">{{feedback.responsibility}}/5</span>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">Attitude Towards Studies</span>
+            <div class="rating-bar"><div class="rating-fill" [style.width.%]="ratingPercent(feedback.att_studies)"></div></div>
+            <span class="rating-value">{{feedback.att_studies}}/5</span>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">Attitude Towards Teachers</span>
+            <div class="rating-bar"><div class="rating-fill" [style.width.%]="ratingPercent(feedback.att_teachers)"></div></div>
+            <span class="rating-value">{{feedback.att_teachers}}/5</span>
+          </div>
+          <div class="rating-row">
+            <span class="rating-label">Attitude Towards Peers</span>
+            <div class="rating-bar"><div class="rating-fill" [style.width.%]="ratingPercent(feedback.att_peers)"></div></div>
+            <span class="rating-value">{{feedback.att_peers}}/5</span>
+          </div>
+        </div>
+
+        <div class="remark-block" *ngIf="feedback.teacher_remarks">
+          <ion-icon name="chatbox-outline"></ion-icon>
+          <div>
+            <span class="remark-label">Teacher's Remarks</span>
+            <p>{{feedback.teacher_remarks}}</p>
+          </div>
+        </div>
+
+        <div class="remark-block" *ngIf="feedback.principal_remarks">
+          <ion-icon name="ribbon-outline"></ion-icon>
+          <div>
+            <span class="remark-label">Principal's Remarks</span>
+            <p>{{feedback.principal_remarks}}</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
