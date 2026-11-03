@@ -12,13 +12,27 @@
 -keepattributes Exceptions
 
 # ---- Capacitor ----
+# Capacitor's PluginManager loads every plugin class via Class.forName() using the
+# literal classpath string in capacitor.plugins.json, and throws a fatal
+# PluginLoadException on the first class it can't find — so every plugin package
+# must be kept, not just the core com.getcapacitor.* bridge classes.
 -keep class com.getcapacitor.** { *; }
 -keep class com.getcapacitor.plugin.** { *; }
+-keep class com.capacitorjs.plugins.** { *; }
 -dontwarn com.getcapacitor.**
+-dontwarn com.capacitorjs.plugins.**
 
 # ---- Cordova plugins ----
+# Cordova's plugin manager instantiates plugins the same way, by the literal
+# android-package class name declared in config.xml — not every Cordova plugin
+# lives under org.apache.cordova, so each actual package must be kept explicitly.
 -keep class org.apache.cordova.** { *; }
 -dontwarn org.apache.cordova.**
+-keep class uk.co.whiteoctober.cordova.** { *; }
+-dontwarn uk.co.whiteoctober.cordova.**
+-keep class org.pushandplay.cordova.** { *; }
+-dontwarn org.pushandplay.cordova.**
+-keep class NativeStorage { *; }
 
 # ---- App package ----
 -keep class com.rrps.app.** { *; }
